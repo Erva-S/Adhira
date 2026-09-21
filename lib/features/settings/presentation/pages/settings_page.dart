@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 
 /// Settings page.
 class SettingsPage extends StatelessWidget {
@@ -10,7 +11,10 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(
+        leading: const AppBackButton(fallbackRoute: RouteNames.profile),
+        title: const Text('Settings'),
+      ),
       body: ListView(
         children: [
           _SettingsSection(title: 'Preferences', items: [

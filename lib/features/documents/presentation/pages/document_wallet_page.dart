@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
 import '../../../../shared/widgets/app_bottom_nav.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -69,15 +71,121 @@ class _DocumentWalletPageState extends State<DocumentWalletPage> {
           // Document cards
           Expanded(
             child: ListView(
-              children: const [
-                DocCard(name: 'Aadhaar Card', category: DocumentCategory.identity, status: DocumentStatus.verified),
-                DocCard(name: 'ST Certificate', category: DocumentCategory.caste, status: DocumentStatus.uploaded),
-                DocCard(name: 'Income Certificate', category: DocumentCategory.income, status: DocumentStatus.rejected),
-                DocCard(name: 'Class 12 Marksheet', category: DocumentCategory.academic, status: DocumentStatus.verified, isFromDigiLocker: true),
-                DocCard(name: 'College Enrollment', category: DocumentCategory.academic, status: DocumentStatus.verified),
-                DocCard(name: 'Bank Passbook', category: DocumentCategory.bank, status: DocumentStatus.uploaded),
-                DocCard(name: 'Domicile Certificate', category: DocumentCategory.address, status: DocumentStatus.verified, isFromDigiLocker: true),
-                DocCard(name: 'Passport Photo', category: DocumentCategory.photo, status: DocumentStatus.verified),
+              children: [
+                DocCard(
+                  name: 'Aadhaar Card',
+                  category: DocumentCategory.identity,
+                  status: DocumentStatus.verified,
+                  onTap: () => context.push(
+                    RouteNames.documentDetails,
+                    extra: {
+                      'name': 'Aadhaar Card',
+                      'category': DocumentCategory.identity,
+                      'status': DocumentStatus.verified,
+                      'isFromDigiLocker': false,
+                    },
+                  ),
+                ),
+                DocCard(
+                  name: 'ST Certificate',
+                  category: DocumentCategory.caste,
+                  status: DocumentStatus.uploaded,
+                  onTap: () => context.push(
+                    RouteNames.documentDetails,
+                    extra: {
+                      'name': 'ST Certificate',
+                      'category': DocumentCategory.caste,
+                      'status': DocumentStatus.uploaded,
+                      'isFromDigiLocker': false,
+                    },
+                  ),
+                ),
+                DocCard(
+                  name: 'Income Certificate',
+                  category: DocumentCategory.income,
+                  status: DocumentStatus.rejected,
+                  onTap: () => context.push(
+                    RouteNames.documentDetails,
+                    extra: {
+                      'name': 'Income Certificate',
+                      'category': DocumentCategory.income,
+                      'status': DocumentStatus.rejected,
+                      'isFromDigiLocker': false,
+                    },
+                  ),
+                ),
+                DocCard(
+                  name: 'Class 12 Marksheet',
+                  category: DocumentCategory.academic,
+                  status: DocumentStatus.verified,
+                  isFromDigiLocker: true,
+                  onTap: () => context.push(
+                    RouteNames.documentDetails,
+                    extra: {
+                      'name': 'Class 12 Marksheet',
+                      'category': DocumentCategory.academic,
+                      'status': DocumentStatus.verified,
+                      'isFromDigiLocker': true,
+                    },
+                  ),
+                ),
+                DocCard(
+                  name: 'College Enrollment',
+                  category: DocumentCategory.academic,
+                  status: DocumentStatus.verified,
+                  onTap: () => context.push(
+                    RouteNames.documentDetails,
+                    extra: {
+                      'name': 'College Enrollment',
+                      'category': DocumentCategory.academic,
+                      'status': DocumentStatus.verified,
+                      'isFromDigiLocker': false,
+                    },
+                  ),
+                ),
+                DocCard(
+                  name: 'Bank Passbook',
+                  category: DocumentCategory.bank,
+                  status: DocumentStatus.uploaded,
+                  onTap: () => context.push(
+                    RouteNames.documentDetails,
+                    extra: {
+                      'name': 'Bank Passbook',
+                      'category': DocumentCategory.bank,
+                      'status': DocumentStatus.uploaded,
+                      'isFromDigiLocker': false,
+                    },
+                  ),
+                ),
+                DocCard(
+                  name: 'Domicile Certificate',
+                  category: DocumentCategory.address,
+                  status: DocumentStatus.verified,
+                  isFromDigiLocker: true,
+                  onTap: () => context.push(
+                    RouteNames.documentDetails,
+                    extra: {
+                      'name': 'Domicile Certificate',
+                      'category': DocumentCategory.address,
+                      'status': DocumentStatus.verified,
+                      'isFromDigiLocker': true,
+                    },
+                  ),
+                ),
+                DocCard(
+                  name: 'Passport Photo',
+                  category: DocumentCategory.photo,
+                  status: DocumentStatus.verified,
+                  onTap: () => context.push(
+                    RouteNames.documentDetails,
+                    extra: {
+                      'name': 'Passport Photo',
+                      'category': DocumentCategory.photo,
+                      'status': DocumentStatus.verified,
+                      'isFromDigiLocker': false,
+                    },
+                  ),
+                ),
               ],
             ),
           ),

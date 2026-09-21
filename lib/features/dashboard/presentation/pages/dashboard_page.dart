@@ -41,7 +41,7 @@ class DashboardPage extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      onPressed: () => context.go(RouteNames.notifications),
+                      onPressed: () => context.push(RouteNames.notifications),
                       icon: Badge(
                         label: const Text('3'),
                         child: const Icon(Icons.notifications_outlined),
@@ -101,17 +101,17 @@ class DashboardPage extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   children: [
                     _QuickAction(icon: Icons.search, label: 'Find\nSchemes', color: AppColors.postMatric, onTap: () => context.go(RouteNames.scholarshipDiscovery)),
-                    _QuickAction(icon: Icons.checklist, label: 'Check\nEligibility', color: AppColors.preMatric, onTap: () => context.go(RouteNames.eligibilityChecker)),
-                    _QuickAction(icon: Icons.track_changes, label: 'Track\nApplication', color: AppColors.nfst, onTap: () => context.go(RouteNames.applicationTracking)),
-                    _QuickAction(icon: Icons.verified_user, label: 'Verification\nCentre', color: AppColors.topClass, onTap: () => context.go(RouteNames.verificationCentre)),
-                    _QuickAction(icon: Icons.payment, label: 'Payment\nStatus', color: AppColors.nos, onTap: () => context.go(RouteNames.payments)),
+                    _QuickAction(icon: Icons.checklist, label: 'Check\nEligibility', color: AppColors.preMatric, onTap: () => context.push(RouteNames.eligibilityChecker)),
+                    _QuickAction(icon: Icons.track_changes, label: 'Track\nApplication', color: AppColors.nfst, onTap: () => context.push(RouteNames.applicationTracking)),
+                    _QuickAction(icon: Icons.verified_user, label: 'Verification\nCentre', color: AppColors.topClass, onTap: () => context.push(RouteNames.verificationCentre)),
+                    _QuickAction(icon: Icons.payment, label: 'Payment\nStatus', color: AppColors.nos, onTap: () => context.push(RouteNames.payments)),
                   ],
                 ),
               ),
               const SizedBox(height: 8),
 
               // ── Current Application ──────────────────────────────
-              SectionHeader(title: 'Current Application', actionText: 'View All', onAction: () => context.go(RouteNames.applicationTracking)),
+              SectionHeader(title: 'Current Application', actionText: 'View All', onAction: () => context.push(RouteNames.applicationTracking)),
               Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 child: Padding(
@@ -138,7 +138,7 @@ class DashboardPage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      AppButton(label: 'View Details', variant: AppButtonVariant.outline, size: AppButtonSize.small, onPressed: () => context.go(RouteNames.applicationTracking)),
+                      AppButton(label: 'View Details', variant: AppButtonVariant.outline, size: AppButtonSize.small, onPressed: () => context.push(RouteNames.applicationTracking)),
                     ],
                   ),
                 ),
@@ -146,7 +146,7 @@ class DashboardPage extends StatelessWidget {
               const SizedBox(height: 16),
 
               // ── Payment Status ───────────────────────────────────
-              SectionHeader(title: 'Payment Status', actionText: 'Details', onAction: () => context.go(RouteNames.payments)),
+              SectionHeader(title: 'Payment Status', actionText: 'Details', onAction: () => context.push(RouteNames.payments)),
               Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 child: Padding(
@@ -187,11 +187,81 @@ class DashboardPage extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   children: [
-                    _SchemeChip(name: 'Pre-Matric', icon: Icons.school, color: AppColors.preMatric),
-                    _SchemeChip(name: 'Post-Matric', icon: Icons.menu_book, color: AppColors.postMatric),
-                    _SchemeChip(name: 'Top Class', icon: Icons.star, color: AppColors.topClass),
-                    _SchemeChip(name: 'NFST', icon: Icons.science, color: AppColors.nfst),
-                    _SchemeChip(name: 'NOS', icon: Icons.flight, color: AppColors.nos),
+                    _SchemeChip(
+                      name: 'Pre-Matric',
+                      icon: Icons.school,
+                      color: AppColors.preMatric,
+                      onTap: () => context.push(
+                        RouteNames.scholarshipDetails,
+                        extra: {
+                          'name': 'Pre-Matric Scholarship for ST',
+                          'type': ScholarshipType.preMatric,
+                          'description': 'Financial assistance for ST students studying in classes 9 and 10 to reduce dropout rates.',
+                          'amount': 'Up to ₹10,000/year',
+                          'deadline': '31 Dec 2025',
+                        },
+                      ),
+                    ),
+                    _SchemeChip(
+                      name: 'Post-Matric',
+                      icon: Icons.menu_book,
+                      color: AppColors.postMatric,
+                      onTap: () => context.push(
+                        RouteNames.scholarshipDetails,
+                        extra: {
+                          'name': 'Post-Matric Scholarship for ST',
+                          'type': ScholarshipType.postMatric,
+                          'description': 'Support for ST students pursuing post-matriculation courses including professional and technical courses.',
+                          'amount': 'Up to ₹1,30,000/year',
+                          'deadline': '31 Jan 2026',
+                        },
+                      ),
+                    ),
+                    _SchemeChip(
+                      name: 'Top Class',
+                      icon: Icons.star,
+                      color: AppColors.topClass,
+                      onTap: () => context.push(
+                        RouteNames.scholarshipDetails,
+                        extra: {
+                          'name': 'Top Class Education for ST',
+                          'type': ScholarshipType.topClass,
+                          'description': 'Full financial support for ST students admitted to top institutions like IITs, IIMs, NITs, AIIMS.',
+                          'amount': 'Full tuition + allowance',
+                          'deadline': '28 Feb 2026',
+                        },
+                      ),
+                    ),
+                    _SchemeChip(
+                      name: 'NFST',
+                      icon: Icons.science,
+                      color: AppColors.nfst,
+                      onTap: () => context.push(
+                        RouteNames.scholarshipDetails,
+                        extra: {
+                          'name': 'National Fellowship for ST (NFST)',
+                          'type': ScholarshipType.nfst,
+                          'description': 'Fellowship for ST students pursuing M.Phil and Ph.D in universities, colleges, and institutions.',
+                          'amount': '₹31,000-₹35,000/month',
+                          'deadline': '15 Mar 2026',
+                        },
+                      ),
+                    ),
+                    _SchemeChip(
+                      name: 'NOS',
+                      icon: Icons.flight,
+                      color: AppColors.nos,
+                      onTap: () => context.push(
+                        RouteNames.scholarshipDetails,
+                        extra: {
+                          'name': 'National Overseas Scholarship',
+                          'type': ScholarshipType.nos,
+                          'description': 'Support for ST students to study abroad at Masters and Ph.D level in accredited institutions.',
+                          'amount': 'Full funding abroad',
+                          'deadline': '30 Apr 2026',
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -264,31 +334,42 @@ class _SchemeChip extends StatelessWidget {
   final String name;
   final IconData icon;
   final Color color;
-  const _SchemeChip({required this.name, required this.icon, required this.color});
+  final VoidCallback? onTap;
+
+  const _SchemeChip({
+    required this.name,
+    required this.icon,
+    required this.color,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Container(
-        width: 100,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.2)),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: color.withOpacity(0.15), shape: BoxShape.circle),
-              child: Icon(icon, size: 24, color: color),
-            ),
-            const SizedBox(height: 10),
-            Text(name, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color), textAlign: TextAlign.center),
-          ],
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          width: 100,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: color.withOpacity(0.2)),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: color.withOpacity(0.15), shape: BoxShape.circle),
+                child: Icon(icon, size: 24, color: color),
+              ),
+              const SizedBox(height: 10),
+              Text(name, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color), textAlign: TextAlign.center),
+            ],
+          ),
         ),
       ),
     );

@@ -1,4 +1,3 @@
-```dart
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
 import 'router/app_router.dart';
@@ -16,4 +15,3 @@ class TribalScholarApp extends StatelessWidget {
     );
   }
 }
-```

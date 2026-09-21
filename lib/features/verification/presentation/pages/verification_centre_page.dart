@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/enums/app_enums.dart';
 import '../../../../shared/widgets/verification_card.dart';
+import '../../../../shared/widgets/app_back_button.dart';
+import '../../../../app/router/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 
 /// Verification centre showing all verification checks.
@@ -10,7 +12,10 @@ class VerificationCentrePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Verification Centre')),
+      appBar: AppBar(
+        leading: const AppBackButton(fallbackRoute: RouteNames.dashboard),
+        title: const Text('Verification Centre'),
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
