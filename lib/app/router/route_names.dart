@@ -13,6 +13,7 @@ class RouteNames {
   static const String dashboard = '/dashboard';
 
   // ── Scholarships ──────────────────────────────────────────────
+  static const String scholarshipDashboard = '/scholarship-dashboard';
   static const String scholarshipDiscovery = '/scholarships';
   static const String scholarshipDetails = '/scholarships/:id';
 
@@ -21,9 +22,10 @@ class RouteNames {
   static const String eligibilityResult = '/eligibility/result';
 
   // ── Applications ──────────────────────────────────────────────
-  static const String applicationTracking = '/applications';
+  static const String applicationsList = '/applications';
+  static const String applicationTracking = '/applications/tracking';
   static const String applicationForm = '/applications/new';
-  static const String applicationDetails = '/applications/:id';
+  static const String applicationDetails = '/applications/detail';
 
   // ── Verification ──────────────────────────────────────────────
   static const String verificationCentre = '/verification';

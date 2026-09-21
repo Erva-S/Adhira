@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
+import '../../../../services/scholarship/scholarship_data_service.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/status_badge.dart';
@@ -62,40 +65,43 @@ class ScholarshipDetailPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      const StatusBadge(label: 'Open for 2025-26', variant: StatusBadgeVariant.success),
+                      const Spacer(),
+                      const StatusBadge(label: 'Applications Open', variant: StatusBadgeVariant.success),
                     ],
                   ),
                   const SizedBox(height: 12),
                   Text(
                     name,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.bold,
+                          height: 1.2,
                         ),
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    'Ministry of Tribal Affairs (MoTA), Govt. of India',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                  const Text(
+                    'Ministry of Tribal Affairs, Government of India',
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 12,
+                    ),
                   ),
                 ],
               ),
             ),
 
+            // Content body
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Overview stats
+                  // Key stats row
                   Row(
                     children: [
                       Expanded(
                         child: _StatBox(
                           icon: Icons.currency_rupee,
-                          title: 'Benefit Amount',
+                          title: 'Max Amount',
                           value: amount,
                           color: AppColors.success,
                         ),
@@ -132,6 +138,23 @@ class ScholarshipDetailPage extends StatelessWidget {
                   const _CheckItem(text: 'Family annual income from all sources must not exceed ₹2.50 Lakh.'),
                   const _CheckItem(text: 'Must be enrolled in a recognised post-matric/post-secondary course.'),
                   const _CheckItem(text: 'Must hold a valid Aadhaar-linked bank account.'),
+                  const SizedBox(height: 20),
+
+                  // Required Documents
+                  Text('Required Documents', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _DocBadge('ST Certificate'),
+                      _DocBadge('Income Certificate'),
+                      _DocBadge('Aadhaar Card'),
+                      _DocBadge('Marksheet'),
+                      _DocBadge('Bank Passbook'),
+                      _DocBadge('Bonafide Cert'),
+                    ],
+                  ),
                   const SizedBox(height: 24),
 
                   // Apply button
@@ -139,8 +162,10 @@ class ScholarshipDetailPage extends StatelessWidget {
                     label: 'Apply for this Scheme',
                     icon: Icons.send,
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Application form submitted!')),
+                      final scheme = context.read<ScholarshipDataService>().getScholarshipByType(type);
+                      context.push(
+                        RouteNames.applicationForm,
+                        extra: {'scholarship': scheme},
                       );
                     },
                   ),
@@ -149,6 +174,8 @@ class ScholarshipDetailPage extends StatelessWidget {
                     onPressed: () {
                       if (Navigator.of(context).canPop()) {
                         Navigator.of(context).pop();
+                      } else {
+                        context.go(RouteNames.scholarshipDiscovery);
                       }
                     },
                     icon: const Icon(Icons.arrow_back),
@@ -179,6 +206,31 @@ class ScholarshipDetailPage extends StatelessWidget {
       case ScholarshipType.nos:
         return AppColors.nos;
     }
+  }
+}
+
+class _DocBadge extends StatelessWidget {
+  final String label;
+  const _DocBadge(this.label);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.description_outlined, size: 14, color: AppColors.primary),
+          const SizedBox(width: 6),
+          Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+        ],
+      ),
+    );
   }
 }
 
