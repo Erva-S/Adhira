@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
 import '../../../../shared/widgets/app_bottom_nav.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -66,13 +68,23 @@ class _ScholarshipDiscoveryPageState extends State<ScholarshipDiscoveryPage> {
           // Scholarship list
           Expanded(
             child: ListView(
-              children: const [
+              children: [
                 ScholarshipCard(
                   name: 'Pre-Matric Scholarship for ST',
                   type: ScholarshipType.preMatric,
                   description: 'Financial assistance for ST students studying in classes 9 and 10 to reduce dropout rates.',
                   amount: 'Up to ₹10,000/year',
                   deadline: '31 Dec 2025',
+                  onTap: () => context.push(
+                    RouteNames.scholarshipDetails,
+                    extra: {
+                      'name': 'Pre-Matric Scholarship for ST',
+                      'type': ScholarshipType.preMatric,
+                      'description': 'Financial assistance for ST students studying in classes 9 and 10 to reduce dropout rates.',
+                      'amount': 'Up to ₹10,000/year',
+                      'deadline': '31 Dec 2025',
+                    },
+                  ),
                 ),
                 ScholarshipCard(
                   name: 'Post-Matric Scholarship for ST',
@@ -80,6 +92,16 @@ class _ScholarshipDiscoveryPageState extends State<ScholarshipDiscoveryPage> {
                   description: 'Support for ST students pursuing post-matriculation courses including professional and technical courses.',
                   amount: 'Up to ₹1,30,000/year',
                   deadline: '31 Jan 2026',
+                  onTap: () => context.push(
+                    RouteNames.scholarshipDetails,
+                    extra: {
+                      'name': 'Post-Matric Scholarship for ST',
+                      'type': ScholarshipType.postMatric,
+                      'description': 'Support for ST students pursuing post-matriculation courses including professional and technical courses.',
+                      'amount': 'Up to ₹1,30,000/year',
+                      'deadline': '31 Jan 2026',
+                    },
+                  ),
                 ),
                 ScholarshipCard(
                   name: 'Top Class Education for ST',
@@ -87,6 +109,16 @@ class _ScholarshipDiscoveryPageState extends State<ScholarshipDiscoveryPage> {
                   description: 'Full financial support for ST students admitted to top institutions like IITs, IIMs, NITs, AIIMS.',
                   amount: 'Full tuition + allowance',
                   deadline: '28 Feb 2026',
+                  onTap: () => context.push(
+                    RouteNames.scholarshipDetails,
+                    extra: {
+                      'name': 'Top Class Education for ST',
+                      'type': ScholarshipType.topClass,
+                      'description': 'Full financial support for ST students admitted to top institutions like IITs, IIMs, NITs, AIIMS.',
+                      'amount': 'Full tuition + allowance',
+                      'deadline': '28 Feb 2026',
+                    },
+                  ),
                 ),
                 ScholarshipCard(
                   name: 'National Fellowship for ST (NFST)',
@@ -94,6 +126,16 @@ class _ScholarshipDiscoveryPageState extends State<ScholarshipDiscoveryPage> {
                   description: 'Fellowship for ST students pursuing M.Phil and Ph.D in universities, colleges, and institutions.',
                   amount: '₹31,000-₹35,000/month',
                   deadline: '15 Mar 2026',
+                  onTap: () => context.push(
+                    RouteNames.scholarshipDetails,
+                    extra: {
+                      'name': 'National Fellowship for ST (NFST)',
+                      'type': ScholarshipType.nfst,
+                      'description': 'Fellowship for ST students pursuing M.Phil and Ph.D in universities, colleges, and institutions.',
+                      'amount': '₹31,000-₹35,000/month',
+                      'deadline': '15 Mar 2026',
+                    },
+                  ),
                 ),
                 ScholarshipCard(
                   name: 'National Overseas Scholarship',
@@ -101,6 +143,16 @@ class _ScholarshipDiscoveryPageState extends State<ScholarshipDiscoveryPage> {
                   description: 'Support for ST students to study abroad at Masters and Ph.D level in accredited institutions.',
                   amount: 'Full funding abroad',
                   deadline: '30 Apr 2026',
+                  onTap: () => context.push(
+                    RouteNames.scholarshipDetails,
+                    extra: {
+                      'name': 'National Overseas Scholarship',
+                      'type': ScholarshipType.nos,
+                      'description': 'Support for ST students to study abroad at Masters and Ph.D level in accredited institutions.',
+                      'amount': 'Full funding abroad',
+                      'deadline': '30 Apr 2026',
+                    },
+                  ),
                 ),
               ],
             ),

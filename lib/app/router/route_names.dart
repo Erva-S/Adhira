@@ -31,6 +31,7 @@ class RouteNames {
 
   // ── Documents ─────────────────────────────────────────────────
   static const String documentWallet = '/documents';
+  static const String documentDetails = '/documents/detail';
   static const String documentUpload = '/documents/upload';
 
   // ── Payments ──────────────────────────────────────────────────
@@ -39,6 +40,7 @@ class RouteNames {
 
   // ── Notifications ─────────────────────────────────────────────
   static const String notifications = '/notifications';
+  static const String notificationDetails = '/notifications/detail';
 
   // ── JAGO Chatbot ──────────────────────────────────────────────
   static const String jago = '/jago';

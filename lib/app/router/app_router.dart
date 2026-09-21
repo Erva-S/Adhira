@@ -16,6 +16,11 @@ import '../../features/notifications/presentation/pages/notifications_page.dart'
 import '../../features/jago/presentation/pages/jago_chat_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
+import '../../features/notifications/presentation/pages/notification_detail_page.dart';
+import '../../features/scholarships/presentation/pages/scholarship_detail_page.dart';
+import '../../features/documents/presentation/pages/document_detail_page.dart';
+import '../../features/profile/presentation/pages/profile_edit_page.dart';
+import '../../core/enums/app_enums.dart';
 
 /// Application router configuration using GoRouter.
 class AppRouter {
@@ -101,6 +106,52 @@ class AppRouter {
         path: RouteNames.settings,
         name: 'settings',
         builder: (context, state) => const SettingsPage(),
+      ),
+      GoRoute(
+        path: RouteNames.notificationDetails,
+        name: 'notificationDetails',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return NotificationDetailPage(
+            title: extra?['title'] as String? ?? 'Notification',
+            message: extra?['message'] as String? ?? 'No message content available.',
+            time: extra?['time'] as String? ?? 'Just now',
+            type: extra?['type'] as NotificationType? ?? NotificationType.system,
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteNames.scholarshipDetails,
+        name: 'scholarshipDetails',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return ScholarshipDetailPage(
+            name: extra?['name'] as String? ?? 'Scholarship Scheme',
+            type: extra?['type'] as ScholarshipType? ?? ScholarshipType.postMatric,
+            description: extra?['description'] as String? ??
+                'Comprehensive scholarship scheme for ST students.',
+            amount: extra?['amount'] as String? ?? 'Up to ₹1,30,000/year',
+            deadline: extra?['deadline'] as String? ?? '31 Jan 2026',
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteNames.documentDetails,
+        name: 'documentDetails',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return DocumentDetailPage(
+            name: extra?['name'] as String? ?? 'Document',
+            category: extra?['category'] as DocumentCategory? ?? DocumentCategory.identity,
+            status: extra?['status'] as DocumentStatus? ?? DocumentStatus.uploaded,
+            isFromDigiLocker: extra?['isFromDigiLocker'] as bool? ?? false,
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteNames.profileEdit,
+        name: 'profileEdit',
+        builder: (context, state) => const ProfileEditPage(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

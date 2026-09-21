@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/status_badge.dart';
 import '../../../../shared/widgets/timeline_stage.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -12,7 +14,10 @@ class ApplicationTrackingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Application Tracking')),
+      appBar: AppBar(
+        leading: const AppBackButton(fallbackRoute: RouteNames.dashboard),
+        title: const Text('Application Tracking'),
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

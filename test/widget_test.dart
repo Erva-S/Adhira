@@ -12,5 +12,6 @@ void main() {
   testWidgets('App smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(const TribalScholarApp());
     expect(find.byType(TribalScholarApp), findsOneWidget);
+    await tester.pumpAndSettle(const Duration(seconds: 4));
   });
 }

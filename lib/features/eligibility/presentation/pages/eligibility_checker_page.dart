@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/router/route_names.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 
 /// Multi-step eligibility checker page.
@@ -37,7 +40,10 @@ class _EligibilityCheckerPageState extends State<EligibilityCheckerPage> {
   Widget build(BuildContext context) {
     final question = _questions[_currentStep];
     return Scaffold(
-      appBar: AppBar(title: const Text('Eligibility Checker')),
+      appBar: AppBar(
+        leading: const AppBackButton(fallbackRoute: RouteNames.dashboard),
+        title: const Text('Eligibility Checker'),
+      ),
       body: Column(
         children: [
           // Step indicator
@@ -187,7 +193,13 @@ class _EligibilityCheckerPageState extends State<EligibilityCheckerPage> {
             Text('⚠️ Final eligibility is subject to official verification.',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.warning, fontStyle: FontStyle.italic), textAlign: TextAlign.center),
             const SizedBox(height: 24),
-            AppButton(label: 'View Eligible Schemes', onPressed: () => Navigator.pop(context)),
+            AppButton(
+              label: 'View Eligible Schemes',
+              onPressed: () {
+                Navigator.pop(context);
+                context.go(RouteNames.scholarshipDiscovery);
+              },
+            ),
             const SizedBox(height: 16),
           ],
         ),

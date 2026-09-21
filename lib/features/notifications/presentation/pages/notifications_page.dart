@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 
 /// Notifications list page.
 class NotificationsPage extends StatelessWidget {
@@ -19,6 +22,7 @@ class NotificationsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: const AppBackButton(fallbackRoute: RouteNames.dashboard),
         title: const Text('Notifications'),
         actions: [
           TextButton(onPressed: () {}, child: const Text('Mark all read')),
@@ -29,10 +33,21 @@ class NotificationsPage extends StatelessWidget {
         separatorBuilder: (_, __) => const Divider(height: 1),
         itemBuilder: (context, index) {
           final notif = notifications[index];
-          return Container(
-            color: notif.isRead ? null : AppColors.primary.withOpacity(0.03),
+          return Material(
+            color: notif.isRead ? Colors.transparent : AppColors.primary.withOpacity(0.03),
             child: ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              onTap: () {
+                context.push(
+                  RouteNames.notificationDetails,
+                  extra: {
+                    'title': notif.title,
+                    'message': notif.message,
+                    'time': notif.time,
+                    'type': notif.type,
+                  },
+                );
+              },
               leading: Container(
                 width: 40,
                 height: 40,

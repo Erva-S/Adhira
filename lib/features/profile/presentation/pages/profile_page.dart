@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/router/route_names.dart';
 import '../../../../shared/widgets/app_bottom_nav.dart';
 
 /// Student profile page.
@@ -12,7 +14,16 @@ class ProfilePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('My Profile'),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
+          IconButton(
+            onPressed: () => context.push(RouteNames.profileEdit),
+            icon: const Icon(Icons.edit),
+            tooltip: 'Edit Profile',
+          ),
+          IconButton(
+            onPressed: () => context.push(RouteNames.settings),
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: 'Settings',
+          ),
         ],
       ),
       body: SingleChildScrollView(
