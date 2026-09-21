@@ -1,19 +1,16 @@
-/// Abstract DigiLocker integration service.
-abstract class DigiLockerService {
-  /// Initiate DigiLocker OAuth flow and return auth URL.
-  Future<String> getAuthUrl();
+import 'dart:typed_data';
 
-  /// Exchange authorization code for access token.
-  Future<String?> exchangeCode(String code);
+/// Integration status of an external government gateway.
+enum IntegrationStatus {
+  mockDemo('Demo Mode (Simulated Response)'),
+  readyForCredentials('Integration-Ready (Awaiting API Credentials)'),
+  connected('Live Connected');
 
-  /// Fetch list of available documents from user's DigiLocker.
-  Future<List<DigiLockerDocument>> fetchDocuments(String accessToken);
-
-  /// Download a specific document.
-  Future<DigiLockerDocumentData?> downloadDocument(String accessToken, String docUri);
+  final String label;
+  const IntegrationStatus(this.label);
 }
 
-/// Represents a document available in DigiLocker.
+/// Represents a document available from the citizen's DigiLocker account.
 class DigiLockerDocument {
   final String uri;
   final String name;
@@ -35,7 +32,7 @@ class DigiLockerDocumentData {
   final String uri;
   final String name;
   final String mimeType;
-  final List<int> bytes;
+  final Uint8List bytes;
 
   const DigiLockerDocumentData({
     required this.uri,
@@ -45,30 +42,104 @@ class DigiLockerDocumentData {
   });
 }
 
-/// Mock DigiLocker service for development.
+/// Abstract DigiLocker service boundary.
+///
+/// Follows Part 14: Clean service interface with connect(), disconnect(),
+/// getAvailableDocuments(), and importDocument().
+abstract class DigiLockerService {
+  IntegrationStatus get status;
+  bool get isConnected;
+
+  /// Connect to DigiLocker OAuth gateway.
+  Future<bool> connect();
+
+  /// Disconnect DigiLocker session.
+  Future<void> disconnect();
+
+  /// Fetch list of available certificates from user's DigiLocker.
+  Future<List<DigiLockerDocument>> getAvailableDocuments();
+
+  /// Import a specific document and return its data for saving into student's wallet.
+  Future<DigiLockerDocumentData?> importDocument(String docUri, String userId);
+}
+
+/// Simulated DigiLocker service for prototype & demonstration.
+/// Clearly identified as Demo Mode (never claims to be live government API).
 class MockDigiLockerService implements DigiLockerService {
-  @override
-  Future<String> getAuthUrl() async => 'https://digilocker.gov.in/mock-auth';
+  bool _connected = false;
 
   @override
-  Future<String?> exchangeCode(String code) async {
-    await Future.delayed(const Duration(seconds: 1));
-    return 'mock_digilocker_token';
+  IntegrationStatus get status => IntegrationStatus.readyForCredentials;
+
+  @override
+  bool get isConnected => _connected;
+
+  @override
+  Future<bool> connect() async {
+    // Simulate OAuth delay
+    await Future.delayed(const Duration(milliseconds: 800));
+    _connected = true;
+    return true;
   }
 
   @override
-  Future<List<DigiLockerDocument>> fetchDocuments(String accessToken) async {
-    await Future.delayed(const Duration(seconds: 1));
-    return const [
-      DigiLockerDocument(uri: 'dl://aadhaar', name: 'Aadhaar Card', issuer: 'UIDAI', docType: 'ADHAR'),
-      DigiLockerDocument(uri: 'dl://class12', name: 'Class 12 Marksheet', issuer: 'CBSE', docType: 'MRKSHT'),
-      DigiLockerDocument(uri: 'dl://domicile', name: 'Domicile Certificate', issuer: 'State Govt', docType: 'DOMCL'),
+  Future<void> disconnect() async {
+    _connected = false;
+  }
+
+  @override
+  Future<List<DigiLockerDocument>> getAvailableDocuments() async {
+    if (!_connected) {
+      await connect();
+    }
+    await Future.delayed(const Duration(milliseconds: 600));
+
+    return [
+      DigiLockerDocument(
+        uri: 'dl://uidai/aadhaar_card',
+        name: 'Aadhaar Card',
+        issuer: 'UIDAI',
+        docType: 'ADHAR',
+        issuedDate: DateTime(2021, 5, 10),
+      ),
+      DigiLockerDocument(
+        uri: 'dl://edistrict/st_caste_cert',
+        name: 'ST Community Certificate',
+        issuer: 'Revenue Department, Govt of Odisha',
+        docType: 'CASTE_ST',
+        issuedDate: DateTime(2023, 7, 18),
+      ),
+      DigiLockerDocument(
+        uri: 'dl://cbse/class12_marksheet',
+        name: 'Class 12 Passing Certificate & Marksheet',
+        issuer: 'Central Board of Secondary Education (CBSE)',
+        docType: 'ACADEMIC_12',
+        issuedDate: DateTime(2023, 6, 5),
+      ),
+      DigiLockerDocument(
+        uri: 'dl://edistrict/income_cert',
+        name: 'Annual Income Certificate (2025-26)',
+        issuer: 'Tahasildar Baripada',
+        docType: 'INCOME_CERT',
+        issuedDate: DateTime(2025, 4, 12),
+      ),
     ];
   }
 
   @override
-  Future<DigiLockerDocumentData?> downloadDocument(String accessToken, String docUri) async {
-    await Future.delayed(const Duration(seconds: 1));
-    return null; // Stub
+  Future<DigiLockerDocumentData?> importDocument(String docUri, String userId) async {
+    await Future.delayed(const Duration(milliseconds: 700));
+
+    // Simulated dummy PDF binary bytes
+    final dummyBytes = Uint8List.fromList(
+      'MoTA DigiLocker Verified Document Payload [$docUri] for $userId'.codeUnits,
+    );
+
+    return DigiLockerDocumentData(
+      uri: docUri,
+      name: docUri.split('/').last.replaceAll('_', ' ').toUpperCase(),
+      mimeType: 'application/pdf',
+      bytes: dummyBytes,
+    );
   }
 }

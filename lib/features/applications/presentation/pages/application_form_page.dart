@@ -5,6 +5,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
 import '../../../../services/scholarship/scholarship_data_service.dart';
+import '../../../../services/authentication/auth_provider.dart';
 import '../../../../shared/models/models.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -75,6 +76,8 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
   // Step 5: Review declaration
   bool _declarationChecked = false;
 
+  bool _prefilled = false;
+
   @override
   void initState() {
     super.initState();
@@ -83,6 +86,58 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
     _schemeName = init?.name ?? 'Post-Matric Scholarship for ST Students';
     _schemeId = init?.id ?? 'sch-post-matric';
     _requestedAmount = init?.maxAmount ?? 70000;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_prefilled) {
+      AuthProvider? authProvider;
+      try {
+        authProvider = Provider.of<AuthProvider>(context, listen: false);
+      } catch (_) {}
+      final user = authProvider?.currentUser;
+      if (user != null) {
+        if (user.fullName.isNotEmpty) _nameController.text = user.fullName;
+        if (user.mobileNumber != null && user.mobileNumber!.isNotEmpty) {
+          _mobileController.text = '+91 ${user.mobileNumber}';
+        }
+        if (user.email != null && user.email!.isNotEmpty) {
+          _emailController.text = user.email!;
+        }
+        if (user.aadhaarNumber != null && user.aadhaarNumber!.isNotEmpty) {
+          _aadhaarController.text = user.aadhaarNumber!;
+        }
+        if (user.tribeName != null && user.tribeName!.isNotEmpty) {
+          _tribeController.text = user.tribeName!;
+        }
+        if (user.stCertificateNumber != null && user.stCertificateNumber!.isNotEmpty) {
+          _stCertController.text = user.stCertificateNumber!;
+        }
+        if (user.state != null && user.state!.isNotEmpty) _state = user.state!;
+        if (user.district != null && user.district!.isNotEmpty) _district = user.district!;
+        if (user.institutionName != null && user.institutionName!.isNotEmpty) {
+          _instituteController.text = user.institutionName!;
+        }
+        if (user.currentCourse != null && user.currentCourse!.isNotEmpty) {
+          _courseController.text = user.currentCourse!;
+        }
+        if (user.currentYear != null && user.currentYear!.isNotEmpty) {
+          _yearController.text = user.currentYear!;
+        }
+        if (user.bankName != null && user.bankName!.isNotEmpty) {
+          _bankNameController.text = user.bankName!;
+        }
+        if (user.bankAccountNumber != null && user.bankAccountNumber!.isNotEmpty) {
+          _accountNoController.text = user.bankAccountNumber!;
+        }
+        if (user.ifscCode != null && user.ifscCode!.isNotEmpty) {
+          _ifscController.text = user.ifscCode!;
+        }
+        _isPVTG = user.isPVTG;
+      }
+      _prefilled = true;
+    }
   }
 
   @override
@@ -174,6 +229,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
         const SizedBox(height: 12),
         DropdownButtonFormField<ScholarshipType>(
           value: _selectedType,
+          isExpanded: true,
           decoration: const InputDecoration(
             labelText: 'MoTA Scheme *',
             prefixIcon: Icon(Icons.school_outlined),
@@ -226,6 +282,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
             Expanded(
               child: DropdownButtonFormField<String>(
                 value: _gender,
+                isExpanded: true,
                 decoration: const InputDecoration(
                   labelText: 'Gender *',
                   prefixIcon: Icon(Icons.wc_outlined),
@@ -275,6 +332,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
             Expanded(
               child: DropdownButtonFormField<String>(
                 value: _state,
+                isExpanded: true,
                 decoration: const InputDecoration(labelText: 'State *'),
                 items: ['Odisha', 'Jharkhand', 'Madhya Pradesh', 'Chhattisgarh', 'Rajasthan', 'Gujarat']
                     .map((s) => DropdownMenuItem(value: s, child: Text(s)))
@@ -286,6 +344,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
             Expanded(
               child: DropdownButtonFormField<String>(
                 value: _district,
+                isExpanded: true,
                 decoration: const InputDecoration(labelText: 'District *'),
                 items: ['Mayurbhanj', 'Sundargarh', 'Koraput', 'Rayagada', 'Ranchi', 'Bastar']
                     .map((d) => DropdownMenuItem(value: d, child: Text(d)))
@@ -369,6 +428,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
         const SizedBox(height: 12),
         DropdownButtonFormField<String>(
           value: _academicYear,
+          isExpanded: true,
           decoration: const InputDecoration(labelText: 'Academic Year *'),
           items: ['2025-26', '2024-25']
               .map((y) => DropdownMenuItem(value: y, child: Text(y)))
@@ -424,7 +484,64 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
             ],
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
+
+        // Reusable Verified Documents (Part 9)
+        Builder(
+          builder: (context) {
+            final reusable = context.watch<ScholarshipDataService>().reusableDocuments;
+            if (reusable.isEmpty) return const SizedBox.shrink();
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.successLight.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.success),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.recycling, color: AppColors.success, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'Use Existing Verified Documents',
+                            style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E8449), fontSize: 13),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '${reusable.length} verified document(s) found in your wallet. They will be automatically linked:',
+                        style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                      ),
+                      const SizedBox(height: 6),
+                      ...reusable.map((d) => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.check_circle, color: AppColors.success, size: 14),
+                                const SizedBox(width: 6),
+                                Text(d.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
+                                const SizedBox(width: 6),
+                                const Text('(Verified)', style: TextStyle(color: AppColors.success, fontSize: 11)),
+                              ],
+                            ),
+                          )),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+            );
+          },
+        ),
+
         _buildSectionTitle('Document Checklist', 'Tick verified documents ready for submission.'),
         const SizedBox(height: 8),
         _buildDocCheckItem('Aadhaar Card (UIDAI verified)', _docAadhaar, (v) => setState(() => _docAadhaar = v)),
@@ -612,12 +729,16 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
 
   void _submitApplication() {
     final service = context.read<ScholarshipDataService>();
+    final reusableIds = service.reusableDocuments.map((d) => d.id).toList();
+
     service.submitApplication(
       scholarshipId: _schemeId,
       scholarshipName: _schemeName,
       scholarshipType: _selectedType,
       academicYear: _academicYear,
       requestedAmount: _requestedAmount,
+      remarks: 'Certified submission with linked documents.',
+      reusedDocumentIds: reusableIds,
     );
 
     showDialog(

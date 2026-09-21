@@ -6,6 +6,8 @@ enum ApplicationStatus {
   verified('Verified', 'All verifications passed'),
   approved('Approved', 'Application approved for scholarship'),
   sanctioned('Sanctioned', 'Scholarship amount sanctioned'),
+  disbursementInitiated('Disbursement Initiated', 'Payment transfer initiated'),
+  disbursed('Disbursed', 'Amount transferred to bank account'),
   rejected('Rejected', 'Application was rejected'),
   incomplete('Incomplete', 'Application has missing information'),
   withdrawn('Withdrawn', 'Application withdrawn by student');
@@ -13,6 +15,56 @@ enum ApplicationStatus {
   final String label;
   final String description;
   const ApplicationStatus(this.label, this.description);
+}
+
+/// Verification and approval stages of a scholarship application.
+enum ApplicationStage {
+  application('Application', 'Application submission stage'),
+  documentVerification('Document Verification', 'Document verification by verifier'),
+  instituteVerification('Institute Verification', 'Enrollment & bonafide verification by institute'),
+  departmentVerification('Department Verification', 'State Tribal Welfare Department review'),
+  sanction('Sanction', 'Scholarship amount sanction by MoTA'),
+  disbursement('Disbursement', 'Direct Benefit Transfer (DBT) to bank account');
+
+  final String label;
+  final String description;
+  const ApplicationStage(this.label, this.description);
+}
+
+/// Status of a pending action / deficiency on an application.
+enum ActionStatus {
+  open('Open'),
+  inProgress('In Progress'),
+  resolved('Resolved'),
+  dismissed('Dismissed');
+
+  final String label;
+  const ActionStatus(this.label);
+}
+
+/// Category / type of pending action.
+enum ActionType {
+  documentUpdate('Document Update'),
+  bankVerification('Bank Verification'),
+  instituteVerification('Institute Verification'),
+  incomeClarification('Income Clarification'),
+  general('General Action');
+
+  final String label;
+  const ActionType(this.label);
+}
+
+/// State of DBT (Direct Benefit Transfer) processing.
+enum DbtStatus {
+  sanctioned('Sanctioned'),
+  paymentProcessing('Payment Processing'),
+  paymentProcessed('Payment Processed'),
+  dbtInitiated('DBT Initiated'),
+  credited('Credited'),
+  failed('Failed');
+
+  final String label;
+  const DbtStatus(this.label);
 }
 
 /// Status of an individual verification check.
