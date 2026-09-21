@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
+import '../../../../services/authentication/auth_provider.dart';
 
 /// Splash screen — app entry point with branding.
 class SplashPage extends StatefulWidget {
@@ -31,9 +33,18 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     );
     _controller.forward();
 
-    // Navigate after splash
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
+    // Check authentication session and navigate
+    Future.delayed(const Duration(seconds: 2), () async {
+      if (!mounted) return;
+
+      final authProvider = context.read<AuthProvider>();
+      await authProvider.restoreSession();
+
+      if (!mounted) return;
+
+      if (authProvider.isAuthenticated) {
+        context.go(RouteNames.dashboard);
+      } else {
         context.go(RouteNames.onboarding);
       }
     });

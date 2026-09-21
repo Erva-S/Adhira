@@ -1,12 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
+import '../../../../services/authentication/auth_provider.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 
-/// Settings page.
+/// Settings page with real session logout and confirmation.
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
+
+  Future<void> _handleLogout(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.logout, color: AppColors.error),
+            SizedBox(width: 10),
+            Text('Sign Out'),
+          ],
+        ),
+        content: const Text(
+          'Are you sure you want to sign out of your account? You will need to verify your mobile number again to log in.',
+          style: TextStyle(fontSize: 13, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Sign Out'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      final authProvider = context.read<AuthProvider>();
+      await authProvider.logout();
+      if (context.mounted) {
+        context.go(RouteNames.login);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,14 +62,13 @@ class SettingsPage extends StatelessWidget {
       body: ListView(
         children: [
           _SettingsSection(title: 'Preferences', items: [
-            _SettingsTile(icon: Icons.language, title: 'Language', subtitle: 'English', onTap: () {}),
-            _SettingsTile(icon: Icons.dark_mode, title: 'Dark Mode', subtitle: 'System default', onTap: () {}),
-            _SettingsTile(icon: Icons.notifications, title: 'Notifications', subtitle: 'Enabled', onTap: () {}),
+            _SettingsTile(icon: Icons.language, title: 'Language', subtitle: 'English (English)', onTap: () {}),
+            _SettingsTile(icon: Icons.notifications_none, title: 'Notification Preferences', onTap: () {}),
+            _SettingsTile(icon: Icons.dark_mode_outlined, title: 'Theme', subtitle: 'System Default', onTap: () {}),
           ]),
-          _SettingsSection(title: 'Privacy & Security', items: [
-            _SettingsTile(icon: Icons.lock, title: 'Privacy Policy', onTap: () {}),
-            _SettingsTile(icon: Icons.gavel, title: 'Terms of Service', onTap: () {}),
-            _SettingsTile(icon: Icons.security, title: 'Data Consent', subtitle: 'Manage your data sharing preferences', onTap: () {}),
+          _SettingsSection(title: 'Security', items: [
+            _SettingsTile(icon: Icons.fingerprint, title: 'Biometric Login', subtitle: 'Enabled', onTap: () {}),
+            _SettingsTile(icon: Icons.pin_outlined, title: 'App PIN', subtitle: 'Change PIN', onTap: () {}),
           ]),
           _SettingsSection(title: 'Support', items: [
             _SettingsTile(icon: Icons.help_outline, title: 'Help & FAQ', onTap: () {}),
@@ -40,7 +83,7 @@ class SettingsPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: OutlinedButton.icon(
-              onPressed: () => context.go(RouteNames.login),
+              onPressed: () => _handleLogout(context),
               icon: const Icon(Icons.logout, color: AppColors.error),
               label: const Text('Logout', style: TextStyle(color: AppColors.error)),
               style: OutlinedButton.styleFrom(
@@ -68,9 +111,21 @@ class _SettingsSection extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
-          child: Text(title, style: Theme.of(context).textTheme.labelLarge?.copyWith(color: AppColors.textSecondary)),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primary,
+            ),
+          ),
         ),
-        ...items,
+        Card(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+          child: Column(
+            children: items,
+          ),
+        ),
       ],
     );
   }
@@ -81,12 +136,18 @@ class _SettingsTile extends StatelessWidget {
   final String title;
   final String? subtitle;
   final VoidCallback onTap;
-  const _SettingsTile({required this.icon, required this.title, this.subtitle, required this.onTap});
+
+  const _SettingsTile({
+    required this.icon,
+    required this.title,
+    this.subtitle,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.primary, size: 22),
+      leading: Icon(icon, size: 22, color: AppColors.textPrimary),
       title: Text(title, style: const TextStyle(fontSize: 14)),
       subtitle: subtitle != null ? Text(subtitle!, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)) : null,
       trailing: const Icon(Icons.chevron_right, size: 20, color: AppColors.textTertiary),

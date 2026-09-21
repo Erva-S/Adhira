@@ -5,6 +5,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
 import '../../../../services/scholarship/scholarship_data_service.dart';
+import '../../../../services/authentication/auth_provider.dart';
 import '../../../../shared/widgets/app_bottom_nav.dart';
 import '../../../../shared/widgets/section_header.dart';
 import '../../../../shared/widgets/status_badge.dart';
@@ -16,12 +17,29 @@ class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ScholarshipDataService>(
-      builder: (context, scholarshipService, _) {
+    return Consumer2<ScholarshipDataService, AuthProvider>(
+      builder: (context, scholarshipService, authProvider, _) {
+        final student = authProvider.currentUser;
+        if (student != null && scholarshipService.currentUserId != student.id) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            scholarshipService.switchUser(student.id);
+          });
+        }
+
         final currentApp = scholarshipService.activeApplications.firstOrNull ??
             scholarshipService.applications.firstOrNull;
         final disbursed = scholarshipService.totalDisbursed.toInt();
         final pending = scholarshipService.totalPending.toInt();
+        final displayName = student?.fullName ?? 'Scholar';
+        final initials = displayName
+            .split(' ')
+            .where((w) => w.isNotEmpty)
+            .map((w) => w[0])
+            .take(2)
+            .join()
+            .toUpperCase();
+        final profilePercent = ((student?.profileCompletionPercent ?? 0.72) * 100).toInt();
+        final openActions = scholarshipService.pendingActions.where((a) => a.isOpen).toList();
 
         return Scaffold(
           body: SafeArea(
@@ -34,25 +52,37 @@ class DashboardPage extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                     child: Row(
                       children: [
-                        const CircleAvatar(
+                        CircleAvatar(
                           radius: 22,
                           backgroundColor: AppColors.primaryLight,
-                          child: Text('RS', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                          child: Text(
+                            initials.isNotEmpty ? initials : 'ST',
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                          ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Namaste, Rajesh 🙏', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-                              Text('Post-Matric Scholarship • 2025-26', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary)),
+                              Text(
+                                'Namaste, $displayName 🙏',
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                              ),
+                              Text(
+                                currentApp != null
+                                    ? '${currentApp.scholarshipName} • ${currentApp.academicYear ?? "2025-26"}'
+                                    : 'Tribal Scholar Saathi • MoTA',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                              ),
                             ],
                           ),
                         ),
                         IconButton(
                           onPressed: () => context.push(RouteNames.notifications),
                           icon: Badge(
-                            label: const Text('3'),
+                            isLabelVisible: scholarshipService.unreadNotificationCount > 0,
+                            label: Text('${scholarshipService.unreadNotificationCount}'),
                             child: const Icon(Icons.notifications_outlined),
                           ),
                         ),
@@ -80,26 +110,86 @@ class DashboardPage extends StatelessWidget {
                               const Expanded(
                                 child: Text('Profile Completion', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
                               ),
-                              const Text('72%', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 20)),
+                              Text('$profilePercent%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 20)),
                             ],
                           ),
                           const SizedBox(height: 10),
                           ClipRRect(
                             borderRadius: BorderRadius.circular(4),
                             child: LinearProgressIndicator(
-                              value: 0.72,
+                              value: (student?.profileCompletionPercent ?? 0.72).clamp(0.0, 1.0),
                               backgroundColor: Colors.white.withOpacity(0.2),
                               valueColor: const AlwaysStoppedAnimation(Colors.white),
                               minHeight: 6,
                             ),
                           ),
                           const SizedBox(height: 8),
-                          Text('Complete your profile to apply for scholarships', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12)),
+                          Text(
+                            profilePercent < 100
+                                ? 'Complete all profile details to fast-track verification'
+                                : 'Profile 100% complete — verified for all schemes',
+                            style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12),
+                          ),
                         ],
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
+
+                  // ── Pending Actions / Deficiencies (Part 11) ───────────
+                  if (openActions.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppColors.warningLight.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.warning),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 20),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'Action Required (Deficiency)',
+                                  style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFB78103)),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              openActions.first.title,
+                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              openActions.first.description,
+                              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                TextButton(
+                                  onPressed: () => scholarshipService.resolvePendingAction(openActions.first.id),
+                                  child: const Text('Mark Resolved'),
+                                ),
+                                const SizedBox(width: 8),
+                                ElevatedButton(
+                                  onPressed: () => context.push(RouteNames.documentWallet),
+                                  child: const Text('Go to Documents'),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  if (openActions.isNotEmpty) const SizedBox(height: 16),
 
                   // ── Quick Actions ────────────────────────────────────
                   SectionHeader(title: 'Quick Actions'),

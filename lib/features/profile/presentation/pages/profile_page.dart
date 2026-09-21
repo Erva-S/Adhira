@@ -1,86 +1,128 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
+import '../../../../services/authentication/auth_provider.dart';
+import '../../../../shared/models/student.dart';
 import '../../../../shared/widgets/app_bottom_nav.dart';
 
-/// Student profile page.
+/// Student profile page — dynamically populated from authenticated student profile.
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Profile'),
-        actions: [
-          IconButton(
-            onPressed: () => context.push(RouteNames.profileEdit),
-            icon: const Icon(Icons.edit),
-            tooltip: 'Edit Profile',
-          ),
-          IconButton(
-            onPressed: () => context.push(RouteNames.settings),
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: 'Settings',
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Avatar + name
-            const SizedBox(height: 20),
-            const CircleAvatar(
-              radius: 48,
-              backgroundColor: AppColors.primaryLight,
-              child: Text('RS', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600, color: Colors.white)),
-            ),
-            const SizedBox(height: 12),
-            Text('Rajesh Singh', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600)),
-            Text('Student ID: TSS-2025-45678', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary)),
-            const SizedBox(height: 8),
-            // Profile completion
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 40),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.08), borderRadius: BorderRadius.circular(20)),
-              child: const Text('Profile: 72% Complete', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 13)),
-            ),
-            const SizedBox(height: 24),
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, _) {
+        final student = authProvider.currentUser;
+        final displayName = student?.fullName ?? 'Student';
+        final initials = displayName
+            .split(' ')
+            .where((w) => w.isNotEmpty)
+            .map((w) => w[0])
+            .take(2)
+            .join()
+            .toUpperCase();
+        final profilePercent = ((student?.profileCompletionPercent ?? 0.72) * 100).toInt();
 
-            // Profile sections
-            _ProfileSection(title: 'Personal Details', items: [
-              _ProfileItem(label: 'Full Name', value: 'Rajesh Singh'),
-              _ProfileItem(label: 'Father\'s Name', value: 'Manoj Singh'),
-              _ProfileItem(label: 'Date of Birth', value: '15 Mar 2003'),
-              _ProfileItem(label: 'Gender', value: 'Male'),
-              _ProfileItem(label: 'Mobile', value: '+91 98765 43210'),
-              _ProfileItem(label: 'Email', value: 'rajesh.singh@email.com'),
-            ]),
-            _ProfileSection(title: 'ST/Tribal Details', items: [
-              _ProfileItem(label: 'Tribe', value: 'Santal'),
-              _ProfileItem(label: 'PVTG', value: 'No'),
-              _ProfileItem(label: 'ST Certificate', value: 'SC/OD/2023/12345'),
-              _ProfileItem(label: 'State', value: 'Odisha'),
-              _ProfileItem(label: 'District', value: 'Mayurbhanj'),
-            ]),
-            _ProfileSection(title: 'Education', items: [
-              _ProfileItem(label: 'Course', value: 'B.Tech Computer Science'),
-              _ProfileItem(label: 'Year', value: '2nd Year'),
-              _ProfileItem(label: 'Institution', value: 'NIT Rourkela'),
-              _ProfileItem(label: 'AISHE Code', value: 'C-12345'),
-            ]),
-            _ProfileSection(title: 'Bank Details', items: [
-              _ProfileItem(label: 'Bank', value: 'State Bank of India'),
-              _ProfileItem(label: 'Account', value: '****7890'),
-              _ProfileItem(label: 'IFSC', value: 'SBIN0001234'),
-            ]),
-            const SizedBox(height: 32),
-          ],
-        ),
-      ),
-      bottomNavigationBar: const AppBottomNav(currentIndex: 4),
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('My Profile'),
+            actions: [
+              IconButton(
+                onPressed: () => context.push(RouteNames.profileEdit),
+                icon: const Icon(Icons.edit),
+                tooltip: 'Edit Profile',
+              ),
+              IconButton(
+                onPressed: () => context.push(RouteNames.settings),
+                icon: const Icon(Icons.settings_outlined),
+                tooltip: 'Settings',
+              ),
+            ],
+          ),
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                // Avatar + name
+                const SizedBox(height: 20),
+                CircleAvatar(
+                  radius: 48,
+                  backgroundColor: AppColors.primaryLight,
+                  child: Text(
+                    initials.isNotEmpty ? initials : 'ST',
+                    style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w600, color: Colors.white),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  displayName,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  'Student ID: ${student?.id ?? "N/A"}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                ),
+                const SizedBox(height: 8),
+
+                // Profile completion badge
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 40),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    'Profile: $profilePercent% Complete',
+                    style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 13),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Profile sections (Dynamic)
+                _ProfileSection(title: 'Personal Details', items: [
+                  _ProfileItem(label: 'Full Name', value: student?.fullName ?? '—'),
+                  _ProfileItem(label: 'Father\'s Name', value: student?.fatherName ?? '—'),
+                  _ProfileItem(label: 'Mother\'s Name', value: student?.motherName ?? '—'),
+                  _ProfileItem(
+                    label: 'Date of Birth',
+                    value: student?.dateOfBirth != null
+                        ? '${student!.dateOfBirth!.day}/${student.dateOfBirth!.month}/${student.dateOfBirth!.year}'
+                        : '14 Aug 2004',
+                  ),
+                  _ProfileItem(label: 'Gender', value: student?.gender ?? 'Male'),
+                  _ProfileItem(label: 'Mobile', value: student?.mobileNumber != null ? '+91 ${student!.mobileNumber}' : '—'),
+                  _ProfileItem(label: 'Email', value: student?.email ?? '—'),
+                ]),
+                _ProfileSection(title: 'ST/Tribal Details', items: [
+                  _ProfileItem(label: 'Category', value: student?.category ?? 'ST'),
+                  _ProfileItem(label: 'Tribe Name', value: student?.tribeName ?? 'Santal'),
+                  _ProfileItem(label: 'PVTG Status', value: (student?.isPVTG == true) ? 'Yes' : 'No'),
+                  _ProfileItem(label: 'ST Certificate', value: student?.stCertificateNumber ?? 'SC/OD/2023/12345'),
+                  _ProfileItem(label: 'State', value: student?.state ?? 'Odisha'),
+                  _ProfileItem(label: 'District', value: student?.district ?? 'Mayurbhanj'),
+                ]),
+                _ProfileSection(title: 'Education', items: [
+                  _ProfileItem(label: 'Level', value: student?.educationLevel ?? 'Undergraduate'),
+                  _ProfileItem(label: 'Course', value: student?.currentCourse ?? 'B.Tech Computer Science'),
+                  _ProfileItem(label: 'Year of Study', value: student?.currentYear ?? '2nd Year'),
+                  _ProfileItem(label: 'Institution', value: student?.institutionName ?? 'NIT Rourkela'),
+                  _ProfileItem(label: 'AISHE Code', value: student?.institutionId ?? 'AISHE-U-0355'),
+                ]),
+                _ProfileSection(title: 'Bank Details (for DBT)', items: [
+                  _ProfileItem(label: 'Bank Name', value: student?.bankName ?? 'State Bank of India'),
+                  _ProfileItem(label: 'Account Number', value: student?.bankAccountNumber ?? '****7890'),
+                  _ProfileItem(label: 'IFSC Code', value: student?.ifscCode ?? 'SBIN0001234'),
+                ]),
+                const SizedBox(height: 32),
+              ],
+            ),
+          ),
+          bottomNavigationBar: const AppBottomNav(currentIndex: 4),
+        );
+      },
     );
   }
 }
@@ -97,40 +139,54 @@ class _ProfileSection extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-          child: Text(title, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600, color: AppColors.primary)),
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
+                ),
+          ),
         ),
-        Card(
+        Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(children: items),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Column(
+            children: items.map((item) => _buildRow(context, item)).toList(),
           ),
         ),
       ],
     );
   }
-}
 
-class _ProfileItem extends StatelessWidget {
-  final String label;
-  final String value;
-  const _ProfileItem({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildRow(BuildContext context, _ProfileItem item) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          SizedBox(
-            width: 130,
-            child: Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary)),
+          Expanded(
+            flex: 2,
+            child: Text(item.label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
           ),
           Expanded(
-            child: Text(value, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500)),
+            flex: 3,
+            child: Text(
+              item.value,
+              style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+              textAlign: TextAlign.end,
+            ),
           ),
         ],
       ),
     );
   }
+}
+
+class _ProfileItem {
+  final String label;
+  final String value;
+  const _ProfileItem({required this.label, required this.value});
 }

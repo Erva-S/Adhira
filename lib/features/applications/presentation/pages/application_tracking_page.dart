@@ -127,7 +127,7 @@ class ApplicationTrackingPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                'Application Timeline',
+                'Application Timeline (Status History)',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -136,61 +136,83 @@ class ApplicationTrackingPage extends StatelessWidget {
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.only(left: 16),
-              child: Column(
-                children: [
-                  TimelineStage(
-                    title: 'Application Submitted',
-                    subtitle: 'All required fields completed & certified',
-                    date: appliedDate,
-                    status: VerificationStatus.verified,
-                    isFirst: true,
-                  ),
-                  TimelineStage(
-                    title: 'Document Upload & DigiLocker',
-                    subtitle: 'Aadhaar, ST certificate & marksheets attached',
-                    date: appliedDate,
-                    status: VerificationStatus.verified,
-                  ),
-                  TimelineStage(
-                    title: 'Institute Verification',
-                    subtitle: 'Enrollment & bonafide verified by institution',
-                    status: (status != ApplicationStatus.draft && status != ApplicationStatus.submitted)
-                        ? VerificationStatus.verified
-                        : VerificationStatus.inProgress,
-                  ),
-                  TimelineStage(
-                    title: 'Tribal Welfare / District Verification',
-                    subtitle: 'ST community & family income verification',
-                    status: status == ApplicationStatus.underReview
-                        ? VerificationStatus.inProgress
-                        : (status == ApplicationStatus.approved || status == ApplicationStatus.sanctioned
-                            ? VerificationStatus.verified
-                            : VerificationStatus.pending),
-                  ),
-                  TimelineStage(
-                    title: 'State Nodal Officer Approval',
-                    subtitle: 'State government sanction & recommendation',
-                    status: (status == ApplicationStatus.approved || status == ApplicationStatus.sanctioned)
-                        ? VerificationStatus.verified
-                        : VerificationStatus.pending,
-                  ),
-                  TimelineStage(
-                    title: 'Scholarship Sanctioned',
-                    subtitle: 'Central MoTA fund allocation',
-                    status: status == ApplicationStatus.sanctioned
-                        ? VerificationStatus.verified
-                        : VerificationStatus.pending,
-                  ),
-                  TimelineStage(
-                    title: 'DBT Payment Disbursed',
-                    subtitle: 'Fund transferred to Aadhaar-seeded bank account',
-                    status: isPaymentDisbursed
-                        ? VerificationStatus.verified
-                        : VerificationStatus.pending,
-                    isLast: true,
-                  ),
-                ],
-              ),
+              child: app == null
+                  ? const Center(child: Text('No application selected.'))
+                  : FutureBuilder<List<ApplicationStatusHistory>>(
+                      future: service?.getStatusHistory(app.id),
+                      builder: (context, snapshot) {
+                        final history = snapshot.data ?? [];
+                        if (history.isEmpty) {
+                          // Fallback initial stage
+                          return Column(
+                            children: [
+                              TimelineStage(
+                                title: 'Application Submitted',
+                                subtitle: 'Application registered in system',
+                                date: appliedDate,
+                                status: VerificationStatus.verified,
+                                isFirst: true,
+                              ),
+                              TimelineStage(
+                                title: 'Document Verification',
+                                subtitle: 'Under verification by authorities',
+                                status: VerificationStatus.inProgress,
+                                isLast: true,
+                              ),
+                            ],
+                          );
+                        }
+
+                        // Render dynamic stages from application_status_history
+                        final stages = <Widget>[];
+                        for (int i = 0; i < history.length; i++) {
+                          final h = history[i];
+                          final isFirst = i == 0;
+                          final isLast = i == history.length - 1 &&
+                              (app.status == ApplicationStatus.disbursed ||
+                                  app.status == ApplicationStatus.rejected);
+
+                          stages.add(
+                            TimelineStage(
+                              title: h.stage.label,
+                              subtitle: '${h.message} (${h.changedBy})',
+                              date: _formatDate(h.changedAt),
+                              status: h.status,
+                              isFirst: isFirst,
+                              isLast: isLast,
+                            ),
+                          );
+                        }
+
+                        // Add pending future stages if not yet disbursed or rejected
+                        if (app.status != ApplicationStatus.disbursed &&
+                            app.status != ApplicationStatus.rejected) {
+                          if (!history.any((h) => h.stage == ApplicationStage.sanction)) {
+                            stages.add(
+                              const TimelineStage(
+                                title: 'Scholarship Sanction',
+                                subtitle: 'Pending sanction approval by Department',
+                                status: VerificationStatus.pending,
+                              ),
+                            );
+                          }
+                          if (!history.any((h) => h.stage == ApplicationStage.disbursement)) {
+                            stages.add(
+                              TimelineStage(
+                                title: 'DBT Payment Disbursement',
+                                subtitle: 'Direct transfer to Aadhaar-seeded bank account',
+                                status: isPaymentDisbursed
+                                    ? VerificationStatus.verified
+                                    : VerificationStatus.pending,
+                                isLast: true,
+                              ),
+                            );
+                          }
+                        }
+
+                        return Column(children: stages);
+                      },
+                    ),
             ),
             const SizedBox(height: 24),
             Padding(

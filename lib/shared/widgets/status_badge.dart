@@ -114,6 +114,8 @@ class StatusBadge extends StatelessWidget {
       case ApplicationStatus.verified: return StatusBadgeVariant.success;
       case ApplicationStatus.approved: return StatusBadgeVariant.success;
       case ApplicationStatus.sanctioned: return StatusBadgeVariant.accent;
+      case ApplicationStatus.disbursementInitiated: return StatusBadgeVariant.info;
+      case ApplicationStatus.disbursed: return StatusBadgeVariant.success;
       case ApplicationStatus.rejected: return StatusBadgeVariant.error;
       case ApplicationStatus.incomplete: return StatusBadgeVariant.warning;
       case ApplicationStatus.withdrawn: return StatusBadgeVariant.neutral;
