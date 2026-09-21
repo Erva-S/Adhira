@@ -1,0 +1,70 @@
+import '/components/button/button_widget.dart';
+import '/components/status_badge2/status_badge2_widget.dart';
+import '/components/timeline_stage/timeline_stage_widget.dart';
+import '/flutter_flow/flutter_flow_icon_button.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
+import 'application_tracking_widget.dart' show ApplicationTrackingWidget;
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
+class ApplicationTrackingModel
+    extends FlutterFlowModel<ApplicationTrackingWidget> {
+  ///  State fields for stateful widgets in this page.
+
+  // Model for StatusBadge.
+  late StatusBadge2Model statusBadgeModel;
+  // Model for Button.
+  late ButtonModel buttonModel1;
+  // Model for TimelineStage.
+  late TimelineStageModel timelineStageModel1;
+  // Model for TimelineStage.
+  late TimelineStageModel timelineStageModel2;
+  // Model for TimelineStage.
+  late TimelineStageModel timelineStageModel3;
+  // Model for TimelineStage.
+  late TimelineStageModel timelineStageModel4;
+  // Model for TimelineStage.
+  late TimelineStageModel timelineStageModel5;
+  // Model for TimelineStage.
+  late TimelineStageModel timelineStageModel6;
+  // Model for TimelineStage.
+  late TimelineStageModel timelineStageModel7;
+  // Model for TimelineStage.
+  late TimelineStageModel timelineStageModel8;
+  // Model for Button.
+  late ButtonModel buttonModel2;
+
+  @override
+  void initState(BuildContext context) {
+    statusBadgeModel = createModel(context, () => StatusBadge2Model());
+    buttonModel1 = createModel(context, () => ButtonModel());
+    timelineStageModel1 = createModel(context, () => TimelineStageModel());
+    timelineStageModel2 = createModel(context, () => TimelineStageModel());
+    timelineStageModel3 = createModel(context, () => TimelineStageModel());
+    timelineStageModel4 = createModel(context, () => TimelineStageModel());
+    timelineStageModel5 = createModel(context, () => TimelineStageModel());
+    timelineStageModel6 = createModel(context, () => TimelineStageModel());
+    timelineStageModel7 = createModel(context, () => TimelineStageModel());
+    timelineStageModel8 = createModel(context, () => TimelineStageModel());
+    buttonModel2 = createModel(context, () => ButtonModel());
+  }
+
+  @override
+  void dispose() {
+    statusBadgeModel.dispose();
+    buttonModel1.dispose();
+    timelineStageModel1.dispose();
+    timelineStageModel2.dispose();
+    timelineStageModel3.dispose();
+    timelineStageModel4.dispose();
+    timelineStageModel5.dispose();
+    timelineStageModel6.dispose();
+    timelineStageModel7.dispose();
+    timelineStageModel8.dispose();
+    buttonModel2.dispose();
+  }
+}

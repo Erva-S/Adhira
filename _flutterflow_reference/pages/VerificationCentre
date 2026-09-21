@@ -1,0 +1,60 @@
+import '/components/verification_card/verification_card_widget.dart';
+import '/flutter_flow/flutter_flow_icon_button.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
+import 'verification_center_widget.dart' show VerificationCenterWidget;
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:percent_indicator/percent_indicator.dart';
+import 'package:provider/provider.dart';
+
+class VerificationCenterModel
+    extends FlutterFlowModel<VerificationCenterWidget> {
+  ///  State fields for stateful widgets in this page.
+
+  // Model for VerificationCard.
+  late VerificationCardModel verificationCardModel1;
+  // Model for VerificationCard.
+  late VerificationCardModel verificationCardModel2;
+  // Model for VerificationCard.
+  late VerificationCardModel verificationCardModel3;
+  // Model for VerificationCard.
+  late VerificationCardModel verificationCardModel4;
+  // Model for VerificationCard.
+  late VerificationCardModel verificationCardModel5;
+  // Model for VerificationCard.
+  late VerificationCardModel verificationCardModel6;
+  // Model for VerificationCard.
+  late VerificationCardModel verificationCardModel7;
+
+  @override
+  void initState(BuildContext context) {
+    verificationCardModel1 =
+        createModel(context, () => VerificationCardModel());
+    verificationCardModel2 =
+        createModel(context, () => VerificationCardModel());
+    verificationCardModel3 =
+        createModel(context, () => VerificationCardModel());
+    verificationCardModel4 =
+        createModel(context, () => VerificationCardModel());
+    verificationCardModel5 =
+        createModel(context, () => VerificationCardModel());
+    verificationCardModel6 =
+        createModel(context, () => VerificationCardModel());
+    verificationCardModel7 =
+        createModel(context, () => VerificationCardModel());
+  }
+
+  @override
+  void dispose() {
+    verificationCardModel1.dispose();
+    verificationCardModel2.dispose();
+    verificationCardModel3.dispose();
+    verificationCardModel4.dispose();
+    verificationCardModel5.dispose();
+    verificationCardModel6.dispose();
+    verificationCardModel7.dispose();
+  }
+}

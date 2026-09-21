@@ -1,0 +1,45 @@
+import '/components/auth_header/auth_header_widget.dart';
+import '/components/button/button_widget.dart';
+import '/components/social_auth_button/social_auth_button_widget.dart';
+import '/components/text_field/text_field_widget.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
+import 'login_registration_widget.dart' show LoginRegistrationWidget;
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
+class LoginRegistrationModel extends FlutterFlowModel<LoginRegistrationWidget> {
+  ///  State fields for stateful widgets in this page.
+
+  // Model for AuthHeader.
+  late AuthHeaderModel authHeaderModel;
+  // Model for TextField.
+  late TextFieldModel textFieldModel;
+  // Model for Button.
+  late ButtonModel buttonModel1;
+  // Model for SocialAuthButton.
+  late SocialAuthButtonModel socialAuthButtonModel;
+  // Model for Button.
+  late ButtonModel buttonModel2;
+
+  @override
+  void initState(BuildContext context) {
+    authHeaderModel = createModel(context, () => AuthHeaderModel());
+    textFieldModel = createModel(context, () => TextFieldModel());
+    buttonModel1 = createModel(context, () => ButtonModel());
+    socialAuthButtonModel = createModel(context, () => SocialAuthButtonModel());
+    buttonModel2 = createModel(context, () => ButtonModel());
+  }
+
+  @override
+  void dispose() {
+    authHeaderModel.dispose();
+    textFieldModel.dispose();
+    buttonModel1.dispose();
+    socialAuthButtonModel.dispose();
+    buttonModel2.dispose();
+  }
+}

@@ -1,0 +1,42 @@
+import '/components/button/button_widget.dart';
+import '/components/payment_summary_card/payment_summary_card_widget.dart';
+import '/components/transaction_item/transaction_item_widget.dart';
+import '/flutter_flow/flutter_flow_icon_button.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
+import 'payments_d_b_t_widget.dart' show PaymentsDBTWidget;
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
+class PaymentsDBTModel extends FlutterFlowModel<PaymentsDBTWidget> {
+  ///  State fields for stateful widgets in this page.
+
+  // Model for PaymentSummaryCard.
+  late PaymentSummaryCardModel paymentSummaryCardModel;
+  // Model for TransactionItem.
+  late TransactionItemModel transactionItemModel1;
+  // Model for TransactionItem.
+  late TransactionItemModel transactionItemModel2;
+  // Model for Button.
+  late ButtonModel buttonModel;
+
+  @override
+  void initState(BuildContext context) {
+    paymentSummaryCardModel =
+        createModel(context, () => PaymentSummaryCardModel());
+    transactionItemModel1 = createModel(context, () => TransactionItemModel());
+    transactionItemModel2 = createModel(context, () => TransactionItemModel());
+    buttonModel = createModel(context, () => ButtonModel());
+  }
+
+  @override
+  void dispose() {
+    paymentSummaryCardModel.dispose();
+    transactionItemModel1.dispose();
+    transactionItemModel2.dispose();
+    buttonModel.dispose();
+  }
+}

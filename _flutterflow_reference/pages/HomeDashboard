@@ -1,0 +1,69 @@
+import '/components/bottom_nav/bottom_nav_widget.dart';
+import '/components/bottom_nav_child/bottom_nav_child_widget.dart';
+import '/components/button/button_widget.dart';
+import '/components/section_header/section_header_widget.dart';
+import '/components/status_badge/status_badge_widget.dart';
+import '/flutter_flow/flutter_flow_icon_button.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
+import '/index.dart';
+import 'home_dashboard_widget.dart' show HomeDashboardWidget;
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:percent_indicator/percent_indicator.dart';
+import 'package:provider/provider.dart';
+
+class HomeDashboardModel extends FlutterFlowModel<HomeDashboardWidget> {
+  ///  State fields for stateful widgets in this page.
+
+  // Model for Button.
+  late ButtonModel buttonModel1;
+  // Model for SectionHeader.
+  late SectionHeaderModel sectionHeaderModel1;
+  // Model for StatusBadge.
+  late StatusBadgeModel statusBadgeModel1;
+  // Model for Button.
+  late ButtonModel buttonModel2;
+  // Model for SectionHeader.
+  late SectionHeaderModel sectionHeaderModel2;
+  // Model for StatusBadge.
+  late StatusBadgeModel statusBadgeModel2;
+  // Model for SectionHeader.
+  late SectionHeaderModel sectionHeaderModel3;
+  // Model for Button.
+  late ButtonModel buttonModel3;
+  // Model for Button.
+  late ButtonModel buttonModel4;
+  // Model for BottomNav.
+  late BottomNavModel bottomNavModel;
+
+  @override
+  void initState(BuildContext context) {
+    buttonModel1 = createModel(context, () => ButtonModel());
+    sectionHeaderModel1 = createModel(context, () => SectionHeaderModel());
+    statusBadgeModel1 = createModel(context, () => StatusBadgeModel());
+    buttonModel2 = createModel(context, () => ButtonModel());
+    sectionHeaderModel2 = createModel(context, () => SectionHeaderModel());
+    statusBadgeModel2 = createModel(context, () => StatusBadgeModel());
+    sectionHeaderModel3 = createModel(context, () => SectionHeaderModel());
+    buttonModel3 = createModel(context, () => ButtonModel());
+    buttonModel4 = createModel(context, () => ButtonModel());
+    bottomNavModel = createModel(context, () => BottomNavModel());
+  }
+
+  @override
+  void dispose() {
+    buttonModel1.dispose();
+    sectionHeaderModel1.dispose();
+    statusBadgeModel1.dispose();
+    buttonModel2.dispose();
+    sectionHeaderModel2.dispose();
+    statusBadgeModel2.dispose();
+    sectionHeaderModel3.dispose();
+    buttonModel3.dispose();
+    buttonModel4.dispose();
+    bottomNavModel.dispose();
+  }
+}

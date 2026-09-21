@@ -1,0 +1,40 @@
+import '/components/button/button_widget.dart';
+import '/components/onboarding_step/onboarding_step_widget.dart';
+import '/components/progress_dots/progress_dots_widget.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
+import 'splash_onboarding_widget.dart' show SplashOnboardingWidget;
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
+class SplashOnboardingModel extends FlutterFlowModel<SplashOnboardingWidget> {
+  ///  State fields for stateful widgets in this page.
+
+  // Model for OnboardingStep.
+  late OnboardingStepModel onboardingStepModel;
+  // Model for ProgressDots.
+  late ProgressDotsModel progressDotsModel;
+  // Model for Button.
+  late ButtonModel buttonModel1;
+  // Model for Button.
+  late ButtonModel buttonModel2;
+
+  @override
+  void initState(BuildContext context) {
+    onboardingStepModel = createModel(context, () => OnboardingStepModel());
+    progressDotsModel = createModel(context, () => ProgressDotsModel());
+    buttonModel1 = createModel(context, () => ButtonModel());
+    buttonModel2 = createModel(context, () => ButtonModel());
+  }
+
+  @override
+  void dispose() {
+    onboardingStepModel.dispose();
+    progressDotsModel.dispose();
+    buttonModel1.dispose();
+    buttonModel2.dispose();
+  }
+}

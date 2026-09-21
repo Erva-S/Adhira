@@ -1,0 +1,55 @@
+import '/components/button/button_widget.dart';
+import '/components/option_card/option_card_widget.dart';
+import '/components/step_indicator/step_indicator_widget.dart';
+import '/flutter_flow/flutter_flow_icon_button.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
+import '/index.dart';
+import 'eligibility_checker_widget.dart' show EligibilityCheckerWidget;
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
+class EligibilityCheckerModel
+    extends FlutterFlowModel<EligibilityCheckerWidget> {
+  ///  State fields for stateful widgets in this page.
+
+  // Model for StepIndicator.
+  late StepIndicatorModel stepIndicatorModel;
+  // Model for OptionCard.
+  late OptionCardModel optionCardModel1;
+  // Model for OptionCard.
+  late OptionCardModel optionCardModel2;
+  // Model for OptionCard.
+  late OptionCardModel optionCardModel3;
+  // Model for OptionCard.
+  late OptionCardModel optionCardModel4;
+  // Model for Button.
+  late ButtonModel buttonModel1;
+  // Model for Button.
+  late ButtonModel buttonModel2;
+
+  @override
+  void initState(BuildContext context) {
+    stepIndicatorModel = createModel(context, () => StepIndicatorModel());
+    optionCardModel1 = createModel(context, () => OptionCardModel());
+    optionCardModel2 = createModel(context, () => OptionCardModel());
+    optionCardModel3 = createModel(context, () => OptionCardModel());
+    optionCardModel4 = createModel(context, () => OptionCardModel());
+    buttonModel1 = createModel(context, () => ButtonModel());
+    buttonModel2 = createModel(context, () => ButtonModel());
+  }
+
+  @override
+  void dispose() {
+    stepIndicatorModel.dispose();
+    optionCardModel1.dispose();
+    optionCardModel2.dispose();
+    optionCardModel3.dispose();
+    optionCardModel4.dispose();
+    buttonModel1.dispose();
+    buttonModel2.dispose();
+  }
+}
