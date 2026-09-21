@@ -6,20 +6,25 @@ import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/auth/presentation/pages/onboarding_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
+import '../../features/scholarships/presentation/pages/scholarship_dashboard_page.dart';
 import '../../features/scholarships/presentation/pages/scholarship_discovery_page.dart';
+import '../../features/scholarships/presentation/pages/scholarship_detail_page.dart';
 import '../../features/eligibility/presentation/pages/eligibility_checker_page.dart';
+import '../../features/applications/presentation/pages/applications_list_page.dart';
 import '../../features/applications/presentation/pages/application_tracking_page.dart';
+import '../../features/applications/presentation/pages/application_detail_page.dart';
+import '../../features/applications/presentation/pages/application_form_page.dart';
 import '../../features/verification/presentation/pages/verification_centre_page.dart';
 import '../../features/documents/presentation/pages/document_wallet_page.dart';
+import '../../features/documents/presentation/pages/document_detail_page.dart';
 import '../../features/payments/presentation/pages/payments_page.dart';
 import '../../features/notifications/presentation/pages/notifications_page.dart';
+import '../../features/notifications/presentation/pages/notification_detail_page.dart';
 import '../../features/jago/presentation/pages/jago_chat_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
-import '../../features/settings/presentation/pages/settings_page.dart';
-import '../../features/notifications/presentation/pages/notification_detail_page.dart';
-import '../../features/scholarships/presentation/pages/scholarship_detail_page.dart';
-import '../../features/documents/presentation/pages/document_detail_page.dart';
 import '../../features/profile/presentation/pages/profile_edit_page.dart';
+import '../../features/settings/presentation/pages/settings_page.dart';
+import '../../shared/models/models.dart';
 import '../../core/enums/app_enums.dart';
 
 /// Application router configuration using GoRouter.
@@ -58,67 +63,14 @@ class AppRouter {
         builder: (context, state) => const DashboardPage(),
       ),
       GoRoute(
+        path: RouteNames.scholarshipDashboard,
+        name: 'scholarshipDashboard',
+        builder: (context, state) => const ScholarshipDashboardPage(),
+      ),
+      GoRoute(
         path: RouteNames.scholarshipDiscovery,
         name: 'scholarshipDiscovery',
         builder: (context, state) => const ScholarshipDiscoveryPage(),
-      ),
-      GoRoute(
-        path: RouteNames.eligibilityChecker,
-        name: 'eligibilityChecker',
-        builder: (context, state) => const EligibilityCheckerPage(),
-      ),
-      GoRoute(
-        path: RouteNames.applicationTracking,
-        name: 'applicationTracking',
-        builder: (context, state) => const ApplicationTrackingPage(),
-      ),
-      GoRoute(
-        path: RouteNames.verificationCentre,
-        name: 'verificationCentre',
-        builder: (context, state) => const VerificationCentrePage(),
-      ),
-      GoRoute(
-        path: RouteNames.documentWallet,
-        name: 'documentWallet',
-        builder: (context, state) => const DocumentWalletPage(),
-      ),
-      GoRoute(
-        path: RouteNames.payments,
-        name: 'payments',
-        builder: (context, state) => const PaymentsPage(),
-      ),
-      GoRoute(
-        path: RouteNames.notifications,
-        name: 'notifications',
-        builder: (context, state) => const NotificationsPage(),
-      ),
-      GoRoute(
-        path: RouteNames.jago,
-        name: 'jago',
-        builder: (context, state) => const JagoChatPage(),
-      ),
-      GoRoute(
-        path: RouteNames.profile,
-        name: 'profile',
-        builder: (context, state) => const ProfilePage(),
-      ),
-      GoRoute(
-        path: RouteNames.settings,
-        name: 'settings',
-        builder: (context, state) => const SettingsPage(),
-      ),
-      GoRoute(
-        path: RouteNames.notificationDetails,
-        name: 'notificationDetails',
-        builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>?;
-          return NotificationDetailPage(
-            title: extra?['title'] as String? ?? 'Notification',
-            message: extra?['message'] as String? ?? 'No message content available.',
-            time: extra?['time'] as String? ?? 'Just now',
-            type: extra?['type'] as NotificationType? ?? NotificationType.system,
-          );
-        },
       ),
       GoRoute(
         path: RouteNames.scholarshipDetails,
@@ -135,6 +87,66 @@ class AppRouter {
           );
         },
       ),
+
+      // ── Applications ────────────────────────────────────────────
+      GoRoute(
+        path: RouteNames.applicationsList,
+        name: 'applicationsList',
+        builder: (context, state) => const ApplicationsListPage(),
+      ),
+      GoRoute(
+        path: RouteNames.applicationTracking,
+        name: 'applicationTracking',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return ApplicationTrackingPage(
+            application: extra?['application'] as ScholarshipApplication?,
+            applicationId: extra?['applicationId'] as String?,
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteNames.applicationForm,
+        name: 'applicationForm',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return ApplicationFormPage(
+            initialScholarship: extra?['scholarship'] as Scholarship?,
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteNames.applicationDetails,
+        name: 'applicationDetails',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return ApplicationDetailPage(
+            application: extra?['application'] as ScholarshipApplication?,
+            applicationId: extra?['applicationId'] as String?,
+          );
+        },
+      ),
+
+      // ── Eligibility ─────────────────────────────────────────────
+      GoRoute(
+        path: RouteNames.eligibilityChecker,
+        name: 'eligibilityChecker',
+        builder: (context, state) => const EligibilityCheckerPage(),
+      ),
+
+      // ── Verification ────────────────────────────────────────────
+      GoRoute(
+        path: RouteNames.verificationCentre,
+        name: 'verificationCentre',
+        builder: (context, state) => const VerificationCentrePage(),
+      ),
+
+      // ── Documents ───────────────────────────────────────────────
+      GoRoute(
+        path: RouteNames.documentWallet,
+        name: 'documentWallet',
+        builder: (context, state) => const DocumentWalletPage(),
+      ),
       GoRoute(
         path: RouteNames.documentDetails,
         name: 'documentDetails',
@@ -148,10 +160,58 @@ class AppRouter {
           );
         },
       ),
+
+      // ── Payments ────────────────────────────────────────────────
+      GoRoute(
+        path: RouteNames.payments,
+        name: 'payments',
+        builder: (context, state) => const PaymentsPage(),
+      ),
+
+      // ── Notifications ───────────────────────────────────────────
+      GoRoute(
+        path: RouteNames.notifications,
+        name: 'notifications',
+        builder: (context, state) => const NotificationsPage(),
+      ),
+      GoRoute(
+        path: RouteNames.notificationDetails,
+        name: 'notificationDetails',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return NotificationDetailPage(
+            title: extra?['title'] as String? ?? 'Notification',
+            message: extra?['message'] as String? ?? 'No message content available.',
+            time: extra?['time'] as String? ?? 'Just now',
+            type: extra?['type'] as NotificationType? ?? NotificationType.system,
+          );
+        },
+      ),
+
+      // ── JAGO Chatbot ────────────────────────────────────────────
+      GoRoute(
+        path: RouteNames.jago,
+        name: 'jago',
+        builder: (context, state) => const JagoChatPage(),
+      ),
+
+      // ── Profile ─────────────────────────────────────────────────
+      GoRoute(
+        path: RouteNames.profile,
+        name: 'profile',
+        builder: (context, state) => const ProfilePage(),
+      ),
       GoRoute(
         path: RouteNames.profileEdit,
         name: 'profileEdit',
         builder: (context, state) => const ProfileEditPage(),
+      ),
+
+      // ── Settings ────────────────────────────────────────────────
+      GoRoute(
+        path: RouteNames.settings,
+        name: 'settings',
+        builder: (context, state) => const SettingsPage(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
