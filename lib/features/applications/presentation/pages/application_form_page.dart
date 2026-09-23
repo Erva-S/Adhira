@@ -3,7 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
+import '../../../../core/constants/india_location_data.dart';
 import '../../../../core/enums/app_enums.dart';
+import '../../../../core/validators/app_validators.dart';
 import '../../../../services/scholarship/scholarship_data_service.dart';
 import '../../../../services/authentication/auth_provider.dart';
 import '../../../../shared/models/models.dart';
@@ -25,9 +27,14 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
   int _currentStep = 0;
   static const int _totalSteps = 5;
 
+  final List<GlobalKey<FormState>> _formKeys = List.generate(
+    _totalSteps,
+    (_) => GlobalKey<FormState>(),
+  );
+
   static const List<String> _stepLabels = [
-    'Scheme',
-    'Tribal',
+    'Personal',
+    'Address',
     'Academic',
     'Bank & Docs',
     'Review',
@@ -48,8 +55,8 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
   final _emailController = TextEditingController(text: 'rajesh.soren@nitrkl.ac.in');
 
   // Controllers - Step 2: Tribal & Domicile
-  String _state = 'Odisha';
-  String _district = 'Mayurbhanj';
+  String? _state = 'Odisha';
+  String? _district = 'Mayurbhanj';
   final _tribeController = TextEditingController(text: 'Santhal');
   final _stCertController = TextEditingController(text: 'ST/OD/2023/88921');
   bool _isPVTG = false;
@@ -114,8 +121,17 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
         if (user.stCertificateNumber != null && user.stCertificateNumber!.isNotEmpty) {
           _stCertController.text = user.stCertificateNumber!;
         }
-        if (user.state != null && user.state!.isNotEmpty) _state = user.state!;
-        if (user.district != null && user.district!.isNotEmpty) _district = user.district!;
+        if (user.state != null &&
+            user.state!.isNotEmpty &&
+            IndiaLocationData.states.contains(user.state)) {
+          _state = user.state!;
+          final validDistricts = IndiaLocationData.getDistricts(_state!);
+          if (user.district != null && validDistricts.contains(user.district)) {
+            _district = user.district!;
+          } else {
+            _district = null;
+          }
+        }
         if (user.institutionName != null && user.institutionName!.isNotEmpty) {
           _instituteController.text = user.institutionName!;
         }
@@ -194,7 +210,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
             ),
           ),
 
-          // Bottom Navigation Buttons
+          // Bottom Action Buttons pinned to screen
           _buildBottomActionButtons(),
         ],
       ),
@@ -202,20 +218,31 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
   }
 
   Widget _buildCurrentStep() {
+    Widget stepWidget;
     switch (_currentStep) {
       case 0:
-        return _buildStep1SchemeAndPersonal();
+        stepWidget = _buildStep1SchemeAndPersonal();
+        break;
       case 1:
-        return _buildStep2TribalAndDomicile();
+        stepWidget = _buildStep2TribalAndDomicile();
+        break;
       case 2:
-        return _buildStep3AcademicDetails();
+        stepWidget = _buildStep3AcademicDetails();
+        break;
       case 3:
-        return _buildStep4BankAndDocuments();
+        stepWidget = _buildStep4BankAndDocuments();
+        break;
       case 4:
-        return _buildStep5ReviewAndSubmit();
+        stepWidget = _buildStep5ReviewAndSubmit();
+        break;
       default:
-        return const SizedBox.shrink();
+        stepWidget = const SizedBox.shrink();
     }
+
+    return Form(
+      key: _formKeys[_currentStep],
+      child: stepWidget,
+    );
   }
 
   // ── Step 1: Scheme & Personal Info ─────────────────────────────────
@@ -234,6 +261,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
             labelText: 'MoTA Scheme *',
             prefixIcon: Icon(Icons.school_outlined),
           ),
+          validator: (val) => val == null ? 'Please select a scheme' : null,
           items: ScholarshipType.values.map((type) {
             final scheme = schemes.firstWhere(
               (s) => s.type == type,
@@ -267,30 +295,46 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
           label: 'Full Name (as per Aadhaar) *',
           controller: _nameController,
           prefixIcon: const Icon(Icons.person_outline),
+          validator: (v) => AppValidators.required(v, 'Full Name'),
         ),
         const SizedBox(height: 12),
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: AppTextField(
                 label: 'Date of Birth *',
                 controller: _dobController,
                 prefixIcon: const Icon(Icons.calendar_today_outlined),
+                validator: (v) => AppValidators.required(v, 'Date of Birth'),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: DropdownButtonFormField<String>(
-                value: _gender,
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  labelText: 'Gender *',
-                  prefixIcon: Icon(Icons.wc_outlined),
-                ),
-                items: ['Male', 'Female', 'Other']
-                    .map((g) => DropdownMenuItem(value: g, child: Text(g)))
-                    .toList(),
-                onChanged: (v) => setState(() => _gender = v ?? _gender),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Gender *',
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: AppColors.textPrimary,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    value: _gender,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.wc_outlined),
+                    ),
+                    validator: (v) => (v == null || v.isEmpty) ? 'Select gender' : null,
+                    items: ['Male', 'Female', 'Other']
+                        .map((g) => DropdownMenuItem(value: g, child: Text(g)))
+                        .toList(),
+                    onChanged: (v) => setState(() => _gender = v ?? _gender),
+                  ),
+                ],
               ),
             ),
           ],
@@ -301,6 +345,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
           controller: _aadhaarController,
           prefixIcon: const Icon(Icons.fingerprint),
           readOnly: true,
+          validator: (v) => AppValidators.required(v, 'Aadhaar Number'),
         ),
         const SizedBox(height: 12),
         AppTextField(
@@ -308,6 +353,12 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
           controller: _mobileController,
           prefixIcon: const Icon(Icons.phone_outlined),
           keyboardType: TextInputType.phone,
+          validator: (v) {
+            if (v == null || v.trim().isEmpty) return 'Mobile number is required';
+            final digits = v.replaceAll(RegExp(r'\D'), '');
+            if (digits.length < 10) return 'Enter a valid 10-digit mobile number';
+            return null;
+          },
         ),
         const SizedBox(height: 12),
         AppTextField(
@@ -315,6 +366,12 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
           controller: _emailController,
           prefixIcon: const Icon(Icons.email_outlined),
           keyboardType: TextInputType.emailAddress,
+          validator: (v) {
+            if (v != null && v.trim().isNotEmpty) {
+              return AppValidators.email(v);
+            }
+            return null;
+          },
         ),
       ],
     );
@@ -322,34 +379,81 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
 
   // ── Step 2: Tribal & Domicile ──────────────────────────────────────
   Widget _buildStep2TribalAndDomicile() {
+    final districts = _state != null ? IndiaLocationData.getDistricts(_state!) : <String>[];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle('Tribal Identity & Domicile', 'Official tribal community verification.'),
         const SizedBox(height: 12),
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: DropdownButtonFormField<String>(
-                value: _state,
-                isExpanded: true,
-                decoration: const InputDecoration(labelText: 'State *'),
-                items: ['Odisha', 'Jharkhand', 'Madhya Pradesh', 'Chhattisgarh', 'Rajasthan', 'Gujarat']
-                    .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                    .toList(),
-                onChanged: (v) => setState(() => _state = v ?? _state),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'State *',
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: AppColors.textPrimary,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    value: _state,
+                    isExpanded: true,
+                    items: IndiaLocationData.states
+                        .map((s) => DropdownMenuItem(
+                              value: s,
+                              child: Text(s, overflow: TextOverflow.ellipsis),
+                            ))
+                        .toList(),
+                    validator: (v) => (v == null || v.isEmpty) ? 'Select state' : null,
+                    onChanged: (v) {
+                      setState(() {
+                        _state = v;
+                        _district = null;
+                      });
+                    },
+                  ),
+                ],
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: DropdownButtonFormField<String>(
-                value: _district,
-                isExpanded: true,
-                decoration: const InputDecoration(labelText: 'District *'),
-                items: ['Mayurbhanj', 'Sundargarh', 'Koraput', 'Rayagada', 'Ranchi', 'Bastar']
-                    .map((d) => DropdownMenuItem(value: d, child: Text(d)))
-                    .toList(),
-                onChanged: (v) => setState(() => _district = v ?? _district),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'District *',
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: AppColors.textPrimary,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    key: ValueKey('district_dropdown_$_state'),
+                    value: (_district != null && districts.contains(_district)) ? _district : null,
+                    isExpanded: true,
+                    hint: Text(
+                      _state == null ? 'Select state first' : 'Select district',
+                      style: const TextStyle(fontSize: 13, color: AppColors.textTertiary),
+                    ),
+                    items: districts
+                        .map((d) => DropdownMenuItem(
+                              value: d,
+                              child: Text(d, overflow: TextOverflow.ellipsis),
+                            ))
+                        .toList(),
+                    validator: (v) => (v == null || v.isEmpty) ? 'Select district' : null,
+                    onChanged: _state == null
+                        ? null
+                        : (v) => setState(() => _district = v),
+                  ),
+                ],
               ),
             ),
           ],
@@ -359,12 +463,14 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
           label: 'Notified Scheduled Tribe (ST) Name *',
           controller: _tribeController,
           prefixIcon: const Icon(Icons.people_outline),
+          validator: (v) => AppValidators.required(v, 'Tribe Name'),
         ),
         const SizedBox(height: 12),
         AppTextField(
           label: 'ST Certificate Number *',
           controller: _stCertController,
           prefixIcon: const Icon(Icons.badge_outlined),
+          validator: (v) => AppValidators.required(v, 'ST Certificate Number'),
         ),
         const SizedBox(height: 16),
         Card(
@@ -398,12 +504,14 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
           label: 'Name of Institution *',
           controller: _instituteController,
           prefixIcon: const Icon(Icons.account_balance_outlined),
+          validator: (v) => AppValidators.required(v, 'Institution Name'),
         ),
         const SizedBox(height: 12),
         AppTextField(
           label: 'Course / Degree *',
           controller: _courseController,
           prefixIcon: const Icon(Icons.school_outlined),
+          validator: (v) => AppValidators.required(v, 'Course / Degree'),
         ),
         const SizedBox(height: 12),
         Row(
@@ -413,6 +521,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                 label: 'Current Year / Sem *',
                 controller: _yearController,
                 prefixIcon: const Icon(Icons.calendar_view_day_outlined),
+                validator: (v) => AppValidators.required(v, 'Current Year'),
               ),
             ),
             const SizedBox(width: 12),
@@ -421,19 +530,33 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                 label: 'Previous Marks % *',
                 controller: _marksController,
                 prefixIcon: const Icon(Icons.grade_outlined),
+                validator: (v) => AppValidators.required(v, 'Previous Marks'),
               ),
             ),
           ],
         ),
         const SizedBox(height: 12),
-        DropdownButtonFormField<String>(
-          value: _academicYear,
-          isExpanded: true,
-          decoration: const InputDecoration(labelText: 'Academic Year *'),
-          items: ['2025-26', '2024-25']
-              .map((y) => DropdownMenuItem(value: y, child: Text(y)))
-              .toList(),
-          onChanged: (v) => setState(() => _academicYear = v ?? _academicYear),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Academic Year *',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: AppColors.textPrimary,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<String>(
+              value: _academicYear,
+              isExpanded: true,
+              items: ['2025-26', '2024-25']
+                  .map((y) => DropdownMenuItem(value: y, child: Text(y)))
+                  .toList(),
+              validator: (v) => (v == null || v.isEmpty) ? 'Select academic year' : null,
+              onChanged: (v) => setState(() => _academicYear = v ?? _academicYear),
+            ),
+          ],
         ),
       ],
     );
@@ -450,18 +573,30 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
           label: 'Bank Name *',
           controller: _bankNameController,
           prefixIcon: const Icon(Icons.account_balance),
+          validator: (v) => AppValidators.required(v, 'Bank Name'),
         ),
         const SizedBox(height: 12),
         AppTextField(
           label: 'Account Number *',
           controller: _accountNoController,
           prefixIcon: const Icon(Icons.credit_card),
+          keyboardType: TextInputType.number,
+          validator: (v) {
+            if (v == null || v.trim().isEmpty) return 'Account Number is required';
+            if (v.trim().length < 8) return 'Enter a valid Account Number';
+            return null;
+          },
         ),
         const SizedBox(height: 12),
         AppTextField(
           label: 'IFSC Code *',
           controller: _ifscController,
           prefixIcon: const Icon(Icons.tag),
+          validator: (v) {
+            if (v == null || v.trim().isEmpty) return 'IFSC Code is required';
+            if (v.trim().length < 4) return 'Enter a valid IFSC Code';
+            return null;
+          },
         ),
         const SizedBox(height: 12),
         Container(
@@ -498,7 +633,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.successLight.withOpacity(0.3),
+                    color: AppColors.successLight.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: AppColors.success),
                   ),
@@ -544,8 +679,8 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
 
         _buildSectionTitle('Document Checklist', 'Tick verified documents ready for submission.'),
         const SizedBox(height: 8),
-        _buildDocCheckItem('Aadhaar Card (UIDAI verified)', _docAadhaar, (v) => setState(() => _docAadhaar = v)),
-        _buildDocCheckItem('ST/Caste Certificate (e-District)', _docSTCert, (v) => setState(() => _docSTCert = v)),
+        _buildDocCheckItem('Aadhaar Card (UIDAI verified) *', _docAadhaar, (v) => setState(() => _docAadhaar = v)),
+        _buildDocCheckItem('ST/Caste Certificate (e-District) *', _docSTCert, (v) => setState(() => _docSTCert = v)),
         _buildDocCheckItem('Income Certificate (< ₹2.50 Lakh)', _docIncome, (v) => setState(() => _docIncome = v)),
         _buildDocCheckItem('Previous Year Marksheet', _docMarksheet, (v) => setState(() => _docMarksheet = v)),
         _buildDocCheckItem('Institution Bonafide / Enrollment', _docBonafide, (v) => setState(() => _docBonafide = v)),
@@ -569,7 +704,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
         _buildReviewCard('Personal & Tribal', [
           _buildReviewRow('Student Name', _nameController.text),
           _buildReviewRow('DOB & Gender', '${_dobController.text} • $_gender'),
-          _buildReviewRow('Tribe & District', '${_tribeController.text} • $_district, $_state'),
+          _buildReviewRow('Tribe & District', '${_tribeController.text} • ${_district ?? "Not selected"}, ${_state ?? "Not selected"}'),
           _buildReviewRow('ST Certificate No', _stCertController.text),
           _buildReviewRow('PVTG Status', _isPVTG ? 'Yes' : 'No'),
         ]),
@@ -674,37 +809,111 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
     final isLastStep = _currentStep == _totalSteps - 1;
 
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surface,
-        border: Border(top: BorderSide(color: AppColors.border)),
-      ),
-      child: Row(
-        children: [
-          if (_currentStep > 0) ...[
-            OutlinedButton(
-              onPressed: () => setState(() => _currentStep--),
-              child: const Text('Back'),
-            ),
-            const SizedBox(width: 12),
-          ],
-          Expanded(
-            child: ElevatedButton(
-              onPressed: isLastStep ? (_declarationChecked ? _submitApplication : null) : _nextStep,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
-              child: Text(isLastStep ? 'Submit Application' : 'Next Step'),
-            ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -3),
           ),
         ],
+        border: const Border(top: BorderSide(color: AppColors.border)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              if (_currentStep > 0) ...[
+                OutlinedButton.icon(
+                  onPressed: () => setState(() => _currentStep--),
+                  icon: const Icon(Icons.arrow_back, size: 18),
+                  label: const Text('Back'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    side: const BorderSide(color: AppColors.primary, width: 1.5),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+                const SizedBox(width: 12),
+              ],
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    if (isLastStep) {
+                      if (!_declarationChecked) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please check the Declaration of Authenticity before submitting.'),
+                            backgroundColor: AppColors.error,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        return;
+                      }
+                      _submitApplication();
+                    } else {
+                      _nextStep();
+                    }
+                  },
+                  icon: Icon(
+                    isLastStep ? Icons.check_circle_outline : Icons.arrow_forward,
+                    size: 20,
+                  ),
+                  label: Text(
+                    isLastStep ? 'Review & Submit' : 'Next Step',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
   void _nextStep() {
+    final formState = _formKeys[_currentStep].currentState;
+    if (formState != null && !formState.validate()) {
+      return;
+    }
+
+    // Step 2 specific check: ensure state and district are selected
+    if (_currentStep == 1) {
+      if (_state == null || _state!.isEmpty || _district == null || _district!.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select both State and District to proceed.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+    }
+
+    // Step 4 specific check: ensure essential documents are checked
+    if (_currentStep == 3) {
+      if (!_docAadhaar || !_docSTCert) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please verify required documents (Aadhaar & ST Certificate) before proceeding.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+    }
+
     if (_currentStep < _totalSteps - 1) {
       setState(() => _currentStep++);
     }

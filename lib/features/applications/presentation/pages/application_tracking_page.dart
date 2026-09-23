@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
+import '../../../../services/authentication/auth_provider.dart';
+import '../../../../services/pdf/application_pdf_service.dart';
 import '../../../../services/scholarship/scholarship_data_service.dart';
 import '../../../../services/scholarship/scholarship_mock_data.dart';
 import '../../../../shared/models/models.dart';
@@ -221,10 +223,33 @@ class ApplicationTrackingPage extends StatelessWidget {
                 label: 'Download Application PDF',
                 icon: Icons.download,
                 variant: AppButtonVariant.outline,
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Downloading PDF for $appNumber...')),
-                  );
+                onPressed: () async {
+                  if (app == null) return;
+                  AuthProvider? authProvider;
+                  try {
+                    authProvider = Provider.of<AuthProvider>(context, listen: false);
+                  } catch (_) {}
+                  final student = authProvider?.currentUser ??
+                      Student(
+                        id: app.studentId,
+                        fullName: 'Rajesh Kumar Munda',
+                        category: 'ST',
+                      );
+                  final history = service != null
+                      ? await service.getStatusHistory(app.id)
+                      : <ApplicationStatusHistory>[];
+                  final payments = service != null
+                      ? service.getPaymentsForApplication(app.id)
+                      : <Payment>[];
+                  if (context.mounted) {
+                    await ApplicationPdfService.downloadOrShareApplicationPdf(
+                      context,
+                      application: app,
+                      student: student,
+                      statusHistory: history,
+                      payments: payments,
+                    );
+                  }
                 },
               ),
             ),

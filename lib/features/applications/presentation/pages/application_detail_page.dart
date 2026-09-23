@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
+import '../../../../services/authentication/auth_provider.dart';
+import '../../../../services/pdf/application_pdf_service.dart';
 import '../../../../services/scholarship/scholarship_data_service.dart';
 import '../../../../shared/models/models.dart';
 import '../../../../shared/widgets/app_back_button.dart';
@@ -228,14 +230,27 @@ class ApplicationDetailPage extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Downloading application receipt for ${app.applicationNumber}...',
-                                ),
-                              ),
-                            );
+                          onPressed: () async {
+                            AuthProvider? authProvider;
+                            try {
+                              authProvider = Provider.of<AuthProvider>(context, listen: false);
+                            } catch (_) {}
+                            final student = authProvider?.currentUser ??
+                                Student(
+                                  id: app.studentId,
+                                  fullName: 'Rajesh Kumar Munda',
+                                  category: 'ST',
+                                );
+                            final history = await scholarshipService.getStatusHistory(app.id);
+                            if (context.mounted) {
+                              await ApplicationPdfService.downloadOrShareApplicationPdf(
+                                context,
+                                application: app,
+                                student: student,
+                                statusHistory: history,
+                                payments: linkedPayments,
+                              );
+                            }
                           },
                           icon: const Icon(Icons.download, size: 18),
                           label: const Text('Download PDF'),
