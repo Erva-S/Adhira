@@ -28,35 +28,45 @@ class AppBottomNav extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _NavItem(
-                icon: Icons.home_rounded,
-                label: 'Home',
-                isSelected: currentIndex == 0,
-                onTap: () => context.go(RouteNames.dashboard),
+              Expanded(
+                child: _NavItem(
+                  icon: Icons.home_rounded,
+                  label: 'Home',
+                  isSelected: currentIndex == 0,
+                  onTap: () => context.go(RouteNames.dashboard),
+                ),
               ),
-              _NavItem(
-                icon: Icons.school_rounded,
-                label: 'Schemes',
-                isSelected: currentIndex == 1,
-                onTap: () => context.go(RouteNames.scholarshipDiscovery),
+              Expanded(
+                child: _NavItem(
+                  icon: Icons.school_rounded,
+                  label: 'Schemes',
+                  isSelected: currentIndex == 1,
+                  onTap: () => context.go(RouteNames.scholarshipDiscovery),
+                ),
               ),
-              _NavItem(
-                icon: Icons.folder_rounded,
-                label: 'Documents',
-                isSelected: currentIndex == 2,
-                onTap: () => context.go(RouteNames.documentWallet),
+              Expanded(
+                child: _NavItem(
+                  icon: Icons.folder_rounded,
+                  label: 'Documents',
+                  isSelected: currentIndex == 2,
+                  onTap: () => context.go(RouteNames.documentWallet),
+                ),
               ),
-              _NavItem(
-                icon: Icons.chat_bubble_rounded,
-                label: 'JAGO',
-                isSelected: currentIndex == 3,
-                onTap: () => context.go(RouteNames.jago),
+              Expanded(
+                child: _NavItem(
+                  icon: Icons.chat_bubble_rounded,
+                  label: 'JAGO',
+                  isSelected: currentIndex == 3,
+                  onTap: () => context.go(RouteNames.jago),
+                ),
               ),
-              _NavItem(
-                icon: Icons.person_rounded,
-                label: 'Profile',
-                isSelected: currentIndex == 4,
-                onTap: () => context.go(RouteNames.profile),
+              Expanded(
+                child: _NavItem(
+                  icon: Icons.person_rounded,
+                  label: 'Profile',
+                  isSelected: currentIndex == 4,
+                  onTap: () => context.go(RouteNames.profile),
+                ),
               ),
             ],
           ),
@@ -85,7 +95,7 @@ class _NavItem extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
