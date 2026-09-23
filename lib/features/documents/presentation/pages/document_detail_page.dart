@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
+import '../../../../services/authentication/auth_provider.dart';
+import '../../../../services/pdf/application_pdf_service.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/status_badge.dart';
 
@@ -107,9 +110,21 @@ class DocumentDetailPage extends StatelessWidget {
 
             // Action Buttons
             ElevatedButton.icon(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Downloading document...')),
+              onPressed: () async {
+                AuthProvider? authProvider;
+                try {
+                  authProvider = Provider.of<AuthProvider>(context, listen: false);
+                } catch (_) {}
+                final student = authProvider?.currentUser;
+                await ApplicationPdfService.downloadOrShareDocumentPdf(
+                  context,
+                  title: name,
+                  type: category.label,
+                  studentName: student?.fullName ?? 'Rajesh Kumar Munda',
+                  certNumber: student?.stCertificateNumber ?? 'ST/OD/2023/88921',
+                  issuer: 'Revenue Department / Tehsildar, Mayurbhanj',
+                  issueDate: '16 Aug 2023',
+                  isDigiLocker: isFromDigiLocker,
                 );
               },
               icon: const Icon(Icons.download),

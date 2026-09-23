@@ -241,11 +241,20 @@ class DashboardPage extends StatelessWidget {
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
                             ),
                             const SizedBox(height: 12),
-                            Row(
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 6,
                               children: [
-                                _StatChip(label: 'Academic Year', value: currentApp.academicYear ?? '2025-26', color: AppColors.primary),
-                                const SizedBox(width: 8),
-                                _StatChip(label: 'Pending Actions', value: '${currentApp.pendingActions.length}', color: currentApp.pendingActions.isNotEmpty ? AppColors.warning : AppColors.success),
+                                _StatChip(
+                                  label: 'Academic Year',
+                                  value: currentApp.academicYear ?? '2025-26',
+                                  color: AppColors.primary,
+                                ),
+                                _StatChip(
+                                  label: 'Pending Actions',
+                                  value: '${currentApp.pendingActions.length}',
+                                  color: currentApp.pendingActions.isNotEmpty ? AppColors.warning : AppColors.success,
+                                ),
                               ],
                             ),
                             const SizedBox(height: 12),
@@ -476,12 +485,15 @@ class _StatChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Text('$label: $value', style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w600)),
+      child: Text(
+        '$label: $value',
+        style: TextStyle(fontSize: 11.5, color: color, fontWeight: FontWeight.w600),
+      ),
     );
   }
 }
