@@ -1,3 +1,8 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import '../../app/config/environment.dart';
+import '../api/api_endpoints.dart';
 import '../../core/enums/app_enums.dart';
 import '../../shared/models/models.dart';
 import '../database/relational_data_store.dart';
@@ -6,6 +11,7 @@ import '../scholarship/scholarship_mock_data.dart';
 
 /// Closed-domain AI Assistant Engine for JAGO inside Tribal Scholar Saathi.
 ///
+/// Communicates securely with the backend JAGO Gemini AI service.
 /// Enforces strict domain boundaries:
 /// 1. Only answers from approved MoTA scholarship schemes, eligibility rules,
 ///    document requirements, and the current student's application data.
@@ -15,19 +21,22 @@ import '../scholarship/scholarship_mock_data.dart';
 class JagoAssistantEngine {
   // ── Canonical Controlled Responses ─────────────────────────────────────────
   static const String outOfScopeMessage =
-      "I'm JAGO, the scholarship assistant for Tribal Scholar Saathi. I can only help with scholarship-related information, applications, documents, eligibility, and payment status.";
+      "I'm JAGO, the scholarship assistant. I can help with scholarship schemes, eligibility, applications, documents, verification, DBT, and application status.";
 
   static const String unavailableInfoMessage =
-      "I don't have that information in the current scholarship data.";
+      "I don't have verified information about that in the scholarship system.";
 
   static const String missingStudentDataMessage =
-      "I don't have enough information about your application to answer that yet.";
+      "I couldn't retrieve that information from your application right now.";
 
   static const String missingPaymentInfoMessage =
       "I don't have payment information for your application yet.";
 
+  static const String serviceUnavailableMessage =
+      "JAGO is temporarily unavailable. Please try again shortly.";
+
   static const String systemInstruction = '''
-You are JAGO, the scholarship assistant inside Tribal Scholar Saathi.
+You are JAGO, the official scholarship assistant inside Tribal Scholar Saathi for the Ministry of Tribal Affairs (MoTA).
 
 You are a closed-domain assistant.
 
@@ -56,6 +65,57 @@ Keep responses concise and student-friendly.
     this.scholarshipService,
     this.currentStudent,
   });
+
+  /// Communicates with the secure JAGO Gemini AI backend server.
+  /// Never exposes the Gemini API key in client code.
+  static Future<String> queryBackend({
+    required String message,
+    List<Map<String, String>> conversationHistory = const [],
+    String? userId,
+    String? applicationId,
+    String locale = 'en',
+    ScholarshipDataService? scholarshipService,
+    Student? student,
+  }) async {
+    try {
+      String baseUrl = EnvironmentConfig.current.apiBaseUrl;
+      // In Android emulator, route localhost to host loopback 10.0.2.2
+      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android && baseUrl.contains('localhost')) {
+        baseUrl = baseUrl.replaceAll('localhost', '10.0.2.2');
+      }
+
+      final url = Uri.parse('$baseUrl${ApiEndpoints.jagoChat}');
+      final response = await http
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'message': message,
+              'conversationHistory': conversationHistory,
+              'userId': userId ?? student?.id ?? RelationalDataStore.demoUserId,
+              'applicationId': applicationId ?? (scholarshipService?.activeApplications.firstOrNull?.id),
+              'locale': locale,
+            }),
+          )
+          .timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        if (data['success'] == true && data['reply'] != null) {
+          return data['reply'] as String;
+        }
+      }
+      return serviceUnavailableMessage;
+    } catch (_) {
+      // If backend server is offline during development/tests, fallback to deterministic domain engine
+      return respond(
+        message,
+        scholarshipService: scholarshipService,
+        student: student,
+      );
+    }
+  }
+
 
   /// Processes a user query and returns a strictly grounded response.
   String processQuery(String query) {

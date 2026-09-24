@@ -1,0 +1,235 @@
+{
+  "version": "1.0",
+  "ministry": "Ministry of Tribal Affairs (MoTA), Government of India",
+  "portal": "https://scholarships.gov.in",
+  "schemes": [
+    {
+      "id": "sch-pre-matric",
+      "code": "PRE_MATRIC",
+      "name": "Pre-Matric Scholarship for ST Students",
+      "targetAudience": "ST students studying in Classes 9 and 10",
+      "description": "Financial assistance for Scheduled Tribe students studying in classes 9 and 10 in recognized schools to reduce dropout rates and encourage tribal youth to transition from elementary to secondary education.",
+      "duration": "1 Academic Year (10 Months)",
+      "maxAmount": 22500,
+      "currency": "INR",
+      "eligibilityCriteria": [
+        "Must belong to a notified Scheduled Tribe (ST) category.",
+        "Must be studying in Class 9 or Class 10 in a government or recognized school.",
+        "Annual family income from all sources must not exceed Rs. 2,50,000 (Rs. 2.50 Lakh).",
+        "Must not be holding any other scholarship under central/state government schemes for the same stage.",
+        "Must maintain regular attendance (minimum 50%) and satisfactory academic performance."
+      ],
+      "requiredDocuments": [
+        "ST / Caste Certificate (issued by competent revenue authority)",
+        "Income Certificate for current academic year (from Tehsildar / SDO)",
+        "Previous Class Marksheet / Passing Certificate",
+        "School Bonafide / Enrollment Certificate with UDISE code",
+        "Student Aadhaar Card",
+        "Bank Passbook copy (Aadhaar-seeded bank account for DBT)"
+      ],
+      "applicationProcedure": [
+        "1. Complete Student Profile in Tribal Scholar Saathi with Aadhaar verification.",
+        "2. Link DigiLocker to auto-fetch verified ST & Aadhaar certificates.",
+        "3. Select Pre-Matric Scholarship scheme and verify academic details.",
+        "4. Upload valid Income Certificate for current academic year.",
+        "5. Submit application for School / Headmaster verification."
+      ],
+      "verificationStages": [
+        "Stage 1: School Verification by Headmaster / Principal",
+        "Stage 2: District Welfare Officer (DWO) scrutiny",
+        "Stage 3: State Tribal Welfare Department approval",
+        "Stage 4: MoTA Sanction & DBT credit via PFMS"
+      ],
+      "dbtInformation": "Stipend and book grants are transferred directly into the student's Aadhaar-seeded bank account through the Public Financial Management System (PFMS).",
+      "importantConditions": [
+        "Scholarship is tenable only in recognized government or aided schools.",
+        "Failure or dropout terminates the scholarship for that academic year.",
+        "Income certificate must be renewed every financial year."
+      ],
+      "officialSource": "Ministry of Tribal Affairs Scheme Guidelines (scholarships.gov.in)"
+    },
+    {
+      "id": "sch-post-matric",
+      "code": "POST_MATRIC",
+      "name": "Post-Matric Scholarship for ST Students",
+      "targetAudience": "ST students pursuing post-matriculation courses (Class 11, 12, ITI, Diploma, Degree, PG, Professional courses)",
+      "description": "The flagship Centrally Sponsored Scheme of the Ministry of Tribal Affairs providing comprehensive financial support to ST students at post-matriculation or post-secondary stages to enable them to complete higher education.",
+      "duration": "Duration of the enrolled course (1 to 5 years)",
+      "maxAmount": 70000,
+      "currency": "INR",
+      "eligibilityCriteria": [
+        "Must belong to a notified Scheduled Tribe (ST) category.",
+        "Must be enrolled in Class 11, 12, ITI, Polytechnic, Diploma, Undergraduate, Postgraduate, or Doctoral program in an institution with a valid AISHE code.",
+        "Annual family income from all sources must not exceed Rs. 2,50,000 (Rs. 2.50 Lakh).",
+        "Must hold a valid Aadhaar-seeded bank account.",
+        "Must have passed the qualifying previous examination.",
+        "All children of the same parents can be considered (subject to income ceiling)."
+      ],
+      "requiredDocuments": [
+        "ST / Caste Certificate (issued by competent authority)",
+        "Income Certificate for current academic year (from competent revenue authority)",
+        "Class 10 and Class 12 Marksheets / Passing Certificates",
+        "Institution Bonafide / Enrollment Certificate with AISHE code",
+        "Fee Structure Breakdown from Institution",
+        "Student Aadhaar Card",
+        "Bank Passbook / Cancelled Cheque (Aadhaar-seeded account)",
+        "Hostel Certificate (if applicable for hosteller rate allowance)"
+      ],
+      "applicationProcedure": [
+        "1. Complete Student Profile in Tribal Scholar Saathi with tribal & academic details.",
+        "2. Connect DigiLocker to auto-verify Identity and Marksheets.",
+        "3. Choose Post-Matric Scholarship and input current course details.",
+        "4. Attach updated Income Certificate and Bonafide Certificate.",
+        "5. Submit application for College Nodal Officer verification."
+      ],
+      "verificationStages": [
+        "Stage 1: Institute Verification by College Nodal Officer / Dean",
+        "Stage 2: District Welfare Office / State Department Verification",
+        "Stage 3: Sanction by State Tribal Welfare Department & MoTA",
+        "Stage 4: Direct Benefit Transfer (DBT) disbursement via PFMS"
+      ],
+      "dbtInformation": "Tuition fee component is credited directly to the institution or student account, and monthly maintenance allowance is credited directly to the student's Aadhaar-seeded bank account via PFMS.",
+      "importantConditions": [
+        "Maintenance allowance rates vary for Hostellers and Day Scholars.",
+        "Scholarship is discontinued if the student fails or abandons the course.",
+        "Change of course requires prior approval from State Department."
+      ],
+      "officialSource": "MoTA Post-Matric Scholarship Guidelines (tribal.nic.in / scholarships.gov.in)"
+    },
+    {
+      "id": "sch-top-class",
+      "code": "TOP_CLASS",
+      "name": "National Scholarship for Higher Education of ST Students (Top Class Education)",
+      "targetAudience": "Meritorious ST students admitted to notified premier institutions (IITs, NITs, IIMs, NLUs, AIIMS, premier central universities)",
+      "description": "Central Sector Scheme providing full financial support to meritorious ST students pursuing graduate and post-graduate courses in 250+ notified premier institutes of excellence across India.",
+      "duration": "Full duration of the degree course",
+      "maxAmount": 250000,
+      "currency": "INR",
+      "eligibilityCriteria": [
+        "Must belong to a notified Scheduled Tribe (ST) category.",
+        "Must have secured admission in one of the notified premier institutes (IIT, NIT, IIM, AIIMS, NLU, etc.) through national competitive examinations (JEE, NEET, CAT, CLAT).",
+        "Annual family income from all sources must not exceed Rs. 6,00,000 (Rs. 6.00 Lakh).",
+        "Scholarship is restricted to the maximum notified slots allocated to each institute per year."
+      ],
+      "requiredDocuments": [
+        "ST / Caste Certificate",
+        "Income Certificate (Current financial year, <= Rs. 6 Lakh)",
+        "Institute Admission Offer Letter & Fee Receipt",
+        "Entrance Examination Scorecard / Rank Card (JEE / NEET / CAT / CLAT)",
+        "Class 12 Marksheet",
+        "Aadhaar Card",
+        "Bank Account Passbook (Aadhaar-seeded)"
+      ],
+      "applicationProcedure": [
+        "1. Complete Profile with Premier Institution details in Tribal Scholar Saathi.",
+        "2. Link DigiLocker to verify Caste and Identity.",
+        "3. Submit admission letter, rank card, and institutional fee schedule.",
+        "4. Application is routed to Premier Institute Nodal Officer.",
+        "5. On institutional verification, MoTA generates the sanction order."
+      ],
+      "verificationStages": [
+        "Stage 1: Institutional Verification by Premier Institute Nodal Officer",
+        "Stage 2: MoTA Steering Committee scrutiny and slot allotment",
+        "Stage 3: Sanction Order issuance by Ministry of Tribal Affairs",
+        "Stage 4: Direct disbursement of tuition fee and student allowances via DBT"
+      ],
+      "dbtInformation": "Full non-refundable tuition fees are paid directly to the institute, while living expenses (Rs. 3,000/month), book allowance (Rs. 5,000/year), and one-time computer grant (Rs. 45,000) are disbursed via DBT to the student's bank account.",
+      "importantConditions": [
+        "Student must maintain satisfactory academic standing as per institute norms.",
+        "Only valid for institutes notified under the Top Class scheme."
+      ],
+      "officialSource": "MoTA Top Class Education Scheme Guidelines"
+    },
+    {
+      "id": "sch-nfst",
+      "code": "NFST",
+      "name": "National Fellowship for ST Students (NFST)",
+      "targetAudience": "ST scholars pursuing full-time M.Phil and Ph.D degrees in recognized Indian universities",
+      "description": "Central Sector fellowship scheme providing financial assistance to Scheduled Tribe candidates pursuing regular and full-time higher studies leading to M.Phil and Ph.D degrees in Sciences, Humanities, Engineering, and Social Sciences.",
+      "duration": "Up to 5 Years (2 years JRF + 3 years SRF)",
+      "maxAmount": 42000,
+      "currency": "INR",
+      "eligibilityCriteria": [
+        "Must belong to a notified Scheduled Tribe (ST) category.",
+        "Must have qualified UGC-NET, CSIR-NET, or equivalent national eligibility test.",
+        "Must have secured regular, full-time admission in M.Phil / Ph.D in a UGC-recognized university / institution.",
+        "No income limit applies for this merit fellowship.",
+        "Candidate must not be in full-time gainful employment during the fellowship tenure."
+      ],
+      "requiredDocuments": [
+        "ST Certificate",
+        "UGC-NET / CSIR-NET Scorecard and Award Letter",
+        "University Ph.D / M.Phil Admission / Registration Letter",
+        "Research Proposal / Synopsis approved by University",
+        "Recommendation from Research Supervisor and Head of Department",
+        "Aadhaar Card",
+        "Bank Passbook copy"
+      ],
+      "applicationProcedure": [
+        "1. Complete Profile with research scholar credentials.",
+        "2. Submit NET scorecard, university registration, and research proposal.",
+        "3. University Nodal Officer verifies registration and attendance.",
+        "4. MoTA Fellowship Cell awards JRF/SRF sanction letter.",
+        "5. Monthly stipends are released based on quarterly supervisor progress reports."
+      ],
+      "verificationStages": [
+        "Stage 1: University Research Department / Nodal Officer verification",
+        "Stage 2: MoTA Technical Evaluation and Award Letter issuance",
+        "Stage 3: Monthly Fellowship disbursement via DBT on PFMS portal"
+      ],
+      "dbtInformation": "Monthly fellowship (JRF: Rs. 37,000/month; SRF: Rs. 42,000/month) plus HRA and contingency grant (Rs. 25,000/year for science, Rs. 12,000/year for humanities) credited monthly via DBT.",
+      "importantConditions": [
+        "Conversion from JRF to SRF requires completion of 2 years and evaluation by assessment committee.",
+        "Scholars must submit half-yearly progress reports certified by the guide."
+      ],
+      "officialSource": "MoTA National Fellowship Scheme Guidelines (fellowship.tribal.gov.in)"
+    },
+    {
+      "id": "sch-nos",
+      "code": "NOS",
+      "name": "National Overseas Scholarship for ST Candidates",
+      "targetAudience": "Meritorious ST students pursuing Masters, Ph.D, or Post-Doctoral studies in top accredited foreign universities",
+      "description": "Prestigious Central Sector Scheme providing comprehensive financial support to 20 meritorious Scheduled Tribe candidates each year to pursue Master level, Ph.D, and Post-Doctoral studies abroad in accredited institutions across USA, UK, Germany, Canada, Australia, etc.",
+      "duration": "Masters: 2 to 3 Years | Ph.D: 4 to 5 Years",
+      "maxAmount": 2000000,
+      "currency": "INR",
+      "eligibilityCriteria": [
+        "Must belong to a notified Scheduled Tribe (ST) category.",
+        "Must have secured unconditional admission offer from an institution ranked in the Top 500 QS World University Rankings.",
+        "Total annual family income must not exceed Rs. 6,00,000 (Rs. 6.00 Lakh).",
+        "Minimum 55% marks in qualifying Bachelor's / Master's degree.",
+        "Age below 35 years as on the first day of the application year.",
+        "Valid Indian Passport holder."
+      ],
+      "requiredDocuments": [
+        "ST Certificate",
+        "Income Certificate for current financial year (<= Rs. 6.00 Lakh)",
+        "Unconditional Admission Offer Letter from Top 500 QS Foreign University",
+        "Valid Indian Passport (biographical pages)",
+        "GRE / GMAT / IELTS / TOEFL Scorecard",
+        "Qualifying Degree Marksheets and Degree Certificate",
+        "Statement of Purpose (SOP)",
+        "Aadhaar Card"
+      ],
+      "applicationProcedure": [
+        "1. Register on Overseas Tribal Portal / Tribal Scholar Saathi.",
+        "2. Upload unconditional foreign admission letter and QS ranking verification.",
+        "3. Provide academic transcripts, SOP, and income documentation.",
+        "4. Interview and scrutiny by MoTA Overseas Selection Board.",
+        "5. Award letter generation and foreign currency fee transfer."
+      ],
+      "verificationStages": [
+        "Stage 1: Document verification by MoTA Overseas Division",
+        "Stage 2: Scrutiny by MoTA Expert Selection Committee",
+        "Stage 3: Sanction Order and Visa facilitation letter issuance",
+        "Stage 4: Tuition fee disbursement directly to foreign university and living stipend via Indian Embassy / Mission"
+      ],
+      "dbtInformation": "Covers actual tuition fees paid to the foreign university, annual maintenance allowance (USD 15,400 for USA / GBP 9,900 for UK), contingency allowance, visa fees, economy air passage, and medical insurance.",
+      "importantConditions": [
+        "Candidate must execute a bond to return to India after course completion.",
+        "Total 20 awards per year."
+      ],
+      "officialSource": "MoTA National Overseas Scholarship Guidelines (overseas.tribal.gov.in)"
+    }
+  ]
+}

@@ -204,5 +204,25 @@ void main() {
       );
       expect(response, equals(JagoAssistantEngine.missingStudentDataMessage));
     });
+
+    // ── Asynchronous queryBackend Tests ─────────────────────────────────────
+    test('queryBackend handles domain query with fallback gracefully', () async {
+      final response = await JagoAssistantEngine.queryBackend(
+        message: "What's my application status?",
+        scholarshipService: service,
+        student: demoStudent,
+      );
+      expect(response, contains('Post-Matric Scholarship'));
+      expect(response, contains('Department Verification'));
+    });
+
+    test('queryBackend rejects out-of-domain queries', () async {
+      final response = await JagoAssistantEngine.queryBackend(
+        message: 'Who is Elon Musk?',
+        scholarshipService: service,
+        student: demoStudent,
+      );
+      expect(response, equals(JagoAssistantEngine.outOfScopeMessage));
+    });
   });
 }
