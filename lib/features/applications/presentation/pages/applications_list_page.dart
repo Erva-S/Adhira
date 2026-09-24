@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
+import '../../../../core/localization/app_localizations_extension.dart';
 import '../../../../services/scholarship/scholarship_data_service.dart';
 import '../../../../shared/models/models.dart';
 import '../../../../shared/widgets/app_back_button.dart';
@@ -37,6 +38,7 @@ class _ApplicationsListPageState extends State<ApplicationsListPage>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Consumer<ScholarshipDataService>(
       builder: (context, scholarshipService, _) {
         final allApps = scholarshipService.applications;
@@ -44,7 +46,7 @@ class _ApplicationsListPageState extends State<ApplicationsListPage>
         return Scaffold(
           appBar: AppBar(
             leading: const AppBackButton(fallbackRoute: RouteNames.scholarshipDashboard),
-            title: const Text('My Applications'),
+            title: Text(l10n.myApplications),
             bottom: TabBar(
               controller: _tabController,
               isScrollable: true,
@@ -55,10 +57,10 @@ class _ApplicationsListPageState extends State<ApplicationsListPage>
               indicatorWeight: 3,
               tabs: [
                 Tab(text: 'All (${allApps.length})'),
-                Tab(text: 'Active (${scholarshipService.activeCount})'),
-                Tab(text: 'Approved (${scholarshipService.completedApplications.length})'),
-                Tab(text: 'Drafts (${scholarshipService.draftApplications.length})'),
-                Tab(text: 'Rejected (${scholarshipService.rejectedApplications.length})'),
+                Tab(text: '${l10n.statusUnderReview} (${scholarshipService.activeCount})'),
+                Tab(text: '${l10n.statusApproved} (${scholarshipService.completedApplications.length})'),
+                Tab(text: '${l10n.statusDraft} (${scholarshipService.draftApplications.length})'),
+                Tab(text: '${l10n.statusRejected} (${scholarshipService.rejectedApplications.length})'),
               ],
             ),
           ),

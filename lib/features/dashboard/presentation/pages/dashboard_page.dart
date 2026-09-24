@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
+import '../../../../core/localization/app_localizations_extension.dart';
+import '../../../../core/localization/localized_helpers.dart';
 import '../../../../services/scholarship/scholarship_data_service.dart';
 import '../../../../services/authentication/auth_provider.dart';
 import '../../../../shared/widgets/app_bottom_nav.dart';
@@ -66,13 +68,13 @@ class DashboardPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Namaste, $displayName 🙏',
+                                context.l10n.namasteUser(displayName),
                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                               ),
                               Text(
                                 currentApp != null
-                                    ? '${currentApp.scholarshipName} • ${currentApp.academicYear ?? "2025-26"}'
-                                    : 'Tribal Scholar Saathi • MoTA',
+                                    ? '${LocalizedHelpers.getScholarshipTypeName(context, currentApp.scholarshipType)} • ${currentApp.academicYear ?? "2025-26"}'
+                                    : '${context.l10n.appTitle} • MoTA',
                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
                               ),
                             ],
@@ -192,7 +194,7 @@ class DashboardPage extends StatelessWidget {
                   if (openActions.isNotEmpty) const SizedBox(height: 16),
 
                   // ── Quick Actions ────────────────────────────────────
-                  SectionHeader(title: 'Quick Actions'),
+                  SectionHeader(title: context.l10n.quickActions),
                   SizedBox(
                     height: 90,
                     child: ListView(
@@ -200,11 +202,11 @@ class DashboardPage extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       children: [
                         _QuickAction(icon: Icons.dashboard_customize, label: 'Scholarship\nHub', color: AppColors.primary, onTap: () => context.push(RouteNames.scholarshipDashboard)),
-                        _QuickAction(icon: Icons.search, label: 'Find\nSchemes', color: AppColors.postMatric, onTap: () => context.go(RouteNames.scholarshipDiscovery)),
-                        _QuickAction(icon: Icons.checklist, label: 'Check\nEligibility', color: AppColors.preMatric, onTap: () => context.push(RouteNames.eligibilityChecker)),
-                        _QuickAction(icon: Icons.track_changes, label: 'Track\nApplication', color: AppColors.nfst, onTap: () => context.push(RouteNames.applicationTracking)),
+                        _QuickAction(icon: Icons.search, label: context.l10n.allSchemes, color: AppColors.postMatric, onTap: () => context.go(RouteNames.scholarshipDiscovery)),
+                        _QuickAction(icon: Icons.checklist, label: context.l10n.eligibilityCheck, color: AppColors.preMatric, onTap: () => context.push(RouteNames.eligibilityChecker)),
+                        _QuickAction(icon: Icons.track_changes, label: context.l10n.trackStatus, color: AppColors.nfst, onTap: () => context.push(RouteNames.applicationTracking)),
                         _QuickAction(icon: Icons.verified_user, label: 'Verification\nCentre', color: AppColors.topClass, onTap: () => context.push(RouteNames.verificationCentre)),
-                        _QuickAction(icon: Icons.payment, label: 'Payment\nStatus', color: AppColors.nos, onTap: () => context.push(RouteNames.payments)),
+                        _QuickAction(icon: Icons.payment, label: context.l10n.jagoQuickPayment, color: AppColors.nos, onTap: () => context.push(RouteNames.payments)),
                       ],
                     ),
                   ),
@@ -228,7 +230,7 @@ class DashboardPage extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    currentApp.scholarshipName,
+                                    LocalizedHelpers.getScholarshipTypeName(context, currentApp.scholarshipType),
                                     style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                                   ),
                                 ),
@@ -322,7 +324,7 @@ class DashboardPage extends StatelessWidget {
                               children: [
                                 Text('₹$disbursed', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700, color: AppColors.success)),
                                 const SizedBox(height: 4),
-                                const Text('Disbursed', style: TextStyle(fontSize: 12, color: AppColors.success, fontWeight: FontWeight.w500)),
+                                Text(context.l10n.totalDisbursed, style: const TextStyle(fontSize: 12, color: AppColors.success, fontWeight: FontWeight.w500)),
                               ],
                             ),
                           ),
@@ -332,7 +334,7 @@ class DashboardPage extends StatelessWidget {
                               children: [
                                 Text('₹$pending', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600, color: AppColors.warning)),
                                 const SizedBox(height: 4),
-                                const Text('Pending', style: TextStyle(fontSize: 12, color: AppColors.warning, fontWeight: FontWeight.w500)),
+                                Text(context.l10n.pendingDisbursement, style: const TextStyle(fontSize: 12, color: AppColors.warning, fontWeight: FontWeight.w500)),
                               ],
                             ),
                           ),
@@ -343,7 +345,7 @@ class DashboardPage extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   // ── Eligible Schemes ─────────────────────────────────
-                  SectionHeader(title: 'Explore Schemes', actionText: 'See All', onAction: () => context.go(RouteNames.scholarshipDiscovery)),
+                  SectionHeader(title: context.l10n.allSchemes, actionText: 'See All', onAction: () => context.go(RouteNames.scholarshipDiscovery)),
                   SizedBox(
                     height: 120,
                     child: ListView(
@@ -351,7 +353,7 @@ class DashboardPage extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       children: [
                         _SchemeChip(
-                          name: 'Pre-Matric',
+                          name: context.l10n.preMatric,
                           icon: Icons.school,
                           color: AppColors.preMatric,
                           onTap: () => context.push(
@@ -366,7 +368,7 @@ class DashboardPage extends StatelessWidget {
                           ),
                         ),
                         _SchemeChip(
-                          name: 'Post-Matric',
+                          name: context.l10n.postMatric,
                           icon: Icons.menu_book,
                           color: AppColors.postMatric,
                           onTap: () => context.push(
@@ -381,7 +383,7 @@ class DashboardPage extends StatelessWidget {
                           ),
                         ),
                         _SchemeChip(
-                          name: 'Top Class',
+                          name: context.l10n.topClass,
                           icon: Icons.star,
                           color: AppColors.topClass,
                           onTap: () => context.push(
@@ -396,7 +398,7 @@ class DashboardPage extends StatelessWidget {
                           ),
                         ),
                         _SchemeChip(
-                          name: 'NFST',
+                          name: context.l10n.nfst,
                           icon: Icons.science,
                           color: AppColors.nfst,
                           onTap: () => context.push(
@@ -411,7 +413,7 @@ class DashboardPage extends StatelessWidget {
                           ),
                         ),
                         _SchemeChip(
-                          name: 'NOS',
+                          name: context.l10n.nos,
                           icon: Icons.flight,
                           color: AppColors.nos,
                           onTap: () => context.push(

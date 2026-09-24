@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
+import '../../../../core/localization/app_localizations_extension.dart';
 import '../../../../services/scholarship/scholarship_data_service.dart';
 import '../../../../shared/models/notification_item.dart';
 import '../../../../shared/widgets/app_back_button.dart';
@@ -27,6 +28,7 @@ class NotificationsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     ScholarshipDataService? scholarshipService;
     try {
       scholarshipService = Provider.of<ScholarshipDataService>(context);
@@ -37,12 +39,12 @@ class NotificationsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: const AppBackButton(fallbackRoute: RouteNames.dashboard),
-        title: const Text('Notifications'),
+        title: Text(l10n.notificationsTitle),
         actions: [
           if (notifications.any((n) => !n.isRead))
             TextButton(
               onPressed: () => scholarshipService?.markAllNotificationsAsRead(),
-              child: const Text('Mark all read'),
+              child: Text(l10n.markAllRead),
             ),
         ],
       ),
@@ -54,7 +56,7 @@ class NotificationsPage extends StatelessWidget {
                       Icon(Icons.notifications_none_outlined, size: 64, color: AppColors.textSecondary.withOpacity(0.5)),
                       const SizedBox(height: 16),
                       Text(
-                        'No notifications yet',
+                        l10n.noNotifications,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 8),

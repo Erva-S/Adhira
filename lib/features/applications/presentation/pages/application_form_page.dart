@@ -12,6 +12,9 @@ import '../../../../shared/models/models.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/step_progress_bar.dart';
+import '../../../documents/presentation/pages/digilocker_consent_page.dart';
+import '../../../../shared/widgets/digilocker_preview_sheet.dart';
+import '../../../../core/localization/app_localizations_extension.dart';
 
 /// Multi-step scholarship application form for MoTA schemes.
 class ApplicationFormPage extends StatefulWidget {
@@ -32,12 +35,12 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
     (_) => GlobalKey<FormState>(),
   );
 
-  static const List<String> _stepLabels = [
-    'Personal',
-    'Address',
-    'Academic',
-    'Bank & Docs',
-    'Review',
+  List<String> get _stepLabels => [
+    context.l10n.stepPersonal,
+    context.l10n.stepAddress,
+    context.l10n.stepAcademic,
+    context.l10n.stepBankDocs,
+    context.l10n.stepReview,
   ];
 
   // Form state
@@ -82,6 +85,9 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
 
   // Step 5: Review declaration
   bool _declarationChecked = false;
+
+  // DigiLocker demo link state
+  bool _digiLockerLinked = false;
 
   bool _prefilled = false;
 
@@ -177,14 +183,16 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Scaffold(
       appBar: AppBar(
         leading: const AppBackButton(fallbackRoute: RouteNames.scholarshipDashboard),
-        title: const Text('Scholarship Application'),
+        title: Text(l10n.applicationFormTitle),
         actions: [
           TextButton(
             onPressed: _saveDraft,
-            child: const Text('Save Draft'),
+            child: Text(l10n.saveDraft),
           ),
         ],
       ),
@@ -209,11 +217,9 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
               child: _buildCurrentStep(),
             ),
           ),
-
-          // Bottom Action Buttons pinned to screen
-          _buildBottomActionButtons(),
         ],
       ),
+      bottomNavigationBar: _buildBottomActionButtons(),
     );
   }
 
@@ -621,6 +627,22 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
         ),
         const SizedBox(height: 20),
 
+        // ── DigiLocker Document Linking (Demo) ────────────────
+        _buildSectionTitle(
+          'Link Documents via DigiLocker',
+          'Attach government-issued documents from your DigiLocker — Demo',
+        ),
+        const SizedBox(height: 10),
+        AnimatedCrossFade(
+          duration: const Duration(milliseconds: 300),
+          crossFadeState: _digiLockerLinked
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
+          firstChild: _buildDigiLockerLinkCard(),
+          secondChild: _buildDigiLockerLinkedCard(),
+        ),
+        const SizedBox(height: 20),
+
         // Reusable Verified Documents (Part 9)
         Builder(
           builder: (context) {
@@ -688,6 +710,295 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
     );
   }
 
+  Widget _buildDigiLockerLinkCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0B57D0).withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFF0B57D0).withValues(alpha: 0.3),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0B57D0).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.verified_user_rounded,
+                  color: Color(0xFF0B57D0),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'DigiLocker Integration — Demo',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        color: Color(0xFF0B57D0),
+                      ),
+                    ),
+                    Text(
+                      'Attach documents issued by Govt. of India',
+                      style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Required for this scheme:',
+            style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+          ),
+          const SizedBox(height: 6),
+          _buildRequiredDocChip('Aadhaar Card', Icons.fingerprint),
+          _buildRequiredDocChip('ST Community Certificate', Icons.badge_outlined),
+          _buildRequiredDocChip('Income Certificate', Icons.receipt_long_outlined),
+          _buildRequiredDocChip('Class 12 Marksheet', Icons.school_outlined),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () async {
+                final result = await Navigator.of(context).push<bool>(
+                  MaterialPageRoute(
+                    builder: (_) => const DigiLockerConsentPage(
+                      autoImportToWallet: true,
+                    ),
+                  ),
+                );
+                if (result == true && mounted) {
+                  setState(() => _digiLockerLinked = true);
+                }
+              },
+              icon: const Icon(Icons.link_rounded, size: 18),
+              label: const Text(
+                'Link from DigiLocker (Demo)',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF0B57D0),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDigiLockerLinkedCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.successLight.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.success, width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.verified_rounded,
+                  color: AppColors.success, size: 22),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'DigiLocker Linked — Demo',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        color: AppColors.successDark,
+                      ),
+                    ),
+                    Text(
+                      'Documents from DigiLocker added to your wallet',
+                      style: TextStyle(
+                          fontSize: 11, color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+              TextButton(
+                onPressed: () => setState(() => _digiLockerLinked = false),
+                child: const Text('Change',
+                    style: TextStyle(fontSize: 11)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _buildLinkedDocCard(
+            name: 'Aadhaar Card',
+            category: 'Identity Document',
+            issuer: 'UIDAI',
+            maskedId: 'XXXX XXXX 4401',
+            icon: Icons.fingerprint,
+            assetPath: 'assets/images/aadhaar_card.png',
+          ),
+          const SizedBox(height: 8),
+          _buildLinkedDocCard(
+            name: 'Caste Certificate (SEBC / ST)',
+            category: 'Caste / Community',
+            issuer: 'Govt. of Gujarat',
+            maskedId: 'Certificate No. 809/XXXX',
+            icon: Icons.badge_outlined,
+            assetPath: 'assets/images/caste_certificate.jpg',
+          ),
+          const SizedBox(height: 8),
+          _buildLinkedDocCard(
+            name: 'Class 12 Marksheet',
+            category: 'Academic Qualification',
+            issuer: 'CBSE',
+            maskedId: 'Roll No. 1163XXXX',
+            icon: Icons.school_outlined,
+            assetPath: 'assets/images/class12_marksheet.jpg',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLinkedDocCard({
+    required String name,
+    required String category,
+    required String issuer,
+    required String maskedId,
+    required IconData icon,
+    required String assetPath,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(
+              color: AppColors.successLight,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 18, color: AppColors.success),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        name,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    const Icon(Icons.verified, size: 13, color: AppColors.success),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '$issuer • $maskedId',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          TextButton.icon(
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            onPressed: () {
+              showDigiLockerDocumentPreview(
+                context,
+                name: name,
+                category: category,
+                issuer: issuer,
+                maskedNumber: maskedId,
+                isVerified: true,
+                assetImagePath: assetPath,
+              );
+            },
+            icon: const Icon(Icons.visibility_outlined, size: 14, color: AppColors.primary),
+            label: const Text(
+              'View',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRequiredDocChip(String name, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        children: [
+          Icon(icon, size: 14, color: const Color(0xFF0B57D0)),
+          const SizedBox(width: 6),
+          Text(
+            name,
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // ── Step 5: Review & Submit ────────────────────────────────────────
   Widget _buildStep5ReviewAndSubmit() {
     return Column(
@@ -720,6 +1031,14 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
           _buildReviewRow('Account No', _accountNoController.text),
           _buildReviewRow('IFSC', _ifscController.text),
         ]),
+        if (_digiLockerLinked) ...[
+          const SizedBox(height: 12),
+          _buildReviewCard('Attached Documents (DigiLocker Verified)', [
+            _buildReviewRow('Aadhaar Card', 'Govt. Verified (UIDAI • XXXX XXXX 4401)'),
+            _buildReviewRow('Caste Certificate', 'Govt. Verified (Govt. of Gujarat • 809/XXXX)'),
+            _buildReviewRow('Class 12 Marksheet', 'Govt. Verified (CBSE • Roll 1163XXXX)'),
+          ]),
+        ],
         const SizedBox(height: 20),
         Card(
           margin: EdgeInsets.zero,
@@ -830,7 +1149,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                 OutlinedButton.icon(
                   onPressed: () => setState(() => _currentStep--),
                   icon: const Icon(Icons.arrow_back, size: 18),
-                  label: const Text('Back'),
+                  label: Text(context.l10n.back),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                     side: const BorderSide(color: AppColors.primary, width: 1.5),
@@ -863,7 +1182,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                     size: 20,
                   ),
                   label: Text(
-                    isLastStep ? 'Review & Submit' : 'Next Step',
+                    isLastStep ? context.l10n.reviewAndSubmit : context.l10n.nextStep,
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -950,20 +1269,22 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
       reusedDocumentIds: reusableIds,
     );
 
+    final l10n = context.l10n;
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Row(
+        title: Row(
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               backgroundColor: AppColors.successLight,
               child: Icon(Icons.check, color: AppColors.success),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
-              child: Text('Application Submitted!', style: TextStyle(fontSize: 16)),
+              child: Text(l10n.applicationSubmittedTitle, style: const TextStyle(fontSize: 16)),
             ),
           ],
         ),
@@ -972,7 +1293,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Your application for $_schemeName has been submitted to the Ministry of Tribal Affairs.',
+              l10n.applicationSubmittedMsg,
               style: const TextStyle(fontSize: 13),
             ),
             const SizedBox(height: 12),
@@ -995,9 +1316,9 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Keep this number for tracking and verification purposes.',
-              style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+            Text(
+              l10n.keepApplicationNumber,
+              style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
             ),
           ],
         ),
@@ -1007,7 +1328,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
               Navigator.of(ctx).pop();
               context.go(RouteNames.scholarshipDashboard);
             },
-            child: const Text('Dashboard'),
+            child: Text(l10n.goToDashboard),
           ),
           ElevatedButton(
             onPressed: () {
@@ -1018,7 +1339,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Track Application'),
+            child: Text(l10n.trackApplication),
           ),
         ],
       ),

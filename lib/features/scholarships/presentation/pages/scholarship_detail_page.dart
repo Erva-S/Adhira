@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
+import '../../../../core/localization/app_localizations_extension.dart';
+import '../../../../core/localization/localized_helpers.dart';
 import '../../../../services/scholarship/scholarship_data_service.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -29,12 +31,15 @@ class ScholarshipDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final schemeColor = _getSchemeColor();
+    final displayName = LocalizedHelpers.getScholarshipTypeName(context, type);
+    final displayDesc = LocalizedHelpers.getScholarshipTypeDesc(context, type);
 
     return Scaffold(
       appBar: AppBar(
         leading: const AppBackButton(fallbackRoute: RouteNames.scholarshipDiscovery),
-        title: const Text('Scheme Details'),
+        title: Text(l10n.schemeDetails),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -71,16 +76,16 @@ class ScholarshipDetailPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    name,
+                    displayName,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           height: 1.2,
                         ),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    'Ministry of Tribal Affairs, Government of India',
-                    style: TextStyle(
+                  Text(
+                    '${l10n.motaTitle}, ${l10n.motaGov}',
+                    style: const TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 12,
                     ),
@@ -110,7 +115,7 @@ class ScholarshipDetailPage extends StatelessWidget {
                       Expanded(
                         child: _StatBox(
                           icon: Icons.calendar_month,
-                          title: 'Deadline',
+                          title: l10n.applicationDeadline,
                           value: deadline,
                           color: AppColors.primary,
                         ),
@@ -123,7 +128,7 @@ class ScholarshipDetailPage extends StatelessWidget {
                   Text('Description', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
                   Text(
-                    description,
+                    displayDesc,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: AppColors.textSecondary,
                           height: 1.5,
@@ -132,7 +137,7 @@ class ScholarshipDetailPage extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   // Eligibility Checklist
-                  Text('Key Eligibility Criteria', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                  Text(l10n.eligibilityCriteria, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 10),
                   const _CheckItem(text: 'Must belong to a notified Scheduled Tribe (ST) category.'),
                   const _CheckItem(text: 'Family annual income from all sources must not exceed ₹2.50 Lakh.'),
@@ -141,25 +146,25 @@ class ScholarshipDetailPage extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   // Required Documents
-                  Text('Required Documents', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                  Text(l10n.requiredDocuments, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 10),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      _DocBadge('ST Certificate'),
-                      _DocBadge('Income Certificate'),
-                      _DocBadge('Aadhaar Card'),
-                      _DocBadge('Marksheet'),
-                      _DocBadge('Bank Passbook'),
-                      _DocBadge('Bonafide Cert'),
+                      _DocBadge(l10n.casteCertificate),
+                      _DocBadge(l10n.incomeCertificate),
+                      _DocBadge(l10n.aadhaarCard),
+                      _DocBadge(l10n.marksheet12),
+                      const _DocBadge('Bank Passbook'),
+                      _DocBadge(l10n.bonafideCertificate),
                     ],
                   ),
                   const SizedBox(height: 24),
 
                   // Apply button
                   AppButton(
-                    label: 'Apply for this Scheme',
+                    label: l10n.applyNow,
                     icon: Icons.send,
                     onPressed: () {
                       final scheme = context.read<ScholarshipDataService>().getScholarshipByType(type);
@@ -179,7 +184,7 @@ class ScholarshipDetailPage extends StatelessWidget {
                       }
                     },
                     icon: const Icon(Icons.arrow_back),
-                    label: const Text('Back to Schemes'),
+                    label: Text(l10n.back),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size.fromHeight(48),
                     ),

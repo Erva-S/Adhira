@@ -36,6 +36,9 @@ class RouteNames {
   static const String documentDetails = '/documents/detail';
   static const String documentUpload = '/documents/upload';
 
+  // ── DigiLocker ────────────────────────────────────────────────
+  static const String digiLockerConsent = '/digilocker/connect';
+
   // ── Payments ──────────────────────────────────────────────────
   static const String payments = '/payments';
   static const String paymentDetails = '/payments/:id';

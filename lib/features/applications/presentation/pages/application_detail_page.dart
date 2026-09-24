@@ -12,6 +12,7 @@ import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/section_header.dart';
 import '../../../../shared/widgets/status_badge.dart';
 import '../../../../shared/widgets/timeline_stage.dart';
+import '../../../../shared/widgets/digilocker_preview_sheet.dart';
 
 /// Detailed view of an individual scholarship application.
 class ApplicationDetailPage extends StatelessWidget {
@@ -264,6 +265,54 @@ class ApplicationDetailPage extends StatelessWidget {
                   ),
                 ),
 
+                // ── Submitted Documents (DigiLocker) ─────────────────
+                SectionHeader(
+                  title: 'Submitted Documents (3)',
+                  actionText: 'View Wallet',
+                  onAction: () => context.push(RouteNames.documentWallet),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        children: [
+                          _buildSubmittedDocTile(
+                            context,
+                            name: 'Aadhaar Card',
+                            category: 'Identity Document',
+                            issuer: 'UIDAI',
+                            maskedId: 'XXXX XXXX 4401',
+                            icon: Icons.fingerprint,
+                            assetPath: 'assets/images/aadhaar_card.png',
+                          ),
+                          const Divider(height: 12),
+                          _buildSubmittedDocTile(
+                            context,
+                            name: 'Caste Certificate (SEBC / ST)',
+                            category: 'Caste / Community',
+                            issuer: 'Govt. of Gujarat',
+                            maskedId: 'Certificate No. 809/XXXX',
+                            icon: Icons.badge_outlined,
+                            assetPath: 'assets/images/caste_certificate.jpg',
+                          ),
+                          const Divider(height: 12),
+                          _buildSubmittedDocTile(
+                            context,
+                            name: 'Class 12 Marksheet',
+                            category: 'Academic Qualification',
+                            issuer: 'CBSE',
+                            maskedId: 'Roll No. 1163XXXX',
+                            icon: Icons.school_outlined,
+                            assetPath: 'assets/images/class12_marksheet.jpg',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
                 const SizedBox(height: 20),
 
                 // ── Verification Stages Preview ──────────────────────
@@ -457,5 +506,88 @@ class ApplicationDetailPage extends StatelessWidget {
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
+  }
+
+  Widget _buildSubmittedDocTile(
+    BuildContext context, {
+    required String name,
+    required String category,
+    required String issuer,
+    required String maskedId,
+    required IconData icon,
+    required String assetPath,
+  }) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(7),
+          decoration: BoxDecoration(
+            color: AppColors.successLight,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, size: 18, color: AppColors.success),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  const Icon(Icons.verified, size: 13, color: AppColors.success),
+                ],
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '$issuer • $maskedId',
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+        TextButton.icon(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          onPressed: () {
+            showDigiLockerDocumentPreview(
+              context,
+              name: name,
+              category: category,
+              issuer: issuer,
+              maskedNumber: maskedId,
+              isVerified: true,
+              assetImagePath: assetPath,
+            );
+          },
+          icon: const Icon(Icons.visibility_outlined, size: 14, color: AppColors.primary),
+          label: const Text(
+            'View',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

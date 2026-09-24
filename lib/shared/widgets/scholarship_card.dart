@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../app/theme/app_colors.dart';
 import '../../core/enums/app_enums.dart';
+import '../../core/localization/app_localizations_extension.dart';
+import '../../core/localization/localized_helpers.dart';
 import 'status_badge.dart';
 import 'app_button.dart';
 
@@ -29,6 +31,10 @@ class ScholarshipCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final localizedName = LocalizedHelpers.getScholarshipTypeName(context, type);
+    final localizedDesc = LocalizedHelpers.getScholarshipTypeDesc(context, type);
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: InkWell(
@@ -45,7 +51,7 @@ class ScholarshipCard extends StatelessWidget {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: _getSchemeColor().withOpacity(0.15),
+                      color: _getSchemeColor().withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
@@ -60,7 +66,7 @@ class ScholarshipCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          name,
+                          localizedName.isNotEmpty ? localizedName : name,
                           style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
@@ -86,7 +92,7 @@ class ScholarshipCard extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                description,
+                localizedDesc.isNotEmpty ? localizedDesc : description,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -97,7 +103,7 @@ class ScholarshipCard extends StatelessWidget {
               Row(
                 children: [
                   if (amount != null) ...[
-                    Icon(Icons.currency_rupee, size: 14, color: AppColors.textSecondary),
+                    const Icon(Icons.currency_rupee, size: 14, color: AppColors.textSecondary),
                     const SizedBox(width: 4),
                     Text(
                       amount!,
@@ -108,7 +114,7 @@ class ScholarshipCard extends StatelessWidget {
                     const SizedBox(width: 16),
                   ],
                   if (deadline != null) ...[
-                    Icon(Icons.calendar_today, size: 14, color: AppColors.textSecondary),
+                    const Icon(Icons.calendar_today, size: 14, color: AppColors.textSecondary),
                     const SizedBox(width: 4),
                     Text(
                       deadline!,
@@ -120,7 +126,7 @@ class ScholarshipCard extends StatelessWidget {
                   const Spacer(),
                   if (onApply != null)
                     AppButton(
-                      label: 'Apply',
+                      label: l10n.applyNow,
                       size: AppButtonSize.small,
                       isFullWidth: false,
                       onPressed: onApply,
