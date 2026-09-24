@@ -6,12 +6,13 @@ import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
+import '../../../../core/localization/app_localizations_extension.dart';
+import '../../../../core/localization/localized_helpers.dart';
 import '../../../../services/scholarship/scholarship_data_service.dart';
-import '../../../../services/integrations/digilocker/digilocker_service.dart';
-import '../../../../shared/models/document.dart';
 import '../../../../shared/widgets/app_bottom_nav.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/doc_card.dart';
+import 'digilocker_consent_page.dart';
 
 /// Document wallet page — manage and view uploaded documents dynamically.
 class DocumentWalletPage extends StatefulWidget {
@@ -24,109 +25,27 @@ class DocumentWalletPage extends StatefulWidget {
 class _DocumentWalletPageState extends State<DocumentWalletPage> {
   String _selectedCategory = 'All';
   final _categories = ['All', 'Identity', 'Caste', 'Income', 'Academic', 'Bank'];
-  final DigiLockerService _digiLockerService = MockDigiLockerService();
 
-  void _showDigiLockerSheet(BuildContext context, ScholarshipDataService service) async {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  void _openDigiLockerPage(BuildContext context) async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => const DigiLockerConsentPage(autoImportToWallet: true),
       ),
-      builder: (ctx) {
-        return FutureBuilder<List<DigiLockerDocument>>(
-          future: _digiLockerService.getAvailableDocuments(),
-          builder: (context, snapshot) {
-            return Container(
-              padding: const EdgeInsets.all(20),
-              height: 480,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(Icons.verified_outlined, color: AppColors.primary),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Import from DigiLocker',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              _digiLockerService.status.label,
-                              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Select issued government certificate to import into your wallet:',
-                    style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
-                  ),
-                  const SizedBox(height: 12),
-                  if (snapshot.connectionState == ConnectionState.waiting)
-                    const Expanded(child: Center(child: CircularProgressIndicator()))
-                  else if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty)
-                    const Expanded(child: Center(child: Text('No DigiLocker documents found.')))
-                  else
-                    Expanded(
-                      child: ListView.separated(
-                        itemCount: snapshot.data!.length,
-                        separatorBuilder: (_, __) => const Divider(height: 1),
-                        itemBuilder: (ctx, i) {
-                          final doc = snapshot.data![i];
-                          return ListTile(
-                            leading: const Icon(Icons.file_present_outlined, color: AppColors.primary),
-                            title: Text(doc.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                            subtitle: Text(doc.issuer, style: const TextStyle(fontSize: 12)),
-                            trailing: TextButton(
-                              onPressed: () async {
-                                Navigator.pop(ctx);
-                                final imported = await _digiLockerService.importDocument(
-                                  doc.uri,
-                                  service.currentUserId,
-                                );
-                                if (imported != null) {
-                                  await service.uploadDocument(
-                                    name: doc.name,
-                                    category: _mapDocTypeToCategory(doc.docType),
-                                    documentType: doc.docType,
-                                    fileName: '${doc.docType.toLowerCase()}.pdf',
-                                    bytes: imported.bytes,
-                                  );
-                                  if (mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('${doc.name} imported and verified from DigiLocker!')),
-                                    );
-                                  }
-                                }
-                              },
-                              child: const Text('Import'),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                ],
-              ),
-            );
-          },
-        );
-      },
     );
+    if (result == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white, size: 18),
+              SizedBox(width: 8),
+              Text('DigiLocker documents added to wallet!'),
+            ],
+          ),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    }
   }
 
   void _showUploadDialog(BuildContext context, ScholarshipDataService service) {
@@ -482,15 +401,6 @@ class _DocumentWalletPageState extends State<DocumentWalletPage> {
     );
   }
 
-  DocumentCategory _mapDocTypeToCategory(String docType) {
-    if (docType.contains('ADHAR') || docType.contains('ID')) return DocumentCategory.identity;
-    if (docType.contains('CASTE') || docType.contains('ST')) return DocumentCategory.caste;
-    if (docType.contains('INCOME')) return DocumentCategory.income;
-    if (docType.contains('12') || docType.contains('MRKSHT')) return DocumentCategory.academic;
-    if (docType.contains('BANK')) return DocumentCategory.bank;
-    return DocumentCategory.other;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer<ScholarshipDataService>(
@@ -511,12 +421,29 @@ class _DocumentWalletPageState extends State<DocumentWalletPage> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Document Wallet'),
+            title: Text(context.l10n.docWallet),
             actions: [
-              TextButton.icon(
-                onPressed: () => _showDigiLockerSheet(context, scholarshipService),
-                icon: const Icon(Icons.link, size: 18),
-                label: const Text('DigiLocker'),
+              Container(
+                margin: const EdgeInsets.only(right: 8),
+                child: ElevatedButton.icon(
+                  onPressed: () => _openDigiLockerPage(context),
+                  icon: const Icon(Icons.verified_user_rounded, size: 16),
+                  label: const Text(
+                    'DigiLocker',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0B57D0),
+                    foregroundColor: Colors.white,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 0,
+                    textStyle: const TextStyle(fontSize: 12),
+                  ),
+                ),
               ),
             ],
           ),
@@ -528,9 +455,9 @@ class _DocumentWalletPageState extends State<DocumentWalletPage> {
                 child: Row(
                   children: [
                     _DocStat(label: 'Total', value: '$total', color: AppColors.primary),
-                    _DocStat(label: 'Verified', value: '$verified', color: AppColors.success),
-                    _DocStat(label: 'Pending', value: '$pending', color: AppColors.warning),
-                    _DocStat(label: 'Rejected', value: '$rejected', color: AppColors.error),
+                    _DocStat(label: context.l10n.statusVerified, value: '$verified', color: AppColors.success),
+                    _DocStat(label: context.l10n.statusPending, value: '$pending', color: AppColors.warning),
+                    _DocStat(label: context.l10n.statusRejected, value: '$rejected', color: AppColors.error),
                   ],
                 ),
               ),

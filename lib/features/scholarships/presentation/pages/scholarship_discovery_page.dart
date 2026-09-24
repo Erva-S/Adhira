@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
+import '../../../../core/localization/app_localizations_extension.dart';
 import '../../../../shared/widgets/app_bottom_nav.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/scholarship_card.dart';
@@ -17,13 +18,22 @@ class ScholarshipDiscoveryPage extends StatefulWidget {
 
 class _ScholarshipDiscoveryPageState extends State<ScholarshipDiscoveryPage> {
   String _selectedFilter = 'All';
-  final _filters = ['All', 'Pre-Matric', 'Post-Matric', 'Top Class', 'NFST', 'NOS'];
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final filters = [
+      ('All', l10n.allSchemes),
+      ('Pre-Matric', l10n.preMatric),
+      ('Post-Matric', l10n.postMatric),
+      ('Top Class', l10n.topClass),
+      ('NFST', l10n.nfst),
+      ('NOS', l10n.nos),
+    ];
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Discover Scholarships'),
+        title: Text(l10n.scholarshipSchemes),
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.filter_list)),
         ],
@@ -34,7 +44,7 @@ class _ScholarshipDiscoveryPageState extends State<ScholarshipDiscoveryPage> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: AppTextField(
-              hintText: 'Search scholarships...',
+              hintText: '${l10n.scholarshipSchemes}...',
               prefixIcon: const Icon(Icons.search),
             ),
           ),
@@ -44,16 +54,16 @@ class _ScholarshipDiscoveryPageState extends State<ScholarshipDiscoveryPage> {
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              itemCount: _filters.length,
+              itemCount: filters.length,
               itemBuilder: (context, index) {
-                final filter = _filters[index];
-                final isSelected = filter == _selectedFilter;
+                final filterItem = filters[index];
+                final isSelected = filterItem.$1 == _selectedFilter;
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: ChoiceChip(
-                    label: Text(filter),
+                    label: Text(filterItem.$2),
                     selected: isSelected,
-                    onSelected: (_) => setState(() => _selectedFilter = filter),
+                    onSelected: (_) => setState(() => _selectedFilter = filterItem.$1),
                     selectedColor: AppColors.primary.withOpacity(0.15),
                     labelStyle: TextStyle(
                       color: isSelected ? AppColors.primary : AppColors.textSecondary,

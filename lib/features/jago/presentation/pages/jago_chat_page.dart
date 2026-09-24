@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/enums/app_enums.dart';
 import '../../../../shared/widgets/app_bottom_nav.dart';
 import '../../../../shared/widgets/chat_bubble.dart';
+import '../../../../core/localization/app_localizations_extension.dart';
+import '../../../../shared/widgets/language_selector_sheet.dart';
+import '../../../../services/scholarship/scholarship_data_service.dart';
+import '../../../../services/authentication/auth_provider.dart';
+import '../../../../services/jago/jago_assistant_engine.dart';
 
 /// JAGO AI Chat Assistant page.
 class JagoChatPage extends StatefulWidget {
@@ -15,21 +21,28 @@ class JagoChatPage extends StatefulWidget {
 class _JagoChatPageState extends State<JagoChatPage> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
+  bool _initialized = false;
 
-  final List<_ChatMsg> _messages = [
-    _ChatMsg(text: 'Namaste! 🙏 I\'m JAGO, your scholarship assistant. How can I help you today?', sender: ChatSender.bot),
-    _ChatMsg(text: 'What is my application status?', sender: ChatSender.user),
-    _ChatMsg(text: 'Your Post-Matric Scholarship application (PMS-2025-78432) is currently "Under Review". 5 out of 7 verifications are complete. ST Certificate verification is in progress.', sender: ChatSender.bot),
-    _ChatMsg(text: 'When will I receive the next payment?', sender: ChatSender.user),
-    _ChatMsg(text: 'Your next disbursement of ₹25,000 (Tuition Fee — Sem 2) is expected in January 2026, after all verifications are complete and state approval is received.', sender: ChatSender.bot),
+  final List<_ChatMsg> _messages = [];
+
+  static const List<String> _quickSuggestions = [
+    'Check my eligibility',
+    'Track my application',
+    'What documents do I need?',
+    'What documents are pending?',
+    'Check my payment status',
+    'Which scholarship am I applying for?',
   ];
 
-  final List<String> _quickActions = [
-    '📋 Application Status',
-    '💰 Payment Status',
-    '📄 Document Help',
-    '❓ Am I Eligible?',
-  ];
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      _initialized = true;
+      final l10n = context.l10n;
+      _messages.add(_ChatMsg(text: l10n.jagoGreeting, sender: ChatSender.bot));
+    }
+  }
 
   @override
   void dispose() {
@@ -38,28 +51,53 @@ class _JagoChatPageState extends State<JagoChatPage> {
     super.dispose();
   }
 
-  void _sendMessage() {
-    final text = _messageController.text.trim();
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  void _sendMessage([String? presetText]) {
+    final text = (presetText ?? _messageController.text).trim();
     if (text.isEmpty) return;
+
+    if (presetText == null) {
+      _messageController.clear();
+    }
+
     setState(() {
       _messages.add(_ChatMsg(text: text, sender: ChatSender.user));
-      _messageController.clear();
-      // Mock bot response
-      Future.delayed(const Duration(milliseconds: 800), () {
-        if (mounted) {
-          setState(() {
-            _messages.add(_ChatMsg(
-              text: 'Thank you for your question! This is a demo response. In the production app, JAGO will provide real-time answers based on your scholarship data.',
-              sender: ChatSender.bot,
-            ));
-          });
-        }
+    });
+    _scrollToBottom();
+
+    final scholarshipService = Provider.of<ScholarshipDataService>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final student = authProvider.currentUser;
+
+    Future.delayed(const Duration(milliseconds: 250), () {
+      if (!mounted) return;
+      final responseText = JagoAssistantEngine.respond(
+        text,
+        scholarshipService: scholarshipService,
+        student: student,
+      );
+      setState(() {
+        _messages.add(_ChatMsg(text: responseText, sender: ChatSender.bot));
       });
+      _scrollToBottom();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -68,23 +106,27 @@ class _JagoChatPageState extends State<JagoChatPage> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: AppColors.accent.withOpacity(0.2),
+                color: AppColors.accent.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.smart_toy, size: 18, color: AppColors.accent),
             ),
             const SizedBox(width: 10),
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('JAGO', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                Text('Scholarship Assistant', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w400)),
+                Text(l10n.jagoAssistantName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                Text(l10n.jagoAssistantSubtitle, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w400)),
               ],
             ),
           ],
         ),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.language)),
+          IconButton(
+            onPressed: () => showLanguageSelectorSheet(context),
+            icon: const Icon(Icons.language),
+            tooltip: l10n.selectLanguageTitle,
+          ),
         ],
       ),
       body: Column(
@@ -104,22 +146,20 @@ class _JagoChatPageState extends State<JagoChatPage> {
               },
             ),
           ),
-          // Quick actions
+          // Quick suggestions within allowed domain
           SizedBox(
             height: 40,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              itemCount: _quickActions.length,
+              itemCount: _quickSuggestions.length,
               itemBuilder: (context, index) {
+                final suggestion = _quickSuggestions[index];
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: ActionChip(
-                    label: Text(_quickActions[index], style: const TextStyle(fontSize: 12)),
-                    onPressed: () {
-                      _messageController.text = _quickActions[index].replaceAll(RegExp(r'[^\w\s?]'), '').trim();
-                      _sendMessage();
-                    },
+                    label: Text(suggestion, style: const TextStyle(fontSize: 12)),
+                    onPressed: () => _sendMessage(suggestion),
                   ),
                 );
               },
@@ -129,7 +169,7 @@ class _JagoChatPageState extends State<JagoChatPage> {
           // Input
           Container(
             padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.surface,
               border: Border(top: BorderSide(color: AppColors.border)),
             ),
@@ -139,16 +179,16 @@ class _JagoChatPageState extends State<JagoChatPage> {
                   Expanded(
                     child: TextField(
                       controller: _messageController,
-                      decoration: const InputDecoration(
-                        hintText: 'Ask JAGO anything...',
+                      decoration: InputDecoration(
+                        hintText: l10n.jagoInputHint,
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                       ),
                       onSubmitted: (_) => _sendMessage(),
                     ),
                   ),
                   IconButton(
-                    onPressed: _sendMessage,
+                    onPressed: () => _sendMessage(),
                     icon: const Icon(Icons.send_rounded),
                     color: AppColors.primary,
                   ),
@@ -168,3 +208,4 @@ class _ChatMsg {
   final ChatSender sender;
   const _ChatMsg({required this.text, required this.sender});
 }
+

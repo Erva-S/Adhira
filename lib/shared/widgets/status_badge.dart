@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../core/enums/app_enums.dart';
+import '../../core/localization/localized_helpers.dart';
 
 /// Unified status badge widget — replaces 4 FlutterFlow StatusBadge variants.
 /// Configurable via [variant] and [status]-based auto-coloring.
@@ -12,6 +13,10 @@ class StatusBadge extends StatelessWidget {
   final Color? textColor;
   final IconData? icon;
   final double? fontSize;
+  final ApplicationStatus? appStatus;
+  final VerificationStatus? verifStatus;
+  final PaymentStatus? payStatus;
+  final DocumentStatus? docStatus;
 
   const StatusBadge({
     super.key,
@@ -21,12 +26,17 @@ class StatusBadge extends StatelessWidget {
     this.textColor,
     this.icon,
     this.fontSize,
+    this.appStatus,
+    this.verifStatus,
+    this.payStatus,
+    this.docStatus,
   });
 
   /// Create from an [ApplicationStatus].
   factory StatusBadge.fromApplicationStatus(ApplicationStatus status) {
     return StatusBadge(
       label: status.label,
+      appStatus: status,
       variant: _variantFromAppStatus(status),
     );
   }
@@ -35,6 +45,7 @@ class StatusBadge extends StatelessWidget {
   factory StatusBadge.fromVerificationStatus(VerificationStatus status) {
     return StatusBadge(
       label: status.label,
+      verifStatus: status,
       variant: _variantFromVerifStatus(status),
     );
   }
@@ -43,6 +54,7 @@ class StatusBadge extends StatelessWidget {
   factory StatusBadge.fromPaymentStatus(PaymentStatus status) {
     return StatusBadge(
       label: status.label,
+      payStatus: status,
       variant: _variantFromPaymentStatus(status),
     );
   }
@@ -51,12 +63,24 @@ class StatusBadge extends StatelessWidget {
   factory StatusBadge.fromDocumentStatus(DocumentStatus status) {
     return StatusBadge(
       label: status.label,
+      docStatus: status,
       variant: _variantFromDocStatus(status),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    String effectiveLabel = label;
+    if (appStatus != null) {
+      effectiveLabel = LocalizedHelpers.getApplicationStatusLabel(context, appStatus!);
+    } else if (verifStatus != null) {
+      effectiveLabel = LocalizedHelpers.getVerificationStatusLabel(context, verifStatus!);
+    } else if (payStatus != null) {
+      effectiveLabel = LocalizedHelpers.getPaymentStatusLabel(context, payStatus!);
+    } else if (docStatus != null) {
+      effectiveLabel = LocalizedHelpers.getDocumentStatusLabel(context, docStatus!);
+    }
+
     final colors = _getColors();
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -75,7 +99,7 @@ class StatusBadge extends StatelessWidget {
             const SizedBox(width: 4),
           ],
           Text(
-            label,
+            effectiveLabel,
             style: TextStyle(
               fontSize: fontSize ?? 12,
               fontWeight: FontWeight.w600,

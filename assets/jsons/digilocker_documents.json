@@ -1,0 +1,77 @@
+{
+  "meta": {
+    "source": "demo",
+    "label": "DigiLocker Integration — Demo",
+    "note": "Documents shown are demo data. No real DigiLocker API is called.",
+    "citizen": {
+      "name": "Rajesh Singh",
+      "aadhaar_masked": "XXXX XXXX 4401",
+      "digilocker_id": "DEMO-DL-202500001"
+    }
+  },
+  "documents": [
+    {
+      "uri": "dl://uidai/aadhaar_card",
+      "name": "Aadhaar Card",
+      "issuer": "Unique Identification Authority of India (UIDAI)",
+      "issuer_short": "UIDAI",
+      "doc_type": "ADHAR",
+      "issued_date": "2023-11-01",
+      "is_verified": true,
+      "description": "National Identity Document — Biometric verified",
+      "masked_number": "XXXX XXXX 4401",
+      "asset_image_path": "assets/images/aadhaar_card.png",
+      "required_for_scholarship": true
+    },
+    {
+      "uri": "dl://gujarat/caste_cert",
+      "name": "Caste Certificate (SEBC / ST)",
+      "issuer": "Mamlatdar Office, Surat City, Govt. of Gujarat",
+      "issuer_short": "Govt. of Gujarat",
+      "doc_type": "CASTE_ST",
+      "issued_date": "2023-01-04",
+      "is_verified": true,
+      "description": "Caste Certificate for Educational & State Benefits",
+      "masked_number": "Certificate No. 809/XXXX",
+      "asset_image_path": "assets/images/caste_certificate.jpg",
+      "required_for_scholarship": true
+    },
+    {
+      "uri": "dl://cbse/class12_marksheet",
+      "name": "Class 12 Passing Certificate & Marksheet",
+      "issuer": "Central Board of Secondary Education (CBSE)",
+      "issuer_short": "CBSE",
+      "doc_type": "ACADEMIC_12",
+      "issued_date": "2025-05-13",
+      "is_verified": true,
+      "description": "Senior School Certificate Examination (Class XII)",
+      "masked_number": "Roll No. 1163XXXX",
+      "asset_image_path": "assets/images/class12_marksheet.jpg",
+      "required_for_scholarship": true
+    },
+    {
+      "uri": "dl://edistrict/income_cert",
+      "name": "Annual Income Certificate (2025-26)",
+      "issuer": "Tahasildar Office, Revenue Department",
+      "issuer_short": "e-District",
+      "doc_type": "INCOME_CERT",
+      "issued_date": "2025-04-12",
+      "is_verified": true,
+      "description": "Family annual income verification — Below ₹2.50 Lakhs",
+      "masked_number": "REV/2025/XXXX4821",
+      "required_for_scholarship": true
+    },
+    {
+      "uri": "dl://institute/bonafide_cert",
+      "name": "College Bonafide / Enrollment Certificate",
+      "issuer": "National Institute of Technology",
+      "issuer_short": "NIT",
+      "doc_type": "BONAFIDE",
+      "issued_date": "2025-07-20",
+      "is_verified": false,
+      "description": "Current Academic Session Bonafide Certificate",
+      "masked_number": "INST/2025/XXXX",
+      "required_for_scholarship": false
+    }
+  ]
+}

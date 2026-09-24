@@ -6,6 +6,9 @@ import '../../../../app/router/route_names.dart';
 import '../../../../services/authentication/auth_provider.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../../../core/localization/app_localizations_extension.dart';
+import '../../../../core/localization/locale_provider.dart';
+import '../../../../shared/widgets/language_selector_sheet.dart';
 
 /// Login / Registration page with Indian mobile number validation and OTP trigger.
 class LoginPage extends StatefulWidget {
@@ -90,7 +93,13 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final authProvider = context.watch<AuthProvider>();
+    LocaleProvider? localeProvider;
+    try {
+      localeProvider = Provider.of<LocaleProvider>(context, listen: true);
+    } catch (_) {}
+    final currentLang = localeProvider?.currentLanguage ?? LocaleProvider.supportedLanguages.first;
 
     return Scaffold(
       body: SafeArea(
@@ -101,39 +110,56 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 40),
-                // Header
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: const Icon(Icons.school, color: AppColors.primary, size: 32),
+                const SizedBox(height: 20),
+                // Header with logo and language button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const Icon(Icons.school, color: AppColors.primary, size: 28),
+                    ),
+                    TextButton.icon(
+                      onPressed: () => showLanguageSelectorSheet(context),
+                      icon: const Icon(Icons.language, size: 16),
+                      label: Text(
+                        currentLang.nativeName,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        backgroundColor: AppColors.surfaceVariant,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  _isLogin ? 'Welcome Back' : 'Create Account',
+                  _isLogin ? l10n.welcomeBack : l10n.createAccount,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  _isLogin
-                      ? 'Sign in to continue to your scholarship dashboard'
-                      : 'Register to discover and apply for MoTA scholarships',
+                  _isLogin ? l10n.signInSubtitle : l10n.registerSubtitle,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: AppColors.textSecondary,
                       ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 36),
 
                 // Phone field
                 AppTextField(
-                  label: 'Mobile Number',
-                  hintText: 'Enter 10-digit mobile number',
+                  label: l10n.mobileNumber,
+                  hintText: l10n.enterMobileNumber,
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
                   prefixIcon: const Padding(
@@ -157,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 // Login button
                 AppButton(
-                  label: _isLogin ? 'Send OTP' : 'Register & Send OTP',
+                  label: _isLogin ? l10n.sendOtp : '${l10n.createAccount} & ${l10n.sendOtp}',
                   isLoading: authProvider.isLoading,
                   onPressed: authProvider.isLoading ? null : _handleSendOtp,
                 ),

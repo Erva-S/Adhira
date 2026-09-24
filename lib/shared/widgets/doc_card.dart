@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../app/theme/app_colors.dart';
 import '../../core/enums/app_enums.dart';
+import '../../core/localization/localized_helpers.dart';
 import 'status_badge.dart';
 
 /// Document card for the document wallet.
@@ -50,7 +51,7 @@ class DocCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      name,
+                      LocalizedHelpers.getDocumentName(context, name),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),

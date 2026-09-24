@@ -6,6 +6,7 @@ import '../../../../app/router/route_names.dart';
 import '../../../../services/authentication/auth_provider.dart';
 import '../../../../shared/models/student.dart';
 import '../../../../shared/widgets/app_bottom_nav.dart';
+import '../../../../core/localization/app_localizations_extension.dart';
 
 /// Student profile page — dynamically populated from authenticated student profile.
 class ProfilePage extends StatelessWidget {
@@ -13,6 +14,8 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Consumer<AuthProvider>(
       builder: (context, authProvider, _) {
         final student = authProvider.currentUser;
@@ -28,17 +31,17 @@ class ProfilePage extends StatelessWidget {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('My Profile'),
+            title: Text(l10n.myProfileTitle),
             actions: [
               IconButton(
                 onPressed: () => context.push(RouteNames.profileEdit),
                 icon: const Icon(Icons.edit),
-                tooltip: 'Edit Profile',
+                tooltip: l10n.editProfile,
               ),
               IconButton(
                 onPressed: () => context.push(RouteNames.settings),
                 icon: const Icon(Icons.settings_outlined),
-                tooltip: 'Settings',
+                tooltip: l10n.settingsTitle,
               ),
             ],
           ),
@@ -71,50 +74,50 @@ class ProfilePage extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(horizontal: 40),
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.08),
+                    color: AppColors.primary.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    'Profile: $profilePercent% Complete',
+                    l10n.profileCompletion(profilePercent),
                     style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 13),
                   ),
                 ),
                 const SizedBox(height: 24),
 
                 // Profile sections (Dynamic)
-                _ProfileSection(title: 'Personal Details', items: [
-                  _ProfileItem(label: 'Full Name', value: student?.fullName ?? '—'),
-                  _ProfileItem(label: 'Father\'s Name', value: student?.fatherName ?? '—'),
-                  _ProfileItem(label: 'Mother\'s Name', value: student?.motherName ?? '—'),
+                _ProfileSection(title: l10n.personalDetails, items: [
+                  _ProfileItem(label: l10n.fullName, value: student?.fullName ?? '—'),
+                  _ProfileItem(label: l10n.fatherName, value: student?.fatherName ?? '—'),
+                  _ProfileItem(label: l10n.motherName, value: student?.motherName ?? '—'),
                   _ProfileItem(
-                    label: 'Date of Birth',
+                    label: l10n.dateOfBirth,
                     value: student?.dateOfBirth != null
                         ? '${student!.dateOfBirth!.day}/${student.dateOfBirth!.month}/${student.dateOfBirth!.year}'
                         : '14 Aug 2004',
                   ),
-                  _ProfileItem(label: 'Gender', value: student?.gender ?? 'Male'),
-                  _ProfileItem(label: 'Mobile', value: student?.mobileNumber != null ? '+91 ${student!.mobileNumber}' : '—'),
+                  _ProfileItem(label: l10n.gender, value: student?.gender ?? l10n.male),
+                  _ProfileItem(label: l10n.mobileNumber, value: student?.mobileNumber != null ? '+91 ${student!.mobileNumber}' : '—'),
                   _ProfileItem(label: 'Email', value: student?.email ?? '—'),
                 ]),
-                _ProfileSection(title: 'ST/Tribal Details', items: [
-                  _ProfileItem(label: 'Category', value: student?.category ?? 'ST'),
-                  _ProfileItem(label: 'Tribe Name', value: student?.tribeName ?? 'Santal'),
-                  _ProfileItem(label: 'PVTG Status', value: (student?.isPVTG == true) ? 'Yes' : 'No'),
-                  _ProfileItem(label: 'ST Certificate', value: student?.stCertificateNumber ?? 'SC/OD/2023/12345'),
-                  _ProfileItem(label: 'State', value: student?.state ?? 'Odisha'),
-                  _ProfileItem(label: 'District', value: student?.district ?? 'Mayurbhanj'),
+                _ProfileSection(title: l10n.tribalDetails, items: [
+                  _ProfileItem(label: l10n.category, value: student?.category ?? 'ST'),
+                  _ProfileItem(label: l10n.tribeName, value: student?.tribeName ?? 'Santal'),
+                  _ProfileItem(label: l10n.pvtgStatus, value: (student?.isPVTG == true) ? l10n.yes : l10n.no),
+                  _ProfileItem(label: l10n.casteCertificate, value: student?.stCertificateNumber ?? 'SC/OD/2023/12345'),
+                  _ProfileItem(label: l10n.state, value: student?.state ?? 'Odisha'),
+                  _ProfileItem(label: l10n.district, value: student?.district ?? 'Mayurbhanj'),
                 ]),
-                _ProfileSection(title: 'Education', items: [
+                _ProfileSection(title: l10n.educationDetails, items: [
                   _ProfileItem(label: 'Level', value: student?.educationLevel ?? 'Undergraduate'),
-                  _ProfileItem(label: 'Course', value: student?.currentCourse ?? 'B.Tech Computer Science'),
-                  _ProfileItem(label: 'Year of Study', value: student?.currentYear ?? '2nd Year'),
-                  _ProfileItem(label: 'Institution', value: student?.institutionName ?? 'NIT Rourkela'),
+                  _ProfileItem(label: l10n.courseName, value: student?.currentCourse ?? 'B.Tech Computer Science'),
+                  _ProfileItem(label: l10n.currentYear, value: student?.currentYear ?? '2nd Year'),
+                  _ProfileItem(label: l10n.institutionName, value: student?.institutionName ?? 'NIT Rourkela'),
                   _ProfileItem(label: 'AISHE Code', value: student?.institutionId ?? 'AISHE-U-0355'),
                 ]),
-                _ProfileSection(title: 'Bank Details (for DBT)', items: [
-                  _ProfileItem(label: 'Bank Name', value: student?.bankName ?? 'State Bank of India'),
-                  _ProfileItem(label: 'Account Number', value: student?.bankAccountNumber ?? '****7890'),
-                  _ProfileItem(label: 'IFSC Code', value: student?.ifscCode ?? 'SBIN0001234'),
+                _ProfileSection(title: l10n.bankDetails, items: [
+                  _ProfileItem(label: l10n.bankName, value: student?.bankName ?? 'State Bank of India'),
+                  _ProfileItem(label: l10n.accountNumber, value: student?.bankAccountNumber ?? '****7890'),
+                  _ProfileItem(label: l10n.ifscCode, value: student?.ifscCode ?? 'SBIN0001234'),
                 ]),
                 const SizedBox(height: 32),
               ],

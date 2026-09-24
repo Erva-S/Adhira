@@ -18,6 +18,7 @@ import '../../features/applications/presentation/pages/application_form_page.dar
 import '../../features/verification/presentation/pages/verification_centre_page.dart';
 import '../../features/documents/presentation/pages/document_wallet_page.dart';
 import '../../features/documents/presentation/pages/document_detail_page.dart';
+import '../../features/documents/presentation/pages/digilocker_consent_page.dart';
 import '../../features/payments/presentation/pages/payments_page.dart';
 import '../../features/notifications/presentation/pages/notifications_page.dart';
 import '../../features/notifications/presentation/pages/notification_detail_page.dart';
@@ -169,6 +170,13 @@ class AppRouter {
             isFromDigiLocker: extra?['isFromDigiLocker'] as bool? ?? false,
           );
         },
+      ),
+      GoRoute(
+        path: RouteNames.digiLockerConsent,
+        name: 'digiLockerConsent',
+        builder: (context, state) => const DigiLockerConsentPage(
+          autoImportToWallet: true,
+        ),
       ),
 
       // ── Payments ────────────────────────────────────────────────

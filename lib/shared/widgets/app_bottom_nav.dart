@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/router/route_names.dart';
+import '../../core/localization/app_localizations_extension.dart';
 
 /// Bottom navigation bar used across main pages.
 class AppBottomNav extends StatelessWidget {
@@ -11,6 +12,8 @@ class AppBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -31,7 +34,7 @@ class AppBottomNav extends StatelessWidget {
               Expanded(
                 child: _NavItem(
                   icon: Icons.home_rounded,
-                  label: 'Home',
+                  label: l10n.navHome,
                   isSelected: currentIndex == 0,
                   onTap: () => context.go(RouteNames.dashboard),
                 ),
@@ -39,7 +42,7 @@ class AppBottomNav extends StatelessWidget {
               Expanded(
                 child: _NavItem(
                   icon: Icons.school_rounded,
-                  label: 'Schemes',
+                  label: l10n.navSchemes,
                   isSelected: currentIndex == 1,
                   onTap: () => context.go(RouteNames.scholarshipDiscovery),
                 ),
@@ -47,7 +50,7 @@ class AppBottomNav extends StatelessWidget {
               Expanded(
                 child: _NavItem(
                   icon: Icons.folder_rounded,
-                  label: 'Documents',
+                  label: l10n.navDocuments,
                   isSelected: currentIndex == 2,
                   onTap: () => context.go(RouteNames.documentWallet),
                 ),
@@ -55,7 +58,7 @@ class AppBottomNav extends StatelessWidget {
               Expanded(
                 child: _NavItem(
                   icon: Icons.chat_bubble_rounded,
-                  label: 'JAGO',
+                  label: l10n.navJago,
                   isSelected: currentIndex == 3,
                   onTap: () => context.go(RouteNames.jago),
                 ),
@@ -63,7 +66,7 @@ class AppBottomNav extends StatelessWidget {
               Expanded(
                 child: _NavItem(
                   icon: Icons.person_rounded,
-                  label: 'Profile',
+                  label: l10n.navProfile,
                   isSelected: currentIndex == 4,
                   onTap: () => context.go(RouteNames.profile),
                 ),

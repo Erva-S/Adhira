@@ -7,6 +7,7 @@ import '../../../../app/router/route_names.dart';
 import '../../../../services/authentication/auth_provider.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../core/localization/app_localizations_extension.dart';
 
 /// 6-digit OTP Verification Screen with auto-focus, paste support, and countdown timer.
 class OtpVerificationPage extends StatefulWidget {
@@ -173,10 +174,12 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
     final authProvider = context.watch<AuthProvider>();
     final isOtpComplete = _currentOtp.length == _otpLength;
 
+    final l10n = context.l10n;
+
     return Scaffold(
       appBar: AppBar(
         leading: const AppBackButton(fallbackRoute: RouteNames.login),
-        title: const Text('OTP Verification'),
+        title: Text(l10n.otpVerification),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -209,7 +212,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Enter the 6-digit OTP sent to ${_maskedPhone(widget.phoneNumber)}',
+                      '${l10n.enterOtpSentTo} ${_maskedPhone(widget.phoneNumber)}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: AppColors.textSecondary,
                             height: 1.4,
@@ -218,7 +221,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                   ),
                   TextButton(
                     onPressed: () => context.pop(),
-                    child: const Text('Edit'),
+                    child: Text(l10n.change),
                   ),
                 ],
               ),
@@ -290,7 +293,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
               // Verify button
               AppButton(
-                label: 'Verify & Proceed',
+                label: l10n.verifyAndProceed,
                 isLoading: authProvider.isLoading,
                 onPressed: (isOtpComplete && !authProvider.isLoading) ? _handleVerify : null,
               ),
@@ -303,9 +306,9 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                     ? TextButton.icon(
                         onPressed: authProvider.isLoading ? null : _handleResendOtp,
                         icon: const Icon(Icons.refresh, size: 18),
-                        label: const Text(
-                          'Resend OTP',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        label: Text(
+                          l10n.resendOtp,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       )
                     : Row(
@@ -314,7 +317,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                           const Icon(Icons.timer_outlined, size: 16, color: AppColors.textSecondary),
                           const SizedBox(width: 6),
                           Text(
-                            'Resend OTP in ${authProvider.cooldownSeconds}s',
+                            l10n.resendOtpIn(authProvider.cooldownSeconds),
                             style: const TextStyle(
                               color: AppColors.textSecondary,
                               fontWeight: FontWeight.w600,
