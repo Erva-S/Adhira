@@ -71,6 +71,11 @@ class _JagoChatPageState extends State<JagoChatPage> {
       _messageController.clear();
     }
 
+    final history = _messages.map((m) => {
+      'sender': m.sender == ChatSender.user ? 'user' : 'bot',
+      'text': m.text,
+    }).toList();
+
     setState(() {
       _messages.add(_ChatMsg(text: text, sender: ChatSender.user));
     });
@@ -79,20 +84,28 @@ class _JagoChatPageState extends State<JagoChatPage> {
     final scholarshipService = Provider.of<ScholarshipDataService>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final student = authProvider.currentUser;
+    final locale = Localizations.localeOf(context).languageCode;
+    final activeApp = scholarshipService.activeApplications.isNotEmpty
+        ? scholarshipService.activeApplications.first
+        : null;
 
-    Future.delayed(const Duration(milliseconds: 250), () {
+    JagoAssistantEngine.queryBackend(
+      message: text,
+      conversationHistory: history,
+      userId: student?.id,
+      applicationId: activeApp?.id,
+      locale: locale,
+      scholarshipService: scholarshipService,
+      student: student,
+    ).then((responseText) {
       if (!mounted) return;
-      final responseText = JagoAssistantEngine.respond(
-        text,
-        scholarshipService: scholarshipService,
-        student: student,
-      );
       setState(() {
         _messages.add(_ChatMsg(text: responseText, sender: ChatSender.bot));
       });
       _scrollToBottom();
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
