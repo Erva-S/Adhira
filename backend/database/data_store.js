@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-// Load trusted scholarship knowledge layer
+// Load trusted scholarship knowledge layer extracted from official PDFs
 const knowledgePath = path.join(__dirname, '..', 'knowledge', 'trusted_knowledge.json');
 const knowledgeData = JSON.parse(fs.readFileSync(knowledgePath, 'utf8'));
 
@@ -176,6 +176,25 @@ function normalizeScheme(input) {
 
 // ── Required JAGO Backend Tools / Functions ─────────────────────────────────
 
+function formatEligibilityCriteria(eligibility) {
+  if (!eligibility) return [];
+  if (Array.isArray(eligibility.generalCriteria)) return eligibility.generalCriteria;
+  const list = [];
+  if (eligibility.caste) list.push(eligibility.caste);
+  if (eligibility.academics) list.push(eligibility.academics);
+  if (eligibility.qualification) list.push(eligibility.qualification);
+  if (eligibility.incomeCeiling) list.push(`Income Ceiling: ${eligibility.incomeCeiling}`);
+  if (eligibility.incomeCriteria) list.push(`Income Criteria: ${eligibility.incomeCriteria}`);
+  if (eligibility.instituteCoverage) list.push(eligibility.instituteCoverage);
+  if (eligibility.institutesCovered) list.push(eligibility.institutesCovered);
+  if (eligibility.slotsRule) list.push(eligibility.slotsRule);
+  if (eligibility.ageLimit) list.push(`Age Limit: ${eligibility.ageLimit}`);
+  if (eligibility.priorityRule) list.push(eligibility.priorityRule);
+  if (eligibility.bankAccount) list.push(eligibility.bankAccount);
+  if (eligibility.otherScholarships) list.push(eligibility.otherScholarships);
+  return list;
+}
+
 const dataStore = {
   // 1. getScholarshipSchemes()
   getScholarshipSchemes: async () => {
@@ -183,11 +202,12 @@ const dataStore = {
       id: s.id,
       code: s.code,
       name: s.name,
+      schemeType: s.schemeType,
       targetAudience: s.targetAudience,
-      description: s.description,
-      maxAmount: `${s.currency} ${s.maxAmount}`,
-      duration: s.duration,
-      officialSource: s.officialSource
+      purpose: s.purpose,
+      duration: s.duration || 'Entire Course Duration',
+      sourceDocument: s.sourceReference.file,
+      sourceSections: s.sourceReference.sections
     }));
   },
 
@@ -201,7 +221,11 @@ const dataStore = {
       };
     }
     const found = knowledgeData.schemes.find((s) => s.id === schemeId);
-    return { ...found, verified: true };
+    return {
+      ...found,
+      eligibilityCriteria: formatEligibilityCriteria(found.eligibility),
+      verified: true
+    };
   },
 
   // 3. getEligibilityCriteria(scheme)
@@ -209,14 +233,17 @@ const dataStore = {
     const schemeId = normalizeScheme(scheme);
     if (!schemeId) {
       return {
-        error: `Scheme '${scheme}' is not recognized. Only MoTA schemes (Pre-Matric, Post-Matric, Top Class, NFST, NOS) are supported.`,
+        error: `Scheme '${scheme}' is not recognized. Only official MoTA schemes (Pre-Matric, Post-Matric, Top Class, NFST, NOS) are supported.`,
         verified: false
       };
     }
     const found = knowledgeData.schemes.find((s) => s.id === schemeId);
     return {
       schemeName: found.name,
-      eligibilityCriteria: found.eligibilityCriteria,
+      sourceDocument: found.sourceReference.file,
+      sourceSections: found.sourceReference.sections,
+      eligibilityDetails: found.eligibility,
+      eligibilityCriteria: formatEligibilityCriteria(found.eligibility),
       verified: true
     };
   },
@@ -233,6 +260,8 @@ const dataStore = {
     const found = knowledgeData.schemes.find((s) => s.id === schemeId);
     return {
       schemeName: found.name,
+      sourceDocument: found.sourceReference.file,
+      sourceSections: found.sourceReference.sections,
       requiredDocuments: found.requiredDocuments,
       verified: true
     };

@@ -5,8 +5,8 @@ const dataStore = require('../database/data_store');
 const RESPONSES = {
   UNAVAILABLE: 'JAGO is temporarily unavailable. Please try again shortly.',
   DATA_UNAVAILABLE: "I couldn't retrieve that information from your application right now.",
-  NOT_FOUND: "I don't have verified information about that.",
-  OUT_OF_DOMAIN: "I'm JAGO, the scholarship assistant. I can help with scholarship schemes, eligibility, applications, documents, verification, DBT, and application status."
+  NOT_FOUND: "I don't have verified information about that in the scholarship documents.",
+  OUT_OF_DOMAIN: "I'm JAGO, your scholarship assistant. I can help with scholarship schemes, eligibility, documents, applications, verification, and application status."
 };
 
 // ── Tool / Function Declarations for Gemini Function Calling ───────────────────
@@ -142,8 +142,9 @@ function isExplicitlyOutOfDomain(text) {
   const outOfDomainPatterns = [
     /\b(elon\s*musk|trump|biden|modi|kohli|messi|ronaldo|celebrity|actor|actress)\b/,
     /\bwho\s+is\s+(elon|donald|virat|messi|shahrukh|salman|bill\s*gates|mark\s*zuckerberg)\b/,
-    /\b(write|create|debug|generate|fix)\s+(python|c\+\+|java|javascript|dart|html|css|php|sql|code|script|program)\b/,
-    /\b(python|c\+\+|javascript|typescript|assembly|golang|rust)\s+(code|script|program)\b/,
+    /\b(what\s+is|explain|write|create|debug|generate|fix)\s+(python|c\+\+|java|javascript|dart|html|css|php|sql|code|script|program)\b/,
+    /\b(python|c\+\+|javascript|typescript|assembly|golang|rust)\s+(code|script|program|developer|language)\b/,
+    /\bwhat\s+is\s+python\b/,
     /\bwrite\s+a\s+(c\+\+|python|java)\s+(program|code)\b/,
     /\b(weather|temperature|forecast|rain\s*today|climate|humidity)\b/,
     /\b(joke|funny|riddle|story|poem|song|lyrics|movie|cinema|netflix|game|gaming|cricket\s*score)\b/,
@@ -177,20 +178,35 @@ class GeminiService {
     return `
 You are JAGO, the official AI scholarship assistant inside the "Tribal Scholar Saathi" mobile application for the Ministry of Tribal Affairs (MoTA), Government of India.
 
-ROLE & BOUNDARY:
-- You are a closed-domain assistant for Scheduled Tribe (ST) scholarship programs.
-- Your domain covers ONLY:
-  1. MoTA scholarship schemes: Pre-Matric, Post-Matric, Top Class Education, National Fellowship for ST (NFST), National Overseas Scholarship (NOS).
-  2. Eligibility criteria, application process, required documents, verification stages, sanction process, and Direct Benefit Transfer (DBT) payments.
-  3. The current authenticated student's application status, pending actions, document defects, and payment details.
+ROLE & CLOSED DOMAIN BOUNDARY:
+- You are a strictly closed-domain scholarship assistant for Scheduled Tribe (ST) students.
+- Your knowledge is STRICTLY GROUNDED in the official MoTA scheme guidelines and the student's active application data:
+  1. Pre-Matric Scholarship for ST Students (Classes IX & X) [Source: Pre_Matric_Scholarship_Guidelines_2021-26.pdf]
+  2. Post-Matric Scholarship for ST Students (Class XI to Post-Graduation) [Source: Post_Matric_Scholarship_Guidelines_2022.pdf]
+  3. Top Class Education for ST Students (UG/PG in 252 notified premier institutes) [Source: National_Fellowship_and_Scholarship_Higher_Education_Guidelines_2021-26.pdf, Part-B]
+  4. National Fellowship for ST Students (NFST, for M.Phil and Ph.D) [Source: National_Fellowship_and_Scholarship_Higher_Education_Guidelines_2021-26.pdf, Part-A]
+  5. National Overseas Scholarship (NOS, for Masters and Ph.D in Top 1,000 QS ranked institutions; Note: Post-Doctoral Research omitted from 2026-27) [Source: NOS_Scheme_Amendment_Order_2026-27.pdf]
 - DO NOT answer questions about unrelated topics (celebrities, coding, jokes, weather, science, general chit-chat). If asked, respond with:
   "${RESPONSES.OUT_OF_DOMAIN}"
-- DO NOT invent, guess, or hallucinate scholarship rules, dates, deadlines, amounts, or application statuses.
-- If information is not available in the trusted knowledge base or application database, respond:
-  "${RESPONSES.NOT_FOUND}"
+- STRICT NO-HALLUCINATION RULE:
+  * NEVER invent or guess scholarship amounts, eligibility rules, income ceilings, deadlines, or documents.
+  * If the answer is not present in the trusted database or tool outputs, you MUST reply:
+    "I don't have verified information about that in the scholarship documents."
+  * Do NOT let general external knowledge fill in details.
 
-FUNCTION CALLING & TRUSTED DATA:
-- You have access to backend functions (tools):
+SOURCE-AWARE CITATIONS:
+- When stating scheme rules, allowances, eligibility criteria, required documents, or application procedures, cite the official source clearly and cleanly, e.g.:
+  "[Source: <Document Name>, <Section/Page>]"
+- For example:
+  "According to the Post-Matric Scholarship guidelines, the family income ceiling is ₹2.50 Lakh per annum [Source: Post_Matric_Scholarship_Guidelines_2022.pdf, Para 3.3]."
+
+CONVERSATIONAL CONTEXT & MULTI-TURN:
+- Maintain conversation history. Understand pronouns and references:
+  * If the user previously asked about "Post-Matric" and now asks "What documents do I need?" or "What about income?", answer specifically for Post-Matric without requiring them to repeat the scheme.
+  * If the user's question is completely ambiguous with no established scheme context (e.g., "Am I eligible?"), ask which scholarship scheme they are inquiring about.
+
+FUNCTION CALLING & DATA USAGE:
+- You have access to backend tools to query the official PDF-derived knowledge base and authenticated student records:
   * getScholarshipSchemes()
   * getScholarshipDetails({ scheme })
   * getEligibilityCriteria({ scheme })
@@ -200,22 +216,14 @@ FUNCTION CALLING & TRUSTED DATA:
   * getDeficiencies({ applicationId })
   * getDBTStatus({ applicationId })
   * getUserScholarshipProfile()
-- When a user asks about schemes, criteria, documents, or their application, you MUST call the appropriate function to retrieve real database records.
-- User-provided information is NOT officially verified unless marked verified in the database. Never claim user input is verified.
-- For eligibility questions, clearly separate:
-  * Requirement
-  * User information
-  * Result
-  * Missing information (if any). Do not make a final eligibility claim if required details are missing.
-
-CONVERSATIONAL CONTEXT:
-- Maintain conversation history. Understand pronouns and references (e.g. "What about the income certificate?" refers to the previously mentioned scheme).
+- Always call the appropriate function before answering scheme facts or user status.
+- Differentiate between official scheme criteria (from PDFs) and user profile status (from database). Do not claim a student is officially approved unless the database records indicate official approval.
 
 LANGUAGE & STYLE:
 - The user's requested application language is: "${locale}".
 - Respond in the user's language matching "${locale}".
-- Keep official terminology recognizable: NFST, NOS, DBT, DigiLocker, PFMS, AISHE, MoTA.
-- Style: Simple, helpful, professional, friendly, clear, concise, student-friendly. Use numbered steps for procedures.
+- Preserve official acronyms: MoTA, NFST, NOS, DBT, PFMS, DigiLocker, AISHE, QS.
+- Keep answers polite, clear, structured, and student-friendly. Use bullet points for requirements.
 `;
   }
 
@@ -247,7 +255,7 @@ LANGUAGE & STYLE:
       // If developer hasn't set GEMINI_API_KEY, return standard unavailable message
       // or evaluate offline data for local developer test if configured
       if (process.env.NODE_ENV === 'test' || process.env.ALLOW_LOCAL_FALLBACK === 'true') {
-        return this.localDeterministicFallback({ message: cleanMessage, userId, applicationId, locale });
+        return this.localDeterministicFallback({ message: cleanMessage, conversationHistory, userId, applicationId, locale });
       }
       return {
         reply: RESPONSES.UNAVAILABLE,
@@ -400,7 +408,7 @@ LANGUAGE & STYLE:
       };
     }
 
-    if (lower.includes('status') || lower.includes('track') || lower.includes('where is my application')) {
+    if (((lower.includes('status') || lower.includes('track') || lower.includes('stage')) && !lower.includes('payment') && !lower.includes('dbt') && !lower.includes('money')) || lower.includes('where is my application')) {
       const statusData = await dataStore.getApplicationStatus({ applicationId, authenticatedUserId: userId });
       if (statusData.error) return { reply: RESPONSES.DATA_UNAVAILABLE, toolCalls: ['getApplicationStatus'] };
       return {
@@ -439,25 +447,85 @@ LANGUAGE & STYLE:
       };
     }
 
-    if (lower.includes('post-matric') || lower.includes('post matric')) {
+    if (lower.includes('post-matric') || lower.includes('post matric') || (historyText.includes('post-matric') && !lower.includes('pre-matric') && !lower.includes('top class') && !lower.includes('nfst') && !lower.includes('nos'))) {
       if (lower.includes('document')) {
         const docData = await dataStore.getRequiredDocuments({ scheme: 'post-matric' });
         return {
-          reply: `Required documents for ${docData.schemeName}:\n` + docData.requiredDocuments.map((d) => `• ${d}`).join('\n'),
+          reply: `Required documents for ${docData.schemeName} [Source: ${docData.sourceDocument}, ${docData.sourceSections}]:\n` + docData.requiredDocuments.map((d) => `• ${d}`).join('\n'),
           toolCalls: [{ name: 'getRequiredDocuments', args: { scheme: 'post-matric' } }]
         };
       }
       const elData = await dataStore.getEligibilityCriteria({ scheme: 'post-matric' });
       return {
-        reply: `Eligibility Criteria for ${elData.schemeName}:\n` + elData.eligibilityCriteria.map((c) => `• ${c}`).join('\n'),
+        reply: `Eligibility Criteria for ${elData.schemeName} [Source: ${elData.sourceDocument}, ${elData.sourceSections}]:\n` + elData.eligibilityCriteria.map((c) => `• ${c}`).join('\n'),
         toolCalls: [{ name: 'getEligibilityCriteria', args: { scheme: 'post-matric' } }]
       };
     }
 
-    if (lower.includes('schemes') || lower.includes('available scholarship')) {
+    if (lower.includes('pre-matric') || lower.includes('pre matric') || (historyText.includes('pre-matric') && !lower.includes('post-matric'))) {
+      if (lower.includes('document')) {
+        const docData = await dataStore.getRequiredDocuments({ scheme: 'pre-matric' });
+        return {
+          reply: `Required documents for ${docData.schemeName} [Source: ${docData.sourceDocument}, ${docData.sourceSections}]:\n` + docData.requiredDocuments.map((d) => `• ${d}`).join('\n'),
+          toolCalls: [{ name: 'getRequiredDocuments', args: { scheme: 'pre-matric' } }]
+        };
+      }
+      const elData = await dataStore.getEligibilityCriteria({ scheme: 'pre-matric' });
+      return {
+        reply: `Eligibility Criteria for ${elData.schemeName} [Source: ${elData.sourceDocument}, ${elData.sourceSections}]:\n` + elData.eligibilityCriteria.map((c) => `• ${c}`).join('\n'),
+        toolCalls: [{ name: 'getEligibilityCriteria', args: { scheme: 'pre-matric' } }]
+      };
+    }
+
+    if (lower.includes('top class') || lower.includes('premier institute')) {
+      if (lower.includes('document')) {
+        const docData = await dataStore.getRequiredDocuments({ scheme: 'top-class' });
+        return {
+          reply: `Required documents for ${docData.schemeName} [Source: ${docData.sourceDocument}, ${docData.sourceSections}]:\n` + docData.requiredDocuments.map((d) => `• ${d}`).join('\n'),
+          toolCalls: [{ name: 'getRequiredDocuments', args: { scheme: 'top-class' } }]
+        };
+      }
+      const elData = await dataStore.getEligibilityCriteria({ scheme: 'top-class' });
+      return {
+        reply: `Eligibility Criteria for ${elData.schemeName} [Source: ${elData.sourceDocument}, ${elData.sourceSections}]:\n` + elData.eligibilityCriteria.map((c) => `• ${c}`).join('\n'),
+        toolCalls: [{ name: 'getEligibilityCriteria', args: { scheme: 'top-class' } }]
+      };
+    }
+
+    if (lower.includes('nfst') || lower.includes('fellowship') || lower.includes('m.phil') || lower.includes('ph.d') || lower.includes('phd')) {
+      if (lower.includes('document')) {
+        const docData = await dataStore.getRequiredDocuments({ scheme: 'nfst' });
+        return {
+          reply: `Required documents for ${docData.schemeName} [Source: ${docData.sourceDocument}, ${docData.sourceSections}]:\n` + docData.requiredDocuments.map((d) => `• ${d}`).join('\n'),
+          toolCalls: [{ name: 'getRequiredDocuments', args: { scheme: 'nfst' } }]
+        };
+      }
+      const elData = await dataStore.getEligibilityCriteria({ scheme: 'nfst' });
+      return {
+        reply: `Eligibility Criteria for ${elData.schemeName} [Source: ${elData.sourceDocument}, ${elData.sourceSections}]:\n` + elData.eligibilityCriteria.map((c) => `• ${c}`).join('\n'),
+        toolCalls: [{ name: 'getEligibilityCriteria', args: { scheme: 'nfst' } }]
+      };
+    }
+
+    if (lower.includes('nos') || lower.includes('overseas') || lower.includes('study abroad')) {
+      if (lower.includes('document')) {
+        const docData = await dataStore.getRequiredDocuments({ scheme: 'nos' });
+        return {
+          reply: `Required documents for ${docData.schemeName} [Source: ${docData.sourceDocument}, ${docData.sourceSections}]:\n` + docData.requiredDocuments.map((d) => `• ${d}`).join('\n'),
+          toolCalls: [{ name: 'getRequiredDocuments', args: { scheme: 'nos' } }]
+        };
+      }
+      const elData = await dataStore.getEligibilityCriteria({ scheme: 'nos' });
+      return {
+        reply: `Eligibility Criteria for ${elData.schemeName} [Source: ${elData.sourceDocument}, ${elData.sourceSections}]:\n` + elData.eligibilityCriteria.map((c) => `• ${c}`).join('\n'),
+        toolCalls: [{ name: 'getEligibilityCriteria', args: { scheme: 'nos' } }]
+      };
+    }
+
+    if (lower.includes('scheme') || lower.includes('available scholarship') || lower.includes('scholarships are available') || lower.includes('what scholarship') || lower.includes('which scholarship')) {
       const schemes = await dataStore.getScholarshipSchemes();
       return {
-        reply: 'Available MoTA Scholarship Schemes in Tribal Scholar Saathi:\n' + schemes.map((s) => `• ${s.name} (${s.duration})`).join('\n'),
+        reply: 'Available MoTA Scholarship Schemes in Tribal Scholar Saathi:\n' + schemes.map((s) => `• ${s.name} (${s.duration}) [Source: ${s.sourceDocument}]`).join('\n'),
         toolCalls: [{ name: 'getScholarshipSchemes', args: {} }]
       };
     }
