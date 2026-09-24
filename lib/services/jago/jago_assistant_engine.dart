@@ -694,7 +694,7 @@ Keep responses concise and student-friendly.
     return 'General MoTA Scholarship Eligibility:\n'
         '1. Must belong to a notified Scheduled Tribe (ST) category.\n'
         '2. Enrolled in a recognized school, college, or university.\n'
-        '3. Family annual income within scheme limits (₹2.50L for Pre/Post-Matric, ₹6.00L for Top Class/NFST/NOS).\n'
+        '3. Family annual income within scheme limits (₹2.50L for Pre/Post-Matric, ₹6.00L for Top Class/NOS; No income ceiling for NFST).\n'
         '4. Valid Aadhaar and Aadhaar-seeded bank account for DBT.';
   }
 

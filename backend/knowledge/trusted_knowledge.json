@@ -1,235 +1,355 @@
 {
-  "version": "1.0",
+  "version": "2.0-verified-pdf",
   "ministry": "Ministry of Tribal Affairs (MoTA), Government of India",
-  "portal": "https://scholarships.gov.in",
+  "portals": {
+    "nsp": "https://scholarships.gov.in",
+    "fellowship": "https://fellowship.tribal.gov.in",
+    "dbt": "https://dbttribal.gov.in",
+    "thesisRepository": "https://repository.tribal.gov.in",
+    "grievance": "https://www.tribal.nic.in/grievance"
+  },
+  "sourceDocuments": [
+    {
+      "id": "DOC-PRE-MATRIC",
+      "filename": "Pre_Matric_Scholarship_Guidelines_2021-26.pdf",
+      "title": "Guidelines: Pre-Matric Scholarship for Scheduled Tribe Students Studying in Classes IX & X (2021-22 to 2025-26)",
+      "type": "Centrally Sponsored Scheme Guidelines",
+      "applicablePeriod": "2021-22 to 2025-26",
+      "authority": "Ministry of Tribal Affairs, Government of India"
+    },
+    {
+      "id": "DOC-POST-MATRIC",
+      "filename": "Post_Matric_Scholarship_Guidelines_2022.pdf",
+      "title": "Post Matric Scholarship for the Students Belonging to Scheduled Tribe for Studies in India (Regulations Governing Award)",
+      "type": "Centrally Sponsored Scheme Regulations",
+      "applicablePeriod": "Applicable from 01-04-2022",
+      "authority": "Ministry of Tribal Affairs, Government of India"
+    },
+    {
+      "id": "DOC-HIGHER-ED",
+      "filename": "National_Fellowship_and_Scholarship_Higher_Education_Guidelines_2021-26.pdf",
+      "title": "Guidelines: National Fellowship & Scholarship for Higher Education of Scheduled Tribe Students (2021-22 to 2025-26)",
+      "type": "Central Sector Scheme Guidelines (Part A: Fellowship / Part B: Scholarship)",
+      "applicablePeriod": "2021-22 to 2025-26 (Rates effective 01-04-2022)",
+      "authority": "Ministry of Tribal Affairs, Government of India"
+    },
+    {
+      "id": "DOC-NOS-AMENDMENT",
+      "filename": "NOS_Scheme_Amendment_Order_2026-27.pdf",
+      "title": "Amendment in eligibility criteria and courses covered under the National Overseas Scholarship (NOS) Scheme for ST Students from 2026-27 (File No. 11016/22/2018-Sch)",
+      "type": "Official Ministerial Amendment Order",
+      "applicablePeriod": "Applicable from Selection Year 2026-27 onwards (Issued 14.07.2026)",
+      "authority": "Director Shivanand F. Bachagundi, Ministry of Tribal Affairs"
+    }
+  ],
   "schemes": [
     {
       "id": "sch-pre-matric",
       "code": "PRE_MATRIC",
-      "name": "Pre-Matric Scholarship for ST Students",
-      "targetAudience": "ST students studying in Classes 9 and 10",
-      "description": "Financial assistance for Scheduled Tribe students studying in classes 9 and 10 in recognized schools to reduce dropout rates and encourage tribal youth to transition from elementary to secondary education.",
-      "duration": "1 Academic Year (10 Months)",
-      "maxAmount": 22500,
-      "currency": "INR",
-      "eligibilityCriteria": [
-        "Must belong to a notified Scheduled Tribe (ST) category.",
-        "Must be studying in Class 9 or Class 10 in a government or recognized school.",
-        "Annual family income from all sources must not exceed Rs. 2,50,000 (Rs. 2.50 Lakh).",
-        "Must not be holding any other scholarship under central/state government schemes for the same stage.",
-        "Must maintain regular attendance (minimum 50%) and satisfactory academic performance."
-      ],
+      "name": "Pre-Matric Scholarship for ST Students (Classes IX & X)",
+      "schemeType": "Centrally Sponsored Scheme",
+      "fundingRatio": "75:25 (Centre:State); 90:10 for North East & Hilly States; 100% for UTs without legislature",
+      "sourceReference": {
+        "file": "Pre_Matric_Scholarship_Guidelines_2021-26.pdf",
+        "sections": ["Para 1 (p.3)", "Para 3 (p.3)", "Para 3.4 (p.4)", "Para 5 (p.7)", "Para 6 (p.8)", "Para 8 (p.9)"]
+      },
+      "targetAudience": "ST students studying in Classes 9 and 10 in recognized schools in India",
+      "purpose": "To minimize drop-out rates among ST children transitioning from elementary to secondary stage and improve progression to post-matric education (Para 2, p.3).",
+      "eligibility": {
+        "caste": "Must belong to a notified Scheduled Tribe (ST) of the Domicile State/UT (Para 3.2.I, p.3).",
+        "academics": "Must be studying in Class 9 or 10 in a Government School, or school recognized by Govt or Central/State Board of Secondary Education (Para 3.2.II, p.3).",
+        "incomeCeiling": "Rs. 2,50,000/- (Rs. 2.50 Lakh) per annum total family income from all sources (Para 3.3, p.3).",
+        "incomeRules": [
+          "Both parents working: Combined income of both taken into account (Para 3.3.I, p.4).",
+          "Other family members/siblings: Income of siblings/other relatives is NOT included (Para 3.3.II, p.4).",
+          "Single parent: Income of the living parent only (Para 3.3.III, p.4).",
+          "Orphan: Income criteria DOES NOT APPLY for an orphan supported by a guardian (Para 3.3.IV, p.4).",
+          "Income definition: Gross income without any exemption or deduction under Income Tax Act (Note 1, p.4).",
+          "Validity: Income certificate is required ONCE only at admission to Class 9 and remains valid for Class 10 (Note 2, p.4).",
+          "Self-declarations/affidavits are strictly NOT acceptable (Note 1, p.7)."
+        ],
+        "bankAccount": "Valid account in a Scheduled Bank, held in the name of student or parent, linked with Aadhaar and active mobile number (Para 3.2.IV, p.3 & Para 4.III.b, p.5).",
+        "otherScholarships": "Student must not be receiving any other scholarship (Para 3.2.V, p.3).",
+        "tenability": "Available for only one year in any class. If a student repeats a class, no scholarship is given for the same class twice; renewed upon promotion to the next class (Para 3.2.VI, p.3)."
+      },
+      "benefits": {
+        "dayScholar": {
+          "monthlyStipend": "Rs. 225/- per month (for 10 months = Rs. 2,250/- annually)",
+          "booksAndAdhocGrant": "Rs. 750/- annually",
+          "totalAnnual": "Rs. 3,000/- per annum (Table at Para 3.4, p.4)"
+        },
+        "hosteller": {
+          "monthlyStipend": "Rs. 525/- per month (for 10 months = Rs. 5,250/- annually)",
+          "booksAndAdhocGrant": "Rs. 1,000/- annually",
+          "totalAnnual": "Rs. 6,250/- per annum (Table at Para 3.4, p.4)"
+        },
+        "additionalDisabilityAllowance": {
+          "hosteller": "Rs. 800/- per month (Rs. 9,600/- annually for all 12 months)",
+          "dayScholar": "Rs. 600/- per month (Rs. 7,200/- annually for all 12 months)",
+          "conditions": "Certified by competent medical authority of State/UT (minimum 40% disability). Also applies to leprosy-cured and students having sickle cell anemia or thalassemia (Para 3.4, p.4-5)."
+        }
+      },
       "requiredDocuments": [
-        "ST / Caste Certificate (issued by competent revenue authority)",
-        "Income Certificate for current academic year (from Tehsildar / SDO)",
-        "Previous Class Marksheet / Passing Certificate",
-        "School Bonafide / Enrollment Certificate with UDISE code",
-        "Student Aadhaar Card",
-        "Bank Passbook copy (Aadhaar-seeded bank account for DBT)"
+        "Aadhaar Number (Para 5.a, p.7)",
+        "Domicile Certificate (Para 5.b, p.7)",
+        "ST Certificate issued by competent authority of State/UT (Para 5.c, p.7)",
+        "Family Income Certificate issued by competent revenue authority (Para 5.d & Note 1, p.7)",
+        "Disability Certificate (if applying under Divyangjan/disability category, Para 5.e, p.7)",
+        "Scanned copy of recent passport size photograph (Para 5.f, p.7)",
+        "School Bonafide / Enrollment details with UDISE code (Para 4.1.b, p.6)",
+        "Bank Passbook copy showing active Aadhaar-linked account number & IFSC"
       ],
-      "applicationProcedure": [
-        "1. Complete Student Profile in Tribal Scholar Saathi with Aadhaar verification.",
-        "2. Link DigiLocker to auto-fetch verified ST & Aadhaar certificates.",
-        "3. Select Pre-Matric Scholarship scheme and verify academic details.",
-        "4. Upload valid Income Certificate for current academic year.",
-        "5. Submit application for School / Headmaster verification."
-      ],
-      "verificationStages": [
-        "Stage 1: School Verification by Headmaster / Principal",
-        "Stage 2: District Welfare Officer (DWO) scrutiny",
-        "Stage 3: State Tribal Welfare Department approval",
-        "Stage 4: MoTA Sanction & DBT credit via PFMS"
-      ],
-      "dbtInformation": "Stipend and book grants are transferred directly into the student's Aadhaar-seeded bank account through the Public Financial Management System (PFMS).",
-      "importantConditions": [
-        "Scholarship is tenable only in recognized government or aided schools.",
-        "Failure or dropout terminates the scholarship for that academic year.",
-        "Income certificate must be renewed every financial year."
-      ],
-      "officialSource": "Ministry of Tribal Affairs Scheme Guidelines (scholarships.gov.in)"
+      "annualTimeline": {
+        "portalOpening": "Target 1st April (Para 6, p.8)",
+        "studentRegistration": "1 April – 31st July (Fresh & Renewal)",
+        "instituteVerification": "By 31st August",
+        "stateDistrictVerification": "By 30th September",
+        "dbtDisbursement": "By 31st October"
+      },
+      "portal": "https://scholarships.gov.in (NSP) or State Portal"
     },
     {
       "id": "sch-post-matric",
       "code": "POST_MATRIC",
       "name": "Post-Matric Scholarship for ST Students",
-      "targetAudience": "ST students pursuing post-matriculation courses (Class 11, 12, ITI, Diploma, Degree, PG, Professional courses)",
-      "description": "The flagship Centrally Sponsored Scheme of the Ministry of Tribal Affairs providing comprehensive financial support to ST students at post-matriculation or post-secondary stages to enable them to complete higher education.",
-      "duration": "Duration of the enrolled course (1 to 5 years)",
-      "maxAmount": 70000,
-      "currency": "INR",
-      "eligibilityCriteria": [
-        "Must belong to a notified Scheduled Tribe (ST) category.",
-        "Must be enrolled in Class 11, 12, ITI, Polytechnic, Diploma, Undergraduate, Postgraduate, or Doctoral program in an institution with a valid AISHE code.",
-        "Annual family income from all sources must not exceed Rs. 2,50,000 (Rs. 2.50 Lakh).",
-        "Must hold a valid Aadhaar-seeded bank account.",
-        "Must have passed the qualifying previous examination.",
-        "All children of the same parents can be considered (subject to income ceiling)."
+      "schemeType": "Centrally Sponsored Scheme",
+      "fundingRatio": "75:25 (Centre:State); 90:10 for North East & Hilly States; 100% for UTs without legislature",
+      "sourceReference": {
+        "file": "Post_Matric_Scholarship_Guidelines_2022.pdf",
+        "sections": ["Para 1-3.2 (p.3-4)", "Para 3.2.1-3.2.2 (p.4)", "Para 3.3 (p.5)", "Para 3.4.1-3.4.2 (p.6-8)", "Para 4 (p.8)", "Para 6 (p.12)", "Para 7 (p.13)", "Para 8 (p.14-15)"]
+      },
+      "targetAudience": "ST students pursuing post-matriculation courses (Class 11, 12, ITI, Diploma, Polytechnic, Degree, PG, M.Phil, Ph.D) in India",
+      "purpose": "Flagship scheme providing financial support from post-matric to post-graduate level to enable ST students to successfully complete higher education (Para 1-2, p.3).",
+      "eligibility": {
+        "caste": "Scheduled Tribe belonging to Domicile State/UT (Para 3.2.a, p.3).",
+        "qualification": "Passed Matriculation (Class 10) or Higher Secondary (Class 12) or higher examination from a recognized University or Board (Para 3.2.b, p.3).",
+        "incomeCeiling": "Rs. 2,50,000/- (Rs. 2.50 Lakh) per annum total family income from all sources (Para 3.3, p.5).",
+        "incomeRules": [
+          "Combined income of father and mother if both are working (Para 3.3.I, p.5).",
+          "Earnings of siblings or other family members are excluded (Para 3.3.II, p.5).",
+          "Single living parent: Only that parent's income (Para 3.3.III, p.5).",
+          "Orphan supported by guardian: Income criteria does NOT apply (Para 3.3.IV, p.5).",
+          "Gross income without Income Tax deductions/exemptions (Note 1, p.5).",
+          "Validity: Income certificate taken ONCE only at admission and is valid for the ENTIRE duration of the course. Fresh income certificate is NOT required for renewal in 2nd or subsequent years (Note 2, p.5).",
+          "Affidavits/self-declarations of income are NOT acceptable (Para 6 Note 1, p.12)."
+        ],
+        "instituteCoverage": "Recognized Govt institutions, Institutions of National Importance, UGC 2(f)/12(B) Universities/Colleges, Deemed Universities, NAAC 'A' / NBA accredited private universities, recognized Class XI-XII schools, Diploma granting institutes, and NCVT/AICTE/MCI approved institutes (Para 3.2.f, p.3-4).",
+        "topClassExclusion": "Students admitted to 252 Top Class Institutes are NOT eligible under Post-Matric; they must apply under Top Class Scheme (Para 3.2 Note 1, p.4).",
+        "streamChangeRestriction": "Candidates who complete a course in one stream are NOT eligible for diploma/degree of a different stream at the same level (e.g., student who completed B.A./B.Sc cannot get scholarship for B.Com, and MBBS student cannot get scholarship after B.Tech) (Para 3.2.1, p.4).",
+        "oneScholarshipRule": "Can hold only one scholarship/stipend at a time. If awarded another, student can exercise an option for whichever is more beneficial (Para 3.2.2, p.4-5)."
+      },
+      "benefits": {
+        "components": [
+          "1. Compulsory non-refundable course fees fixed by State Level Fee Fixation Committee (Para 3.4.1, p.6).",
+          "2. Monthly maintenance stipend for up to 10 months per academic year (Para 3.4.2, p.7)."
+        ],
+        "feeCeilingsPrivateInstitutes": {
+          "engineering": "Rs. 2.50 Lakhs per annum per student (Para 3.4.1 Note 1, p.6)",
+          "medical": "Rs. 6.00 Lakhs per annum per student for MBBS/MS/MD (Para 3.4.1 Note 1, p.6)",
+          "otherCourses": "Rs. 1.00 Lakh per annum per student (Para 3.4.1 Note 1, p.6)"
+        },
+        "monthlyStipendRates": {
+          "groupI": {
+            "courses": "Degree, PG Diploma, M.Phil, Ph.D in professional courses (Engineering, Medical, Tech, Management)",
+            "hosteller": "Rs. 1,200/- per month (Rs. 12,000/- annually)",
+            "dayScholar": "Rs. 550/- per month (Rs. 5,500/- annually)"
+          },
+          "groupII": {
+            "courses": "Non-professional recognized Degree & PG in Arts, Science, Commerce (BA, B.Sc, B.Com, MA, M.Sc, M.Com)",
+            "hosteller": "Rs. 820/- per month (Rs. 8,200/- annually)",
+            "dayScholar": "Rs. 530/- per month (Rs. 5,300/- annually)"
+          },
+          "groupIII": {
+            "courses": "Vocational stream, ITI courses, 3-year diploma courses in Polytechnics",
+            "hosteller": "Rs. 570/- per month (Rs. 5,700/- annually)",
+            "dayScholar": "Rs. 300/- per month (Rs. 3,000/- annually)"
+          },
+          "groupIV": {
+            "courses": "Class XI, Class XII, and all post-matric level non-degree courses with Class X entry qualification",
+            "hosteller": "Rs. 380/- per month (Rs. 3,800/- annually)",
+            "dayScholar": "Rs. 230/- per month (Rs. 2,300/- annually)"
+          }
+        },
+        "additionalDisabilityAllowance": {
+          "hosteller": "Rs. 800/- per month (Rs. 9,600/- annually)",
+          "dayScholar": "Rs. 600/- per month (Rs. 7,200/- annually)",
+          "coverage": "Certified Divyangjan (minimum 40%), leprosy-cured, sickle cell anemia, and thalassemia (Para 3.4.2 Note 4, p.8)"
+        },
+        "deemedHostelRule": "If college hostel is unavailable, an approved residence with at least 5 students living together with common mess certified by Head of Institution qualifies for hosteller rates (Para 3.4.2 Note 3, p.8)."
+      },
+      "verification": {
+        "level1_Institute": "Institute Nodal Officer (INO) conducts 1st Level verification of details and uploaded documents against physical records; can verify, reject, or mark defective with reasons (Para 5.1, p.10-11).",
+        "level2_District_State": "District / State Nodal Officer verifies documents at 2nd/3rd level and monitors application pendency (Para 5.2, p.11).",
+        "level3_Ministry": "Ministry of Tribal Affairs monitors progress and verifies PFMS scheme configuration (Para 5.3, p.11-12)."
+      },
+      "renewalRules": [
+        "Tenability: Award covers the entire duration of the course (Para 7.i, p.13).",
+        "Subsequent year application: Student who could not apply in 1st year can apply in 2nd or subsequent year for remaining duration (Para 7.iii, p.13).",
+        "Promotion: Renewed from year to year on passing and moving to the next class (Para 7.iv, p.13).",
+        "Failure: If failed in one year, NOT entitled to scholarship until that class is cleared and student is promoted (Para 7.v, p.13).",
+        "Medical exemption: If unable to appear in annual exam due to illness, renewed on submission of medical certificate certified by Head of Institution (Para 7.vi, p.13).",
+        "Carry-over promotion: If promoted to next class under university regulations with backlogs/arrears, entitled to scholarship for the promoted class (Para 7.vii, p.13).",
+        "Internship: Not paid during internship/houseman-ship if student receives stipend/remuneration (Para 7.vii, p.14)."
       ],
+      "annualTimeline": {
+        "portalOpening": "Target 1st May (Para 8, p.14)",
+        "freshRegistration": "1 April – 30th September",
+        "renewalRegistration": "1 April – 30th September",
+        "instituteVerification": "By 30th October",
+        "stateVerificationFresh": "By 15th November",
+        "stateVerificationRenewal": "By 30th October",
+        "disbursementRenewal": "By 15th November",
+        "disbursementFresh": "By 31st December"
+      },
       "requiredDocuments": [
-        "ST / Caste Certificate (issued by competent authority)",
-        "Income Certificate for current academic year (from competent revenue authority)",
-        "Class 10 and Class 12 Marksheets / Passing Certificates",
-        "Institution Bonafide / Enrollment Certificate with AISHE code",
-        "Fee Structure Breakdown from Institution",
-        "Student Aadhaar Card",
-        "Bank Passbook / Cancelled Cheque (Aadhaar-seeded account)",
-        "Hostel Certificate (if applicable for hosteller rate allowance)"
+        "Aadhaar Number (Para 6.a, p.12)",
+        "Domicile Certificate (Para 6.b, p.12)",
+        "Certificates, diplomas, degree marksheets of all examinations passed (Para 6.c, p.12)",
+        "Last qualified examination percentage / CGPA conversion (Para 6.d, p.12)",
+        "ST Certificate issued by competent State/UT authority (Para 6.e, p.12)",
+        "Family Income Certificate (fresh candidate only; valid for full course) (Para 6.f, p.12)",
+        "Disability Certificate (if applicable, Para 6.g, p.12)",
+        "Scanned Passport Photograph (Para 6.h, p.12)",
+        "Fee breakdown receipt & Bonafide Certificate with AISHE code from institution",
+        "Bank Passbook / Cancelled Cheque (Aadhaar-seeded bank account for DBT)"
       ],
-      "applicationProcedure": [
-        "1. Complete Student Profile in Tribal Scholar Saathi with tribal & academic details.",
-        "2. Connect DigiLocker to auto-verify Identity and Marksheets.",
-        "3. Choose Post-Matric Scholarship and input current course details.",
-        "4. Attach updated Income Certificate and Bonafide Certificate.",
-        "5. Submit application for College Nodal Officer verification."
-      ],
-      "verificationStages": [
-        "Stage 1: Institute Verification by College Nodal Officer / Dean",
-        "Stage 2: District Welfare Office / State Department Verification",
-        "Stage 3: Sanction by State Tribal Welfare Department & MoTA",
-        "Stage 4: Direct Benefit Transfer (DBT) disbursement via PFMS"
-      ],
-      "dbtInformation": "Tuition fee component is credited directly to the institution or student account, and monthly maintenance allowance is credited directly to the student's Aadhaar-seeded bank account via PFMS.",
-      "importantConditions": [
-        "Maintenance allowance rates vary for Hostellers and Day Scholars.",
-        "Scholarship is discontinued if the student fails or abandons the course.",
-        "Change of course requires prior approval from State Department."
-      ],
-      "officialSource": "MoTA Post-Matric Scholarship Guidelines (tribal.nic.in / scholarships.gov.in)"
+      "portal": "https://scholarships.gov.in (NSP) or State Portal"
     },
     {
       "id": "sch-top-class",
       "code": "TOP_CLASS",
       "name": "National Scholarship for Higher Education of ST Students (Top Class Education)",
-      "targetAudience": "Meritorious ST students admitted to notified premier institutions (IITs, NITs, IIMs, NLUs, AIIMS, premier central universities)",
-      "description": "Central Sector Scheme providing full financial support to meritorious ST students pursuing graduate and post-graduate courses in 250+ notified premier institutes of excellence across India.",
-      "duration": "Full duration of the degree course",
-      "maxAmount": 250000,
-      "currency": "INR",
-      "eligibilityCriteria": [
-        "Must belong to a notified Scheduled Tribe (ST) category.",
-        "Must have secured admission in one of the notified premier institutes (IIT, NIT, IIM, AIIMS, NLU, etc.) through national competitive examinations (JEE, NEET, CAT, CLAT).",
-        "Annual family income from all sources must not exceed Rs. 6,00,000 (Rs. 6.00 Lakh).",
-        "Scholarship is restricted to the maximum notified slots allocated to each institute per year."
-      ],
-      "requiredDocuments": [
-        "ST / Caste Certificate",
-        "Income Certificate (Current financial year, <= Rs. 6 Lakh)",
-        "Institute Admission Offer Letter & Fee Receipt",
-        "Entrance Examination Scorecard / Rank Card (JEE / NEET / CAT / CLAT)",
-        "Class 12 Marksheet",
-        "Aadhaar Card",
-        "Bank Account Passbook (Aadhaar-seeded)"
-      ],
-      "applicationProcedure": [
-        "1. Complete Profile with Premier Institution details in Tribal Scholar Saathi.",
-        "2. Link DigiLocker to verify Caste and Identity.",
-        "3. Submit admission letter, rank card, and institutional fee schedule.",
-        "4. Application is routed to Premier Institute Nodal Officer.",
-        "5. On institutional verification, MoTA generates the sanction order."
-      ],
-      "verificationStages": [
-        "Stage 1: Institutional Verification by Premier Institute Nodal Officer",
-        "Stage 2: MoTA Steering Committee scrutiny and slot allotment",
-        "Stage 3: Sanction Order issuance by Ministry of Tribal Affairs",
-        "Stage 4: Direct disbursement of tuition fee and student allowances via DBT"
-      ],
-      "dbtInformation": "Full non-refundable tuition fees are paid directly to the institute, while living expenses (Rs. 3,000/month), book allowance (Rs. 5,000/year), and one-time computer grant (Rs. 45,000) are disbursed via DBT to the student's bank account.",
-      "importantConditions": [
-        "Student must maintain satisfactory academic standing as per institute norms.",
-        "Only valid for institutes notified under the Top Class scheme."
-      ],
-      "officialSource": "MoTA Top Class Education Scheme Guidelines"
+      "schemeType": "Central Sector Scheme (100% Central Funding)",
+      "sourceReference": {
+        "file": "National_Fellowship_and_Scholarship_Higher_Education_Guidelines_2021-26.pdf",
+        "sections": ["Part B: Paras 1-2.5 (p.17-19)", "Paras 3.1-3.3 (p.19-20)", "Paras 4.1-4.3 (p.21-22)", "Annexure I (p.24-38)"]
+      },
+      "targetAudience": "Meritorious ST students pursuing Graduate and Post-Graduate courses in 252 notified premier institutes in India",
+      "purpose": "Encouraging meritorious ST students to pursue courses at Graduate and Post Graduate level in premier institutes in fields like Management, Medicine, Engineering, Law, etc. with 100% funding by MoTA (Part B Para 1-2, p.17).",
+      "eligibility": {
+        "caste": "Scheduled Tribe (ST) students (Part B Para 2.1, p.17).",
+        "institutionAdmission": "Secured admission in one of the 252 premier institutes notified by MoTA (IITs, NITs, IIMs, AIIMS, NLUs, NIFTs, TISS, IIITs, etc.) listed in Annexure I (p.24-38).",
+        "slotsCeiling": "NO SLOTS CEILING! There is NO institute-wise, state-wise, or stream-wise ceiling on the number of slots (Part B Para 2.4, p.18). All eligible ST students admitted on merit who pass verification get the scholarship.",
+        "managementQuotaExclusion": "Students admitted under Management Quota in private institutes are NOT entitled to scholarship (Part B Para 2.4, p.18).",
+        "incomeCeiling": "Total family income from all sources must not exceed Rs. 6.0 Lakh per annum (Part B Para 2.2, p.17).",
+        "incomeRules": [
+          "Combined income of father and mother if both working (Para 2.2.i, p.17).",
+          "Earnings of siblings are excluded (Para 2.2.ii, p.18).",
+          "Single living parent: Only that parent's income (Para 2.2.iii, p.18).",
+          "Orphan: Income criteria DOES NOT APPLY (Para 2.2.iv, p.18).",
+          "Married candidates: Spousal income is added to total family income (Para 2.2.v, p.18).",
+          "Gross income without deductions under IT Act Sections 10, 80 (Note 1, p.18).",
+          "Income certificate taken once at admission, valid for multi-year course; Form-16 accepted for salaried employees (Note 2, p.18)."
+        ],
+        "otherScholarships": "Not eligible to claim benefit of any other Centre/State scholarship for the same study (Part B Para 2.1 Note 1, p.17)."
+      },
+      "benefits": {
+        "tuitionAndAdmissionFee": "Full admission fee, tuition fee, and other compulsory non-refundable charges for Government Institutes. Ceiling of Rs. 2.50 Lakhs per annum per student for private sector institutes (Table at Para 2.5.1, p.19).",
+        "booksAndStationery": "Rs. 5,000/- per annum per student without bills/vouchers (Table at Para 2.5.2, p.19).",
+        "livingStipend": "Rs. 3,000/- per month (Rs. 36,000/- annually) (Table at Para 2.5.3, p.19).",
+        "computerAndAccessories": "Rs. 45,000/- one-time assistance during entire course tenure (without bills/vouchers for Desktop/Laptop etc.) (Table at Para 2.5.4, p.19)."
+      },
+      "dbtPaymentMethod": {
+        "componentI": "Computer & accessories (Rs. 45,000), Books & Stationery (Rs. 5,000/yr), and Living Stipend (Rs. 3,000/mo) released directly into student's Aadhaar-seeded bank account via PFMS DBT (Para 4.1, p.22).",
+        "componentII": "Tuition and admission fee released directly to the Institute through PFMS (or reimbursed to student's account if student already paid at admission on producing receipt) (Para 4.1, p.22).",
+        "frequency": "Payment made once a year through PFMS DBT (Para 4, p.21)."
+      },
+      "notifiedInstitutesSummary": "Total 252 notified institutes across India including all 23 IITs, 31 NITs, 20 IIMs, 24 NLUs/Law Universities, AIIMS & Top Medical Colleges (JIPMER, CMC Vellore), IIITs, NIFTs, NIDs, TISS, IIEST Shibpur, IISc, etc. (Annexure I, p.24-38).",
+      "portal": "https://scholarships.gov.in (NSP)"
     },
     {
       "id": "sch-nfst",
       "code": "NFST",
-      "name": "National Fellowship for ST Students (NFST)",
-      "targetAudience": "ST scholars pursuing full-time M.Phil and Ph.D degrees in recognized Indian universities",
-      "description": "Central Sector fellowship scheme providing financial assistance to Scheduled Tribe candidates pursuing regular and full-time higher studies leading to M.Phil and Ph.D degrees in Sciences, Humanities, Engineering, and Social Sciences.",
-      "duration": "Up to 5 Years (2 years JRF + 3 years SRF)",
-      "maxAmount": 42000,
-      "currency": "INR",
-      "eligibilityCriteria": [
-        "Must belong to a notified Scheduled Tribe (ST) category.",
-        "Must have qualified UGC-NET, CSIR-NET, or equivalent national eligibility test.",
-        "Must have secured regular, full-time admission in M.Phil / Ph.D in a UGC-recognized university / institution.",
-        "No income limit applies for this merit fellowship.",
-        "Candidate must not be in full-time gainful employment during the fellowship tenure."
+      "name": "National Fellowship for ST Students (M.Phil & Ph.D)",
+      "schemeType": "Central Sector Scheme (100% Central Funding)",
+      "sourceReference": {
+        "file": "National_Fellowship_and_Scholarship_Higher_Education_Guidelines_2021-26.pdf",
+        "sections": ["Part A: Paras 1-2.6.1 (p.4-8)", "Paras 3.1-3.8 (p.8-11)", "Paras 4.1-4.3 (p.12-13)", "Paras 5.1-5.5 (p.13-15)"]
+      },
+      "targetAudience": "Meritorious ST scholars pursuing regular, full-time M.Phil and Ph.D degrees in recognized Indian universities",
+      "purpose": "Provide financial assistance to ST students after completing Post-Graduation to pursue higher research degrees leading to M.Phil and Ph.D (Part A Para 1, p.4).",
+      "eligibility": {
+        "caste": "Scheduled Tribe (ST) candidates (Part A Para 2, p.4).",
+        "qualification": "Post-Graduation / Master's Degree with minimum 55% marks at the final examination/grading (Para 2.1, p.5).",
+        "courseAdmission": "Regular and full-time admission in M.Phil or Ph.D in UGC 2(f)/12(B) Universities, Section 3 Deemed Universities, Grant-in-aid institutions, or Institutes of National Importance (Para 2.4, p.5).",
+        "incomeCeiling": "NO INCOME CRITERIA! (Para 2.2, p.5 explicitly states: 'There is no income criteria for eligibility in respect of this scholarship.')",
+        "ageLimit": "Maximum 36 years as on 1st day of July of the relevant award year (Para 2.3, p.5).",
+        "tenure": "M.Phil: 2 years. Ph.D: 5 years. Integrated M.Phil + Ph.D: 2 + 3 = 5 years maximum (Para 2.1, p.5 & Para 5.4, p.13).",
+        "employment": "Candidate must not be in full-time gainful employment during fellowship tenure."
+      },
+      "slotsAndReservation": {
+        "totalFreshSlots": "750 fresh fellowships per year (unavailed slots carried forward; no state ceiling) (Para 2.5, p.5).",
+        "slotBreakdown": [
+          "Divyangjan (5% of 750): 38 slots (minimum 40% certified disability) (Para 2.5.ii, p.6).",
+          "PVTG (Particularly Vulnerable Tribal Groups): 25 slots (Para 2.5.ii, p.6).",
+          "Female (30% of 750): 225 slots (Para 2.5.ii, p.6).",
+          "ST Others: 462 slots (Para 2.5.ii, p.6)."
+        ],
+        "institutePriority": "Students who got admission offers in IITs, AIIMS, IIMs, IISERs are given priority, reducing slots from ST Others proportionately (Para 2.5 Note 1, p.6)."
+      },
+      "benefits": {
+        "monthlyFellowship": {
+          "mphil": "Rs. 31,000/- per month for 2 years (Table at Para 2.6, p.7)",
+          "phd": "Rs. 31,000/- per month for first 2 years (JRF rate); Rs. 35,000/- per month for remaining 3 years (SRF rate) (Table at Para 2.6, p.7)"
+        },
+        "annualContingency": {
+          "mphilHumanities": "Rs. 10,000/- per annum",
+          "mphilScience": "Rs. 12,000/- per annum (Science / Engineering / Technology)",
+          "phdHumanities": "Rs. 20,500/- per annum",
+          "phdScience": "Rs. 25,000/- per annum (Science / Engineering / Technology)"
+        },
+        "hra": "Equal to UGC rates (8%, 16%, or 24% of fellowship depending on city classification). Hostel residents get hostel fees only, no HRA (Para 2.6.1, p.8).",
+        "escortAllowance": "Rs. 2,000/- per month for Divyangjan scholars (at par with UGC rates) (Para 2.6, p.7)."
+      },
+      "disbursementAndCompliance": {
+        "frequency": "Payment made on a quarterly basis through PFMS in DBT mode upon universities uploading quarterly documents (Para 4.1.iii & Para 4.2, p.12).",
+        "quarterlySchedule": "Quarterly continuation certificates: Q1 April-June (by 10 July), Q2 July-Sept (by 10 October), Q3 Oct-Dec (by 10 January), Q4 Jan-March (by 10 April) (Para 3.8 Table, p.11).",
+        "thesisUpload": "Scholars must upload their completed thesis on repository portal (repository.tribal.gov.in). The fellowship for the last quarter is released ONLY after uploading the thesis (Para 4.3.ii, p.13)."
+      },
+      "leavesPermissible": [
+        "Maximum 30 days leave in a year in addition to public holidays (Para 5.5.i, p.14).",
+        "Maternity/Paternity leave: Allowed as per GoI norms. No fellowship paid during leave, but tenure extended by the leave duration (e.g. 6 months leave extends fellowship tenure by 6 months) (Para 5.5.ii, p.14).",
+        "Intermittent Break for women scholars: Up to 1 year, permissible 3 times during entire fellowship (Para 5.5.iii, p.14).",
+        "Academic Leave without fellowship: Up to 1 year throughout tenure for research assignments/foreign visits (Para 5.5.iv, p.14)."
       ],
-      "requiredDocuments": [
-        "ST Certificate",
-        "UGC-NET / CSIR-NET Scorecard and Award Letter",
-        "University Ph.D / M.Phil Admission / Registration Letter",
-        "Research Proposal / Synopsis approved by University",
-        "Recommendation from Research Supervisor and Head of Department",
-        "Aadhaar Card",
-        "Bank Passbook copy"
-      ],
-      "applicationProcedure": [
-        "1. Complete Profile with research scholar credentials.",
-        "2. Submit NET scorecard, university registration, and research proposal.",
-        "3. University Nodal Officer verifies registration and attendance.",
-        "4. MoTA Fellowship Cell awards JRF/SRF sanction letter.",
-        "5. Monthly stipends are released based on quarterly supervisor progress reports."
-      ],
-      "verificationStages": [
-        "Stage 1: University Research Department / Nodal Officer verification",
-        "Stage 2: MoTA Technical Evaluation and Award Letter issuance",
-        "Stage 3: Monthly Fellowship disbursement via DBT on PFMS portal"
-      ],
-      "dbtInformation": "Monthly fellowship (JRF: Rs. 37,000/month; SRF: Rs. 42,000/month) plus HRA and contingency grant (Rs. 25,000/year for science, Rs. 12,000/year for humanities) credited monthly via DBT.",
-      "importantConditions": [
-        "Conversion from JRF to SRF requires completion of 2 years and evaluation by assessment committee.",
-        "Scholars must submit half-yearly progress reports certified by the guide."
-      ],
-      "officialSource": "MoTA National Fellowship Scheme Guidelines (fellowship.tribal.gov.in)"
+      "portal": "https://fellowship.tribal.gov.in"
     },
     {
       "id": "sch-nos",
       "code": "NOS",
-      "name": "National Overseas Scholarship for ST Candidates",
-      "targetAudience": "Meritorious ST students pursuing Masters, Ph.D, or Post-Doctoral studies in top accredited foreign universities",
-      "description": "Prestigious Central Sector Scheme providing comprehensive financial support to 20 meritorious Scheduled Tribe candidates each year to pursue Master level, Ph.D, and Post-Doctoral studies abroad in accredited institutions across USA, UK, Germany, Canada, Australia, etc.",
-      "duration": "Masters: 2 to 3 Years | Ph.D: 4 to 5 Years",
-      "maxAmount": 2000000,
-      "currency": "INR",
-      "eligibilityCriteria": [
-        "Must belong to a notified Scheduled Tribe (ST) category.",
-        "Must have secured unconditional admission offer from an institution ranked in the Top 500 QS World University Rankings.",
-        "Total annual family income must not exceed Rs. 6,00,000 (Rs. 6.00 Lakh).",
-        "Minimum 55% marks in qualifying Bachelor's / Master's degree.",
-        "Age below 35 years as on the first day of the application year.",
-        "Valid Indian Passport holder."
+      "name": "National Overseas Scholarship for ST Candidates (NOS)",
+      "schemeType": "Central Sector Scheme (100% Central Funding)",
+      "sourceReference": {
+        "file": "NOS_Scheme_Amendment_Order_2026-27.pdf",
+        "sections": ["Para 2.1-4.4 (p.1-2)", "Order dated 14.07.2026 (File No. 11016/22/2018-Sch)"]
+      },
+      "targetAudience": "Meritorious ST candidates pursuing Masters and Ph.D. level courses in top foreign universities across the world",
+      "purpose": "Provide financial support to selected ST scholars to study abroad in prestigious global institutions in accredited Master and Doctoral programs.",
+      "eligibility": {
+        "caste": "Notified Scheduled Tribe (ST) candidate.",
+        "coveredCourses": "Masters and Ph.D. level courses ONLY. (NOTE: Post-Doctoral Research was OMITTED vide 14.07.2026 Amendment Order Para 2.i, p.1).",
+        "universityRankingPriority": "First priority is given to candidates with an unconditional offer of admission from TOP 1,000 ranked foreign Institutes/Universities as per the latest QS World Ranking and yet to join as on the date of application (Amended Clause 4.4.a, p.1).",
+        "meritSelection": "Merit list is drawn strictly based on the QS ranking of the Institute. In case of a tie between QS rankings, merit is decided based on marks/grades secured in the qualifying examination (Clause 4.4.a, p.1).",
+        "vacantSlotsInterview": "If sufficient students are not selected under the QS top-1,000 criteria, vacant slots are filled from remaining eligible candidates via personal interview by Ministry's expert committee; candidates with GRE/GMAT/TOEFL scores receive preference (Clause 4.4.c, p.1).",
+        "verification": "Verification of selected candidates is conducted through the respective Domicile State/UT (Clause 4.4.e, p.2).",
+        "incomeCeiling": "Total annual family income must not exceed Rs. 6,00,000/- (Rs. 6.00 Lakh) per annum.",
+        "academicMarks": "Minimum 55% marks or equivalent grade in qualifying Bachelor's / Master's degree.",
+        "ageLimit": "Below 35 years of age as on 1st day of the application year.",
+        "passport": "Must hold a valid Indian Passport."
+      },
+      "benefits": {
+        "tuitionFees": "Actual tuition fees and compulsory non-refundable fees charged by foreign university.",
+        "livingAllowance": "Annual maintenance allowance (USD 15,400 for USA and other countries; GBP 9,900 for UK).",
+        "contingencyAndEquipment": "Annual contingency allowance for books, study tour, and equipment.",
+        "travel": "Actual economy class airfare by shortest route to and from India.",
+        "insuranceAndVisa": "Visa fees and mandatory health/medical insurance charges paid."
+      },
+      "amendments2026": [
+        "Post-Doctoral Research is omitted from 2026-27 onwards (Clause 2.1.i, p.1).",
+        "Institution QS Ranking expanded from Top 500 to Top 1,000 foreign universities (Clause 4.4.a, p.1).",
+        "Selection based on QS ranking with qualifying exam tie-breaker; remaining slots filled via expert interview with GRE/GMAT/TOEFL preference (Clause 4.4.c, p.1)."
       ],
-      "requiredDocuments": [
-        "ST Certificate",
-        "Income Certificate for current financial year (<= Rs. 6.00 Lakh)",
-        "Unconditional Admission Offer Letter from Top 500 QS Foreign University",
-        "Valid Indian Passport (biographical pages)",
-        "GRE / GMAT / IELTS / TOEFL Scorecard",
-        "Qualifying Degree Marksheets and Degree Certificate",
-        "Statement of Purpose (SOP)",
-        "Aadhaar Card"
-      ],
-      "applicationProcedure": [
-        "1. Register on Overseas Tribal Portal / Tribal Scholar Saathi.",
-        "2. Upload unconditional foreign admission letter and QS ranking verification.",
-        "3. Provide academic transcripts, SOP, and income documentation.",
-        "4. Interview and scrutiny by MoTA Overseas Selection Board.",
-        "5. Award letter generation and foreign currency fee transfer."
-      ],
-      "verificationStages": [
-        "Stage 1: Document verification by MoTA Overseas Division",
-        "Stage 2: Scrutiny by MoTA Expert Selection Committee",
-        "Stage 3: Sanction Order and Visa facilitation letter issuance",
-        "Stage 4: Tuition fee disbursement directly to foreign university and living stipend via Indian Embassy / Mission"
-      ],
-      "dbtInformation": "Covers actual tuition fees paid to the foreign university, annual maintenance allowance (USD 15,400 for USA / GBP 9,900 for UK), contingency allowance, visa fees, economy air passage, and medical insurance.",
-      "importantConditions": [
-        "Candidate must execute a bond to return to India after course completion.",
-        "Total 20 awards per year."
-      ],
-      "officialSource": "MoTA National Overseas Scholarship Guidelines (overseas.tribal.gov.in)"
+      "portal": "https://overseas.tribal.gov.in"
     }
   ]
 }

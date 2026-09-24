@@ -13,27 +13,29 @@ class ScholarshipMockData {
       type: ScholarshipType.preMatric,
       name: 'Pre-Matric Scholarship for ST Students',
       description:
-          'Financial assistance for ST students studying in classes 9 and 10 to reduce dropout rates and encourage tribal youth to continue education.',
+          'Centrally Sponsored Scheme by MoTA for ST students in Classes IX & X to minimize dropouts and support progression to post-matric education.',
       detailedDescription:
-          'The Pre-Matric Scholarship scheme is implemented by the Ministry of Tribal Affairs to provide financial support to Scheduled Tribe students at pre-matric level. '
-          'The objective is to minimize dropout rates and incentivize parents to send their children to school. '
-          'It covers maintenance allowances, books, and ad-hoc grants for tribal students studying in recognized institutions.',
-      maxAmount: 10000,
-      duration: '1 Academic Year',
+          'Pre-Matric Scholarship is a Centrally Sponsored Scheme implemented by the Ministry of Tribal Affairs (75:25 Centre-State ratio, 90:10 for North East/Hilly states). '
+          'It supports ST students in Classes IX and X studying in government schools or recognized schools. '
+          'Disbursement is conducted directly to student bank accounts linked with Aadhaar via DBT. '
+          'Income certificate is required once at Class IX admission and remains valid for Class X.',
+      maxAmount: 6250,
+      duration: '10 Months per Academic Year',
       eligibilityCriteria: [
-        'Must belong to a notified Scheduled Tribe (ST) category',
-        'Must be studying in Class 9 or Class 10',
-        'Must be enrolled in a government or recognized school',
-        'Family annual income should not exceed ₹2.50 Lakh',
-        'Must have minimum 50% attendance',
+        'Must belong to a notified Scheduled Tribe (ST) category (Domicile State)',
+        'Must be studying in Class IX or Class X in a Government or recognized school',
+        'Family annual income from all sources must not exceed ₹2.50 Lakh per annum',
+        'Must hold an active bank account linked with Aadhaar and mobile number',
+        'Must not be availing any other government scholarship',
+        'Scholarship is available for one year only per class (repeating students not eligible for same class)',
       ],
       requiredDocuments: [
-        'ST/Caste Certificate',
-        'Income Certificate',
-        'School Enrollment Certificate',
-        'Aadhaar Card',
-        'Bank Passbook',
-        'Passport Photo',
+        'Aadhaar Number / Card',
+        'Domicile Certificate',
+        'ST / Caste Certificate issued by competent authority of State',
+        'Family Income Certificate (issued by competent authority, self-affidavits not accepted)',
+        'Disability Certificate (if claiming Divyangjan allowance)',
+        'Passport Size Photograph',
       ],
       applicationDeadline: DateTime(2025, 12, 31),
       isOpen: true,
@@ -44,29 +46,32 @@ class ScholarshipMockData {
       type: ScholarshipType.postMatric,
       name: 'Post-Matric Scholarship for ST Students',
       description:
-          'Support for ST students pursuing post-matriculation courses including professional and technical courses.',
+          'Centrally Sponsored flagship scheme for ST students pursuing Class XI to Post Graduation courses in India.',
       detailedDescription:
-          'The Post-Matric Scholarship is the flagship scheme of the Ministry of Tribal Affairs (MoTA), Government of India. '
-          'It provides comprehensive financial support to ST students studying at post-matriculation or post-secondary stages to enable them to complete their education. '
-          'The scheme covers tuition fees, maintenance allowances, study tour charges, thesis typing/printing charges, and book allowance.',
+          'Post-Matric Scholarship for ST Students is applicable from 01-04-2022. It covers compulsory non-refundable fees and monthly stipends across 4 course groups. '
+          'In private sector institutes, central support has a ceiling of ₹2.50 Lakh/year for Engineering, ₹6.00 Lakh/year for MBBS/MS/MD, and ₹1.00 Lakh/year for other courses. '
+          'Stipends range from ₹230 to ₹1,200/month for up to 10 months. '
+          'Candidates who complete a course in one stream cannot take a course in a different stream at the same level.',
       maxAmount: 130000,
       duration: 'Duration of the Course',
       eligibilityCriteria: [
-        'Must belong to a notified Scheduled Tribe (ST) category',
-        'Must be enrolled in a recognized post-matric or post-secondary course',
-        'Family annual income must not exceed ₹2.50 Lakh',
-        'Must hold a valid Aadhaar-linked bank account',
-        'Must have cleared the qualifying examination',
+        'Must belong to a notified Scheduled Tribe (ST) of the Domicile State',
+        'Must have passed Matriculation (Class X) or Higher Secondary or higher qualifying examination',
+        'Family annual income from all sources must not exceed ₹2.50 Lakh per annum',
+        'Income certificate taken once at admission is valid for entire course duration',
+        'Active bank account linked with Aadhaar and mobile number for DBT',
+        'Must not be holding another scholarship/stipend concurrently',
+        'Enrolled in recognized Govt / UGC / NAAC A / NBA / NCVT / AICTE accredited institutions',
       ],
       requiredDocuments: [
-        'ST/Caste Certificate',
-        'Income Certificate',
-        'Previous Year Marksheet',
-        'Institution Enrollment Certificate',
-        'Aadhaar Card',
-        'Bank Passbook',
-        'Passport Photo',
+        'Aadhaar Number / Card',
         'Domicile Certificate',
+        'ST / Caste Certificate issued by competent State/UT authority',
+        'Family Income Certificate (self-declaration affidavits strictly unacceptable)',
+        'Certificates, diploma, degree marksheets of all examinations passed',
+        'Last qualified examination marksheet / percentage',
+        'Disability Certificate (if Divyangjan allowance claimed)',
+        'Passport Size Photograph',
       ],
       applicationDeadline: DateTime(2026, 1, 31),
       isOpen: true,
@@ -77,29 +82,29 @@ class ScholarshipMockData {
       type: ScholarshipType.topClass,
       name: 'Top Class Education for ST Students',
       description:
-          'Full financial support for ST students admitted to top institutions like IITs, IIMs, NITs, AIIMS, and other premier institutes.',
+          '100% Central Sector Scheme for ST students admitted on merit to 252 notified premier institutes (IITs, NITs, IIMs, AIIMS, NLUs).',
       detailedDescription:
-          'The Top Class Education scheme provides comprehensive support to ST students admitted in notified premier institutions. '
-          'It covers full tuition fees, living expenses, book allowance, computer/laptop allowance, and other academic needs. '
-          'The scheme aims to ensure that deserving tribal students are not deprived of quality education due to financial constraints.',
+          'Top Class Education Scheme provides 100% funding for Graduate and Post-Graduate ST students admitted to 252 notified premier institutions. '
+          'Covers full tuition and non-refundable fees in Govt institutes (₹2.50 Lakh/year cap in private institutes), ₹5,000/year books/stationery, '
+          '₹3,000/month living stipend, and ₹45,000 one-time computer/accessories assistance. '
+          'There is no Institute-wise, State-wise, or stream-wise ceiling of number of slots.',
       maxAmount: 500000,
       duration: 'Duration of the Course',
       eligibilityCriteria: [
         'Must belong to a notified Scheduled Tribe (ST) category',
-        'Must be admitted to a notified top-class institution',
-        'Family annual income must not exceed ₹6.00 Lakh',
-        'Must have cleared the qualifying entrance examination',
-        'Must maintain minimum CGPA/percentage as per institution norms',
+        'Must have secured admission on merit in one of the 252 notified premier institutes',
+        'Total family income from all sources must not exceed ₹6.00 Lakh per annum (includes spousal income if married)',
+        'Students admitted under Management Quota in private institutes are not eligible',
+        'Students availing this scheme cannot claim benefit of another Central/State scholarship',
+        'Income certificate for preceding financial year required once at admission',
       ],
       requiredDocuments: [
-        'ST/Caste Certificate',
-        'Income Certificate',
-        'Admission Letter from Institution',
-        'Entrance Exam Scorecard',
-        'Aadhaar Card',
-        'Bank Passbook',
-        'Passport Photo',
-        'Domicile Certificate',
+        'ST / PVTG Certificate signed and stamped by competent authority',
+        'Family Income Certificate (or Form-16 for salaried employees) for preceding financial year',
+        'Fee Receipt',
+        'Scanned copy of Bank Passbook (Aadhaar seeded, matching student name)',
+        'Marksheet / Certificate of qualifying exam (12th standard for UG, Graduation for PG)',
+        'Bonafide Certificate issued by the Institute',
       ],
       applicationDeadline: DateTime(2026, 2, 28),
       isOpen: true,
@@ -110,68 +115,73 @@ class ScholarshipMockData {
       type: ScholarshipType.nfst,
       name: 'National Fellowship for ST Students (NFST)',
       description:
-          'Fellowship for ST students pursuing M.Phil and Ph.D in universities, colleges, and institutions recognized by UGC.',
+          'Central Sector Scheme providing 750 fresh fellowships annually to ST scholars pursuing regular, full-time M.Phil and Ph.D in India.',
       detailedDescription:
-          'The National Fellowship for Scheduled Tribe Students (NFST) provides financial assistance to ST students for pursuing higher education leading to M.Phil/Ph.D degrees. '
-          'The fellowship amount is at par with UGC fellowships. It includes monthly fellowship, contingency grant, HRA, '
-          'escort/reader assistance for PwD candidates, and other benefits as per UGC norms.',
+          'NFST provides 750 fresh fellowship slots annually (38 Divyangjan, 25 PVTG, 225 Female, 462 ST Others). '
+          'Crucially, there is NO INCOME CRITERIA for eligibility. '
+          'Fellowship values: M.Phil ₹31,000/month + ₹10,000 - ₹12,000 contingency; Ph.D ₹31,000/month (first 2 yrs) & ₹35,000/month (remaining 3 yrs) + ₹20,500 - ₹25,000 contingency. '
+          'HRA at UGC rates (8%, 16%, or 24%) and ₹2,000/month escort allowance for Divyangjan. Disbursed quarterly via PFMS-DBT.',
       maxAmount: 420000,
-      duration: 'Up to 5 Years',
+      duration: '2 Years for M.Phil, 5 Years for Ph.D',
       eligibilityCriteria: [
         'Must belong to a notified Scheduled Tribe (ST) category',
-        'Must have qualified NET/JRF or equivalent examination',
-        'Must be admitted to M.Phil/Ph.D program in a UGC-recognized university',
-        'Family annual income must not exceed ₹6.00 Lakh',
-        'Age should not exceed 35 years at the time of application',
+        'Must have passed Post-Graduation / Master Degree with minimum 55% marks',
+        'Enrolled in regular & full-time M.Phil or Ph.D in UGC 2(f)/12(B), Deemed, State/Central Grant, or INI institutes',
+        'NO INCOME CRITERIA: There is no income ceiling for eligibility',
+        'Age Limit: Maximum 36 years as on 1st July of the relevant selection year',
+        'Priority given to scholars with admission offers in IITs, AIIMS, IIMs, IISERs',
       ],
       requiredDocuments: [
-        'ST/Caste Certificate',
-        'Income Certificate',
-        'NET/JRF Scorecard',
-        'Ph.D Admission Letter',
-        'Research Proposal',
-        'Aadhaar Card',
-        'Bank Passbook',
-        'Passport Photo',
+        'Latest coloured passport size photograph',
+        'ST / PVTG Certificate issued by competent authority',
+        '10th / Matriculation certificate in support of date of birth',
+        'Divyangjan Certificate certifying minimum 40% disability (if applicable)',
+        'Post-Graduation mark sheet (minimum 55% marks or CGPA conversion formula)',
+        'Admission / Joining certificate of M.Phil / Ph.D from concerned University',
+        'Offer of admission from IITs / AIIMS / IIMs / IISERs (if applicable)',
+        'Aadhaar Card and DigiLocker registration (mandatory)',
       ],
       applicationDeadline: DateTime(2026, 3, 15),
       isOpen: true,
-      portalUrl: 'https://scholarships.gov.in',
+      portalUrl: 'https://fellowship.tribal.gov.in',
     ),
     Scholarship(
       id: 'sch-nos',
       type: ScholarshipType.nos,
       name: 'National Overseas Scholarship for ST Students',
       description:
-          'Support for ST students to study abroad at Masters and Ph.D level in accredited institutions worldwide.',
+          'Financial assistance for meritorious ST students pursuing Masters and Ph.D courses in Top 1,000 QS world-ranked foreign universities.',
       detailedDescription:
-          'The National Overseas Scholarship (NOS) provides financial assistance to selected ST students for pursuing Masters and Ph.D level courses abroad. '
-          'It covers tuition fees, maintenance allowance, contingency & equipment allowance, visa fees, '
-          'air passage, and insurance. Only 20 awards are made each year, making it highly competitive.',
+          'National Overseas Scholarship (NOS) supports ST candidates pursuing post-graduate courses (Masters and Ph.D) abroad. '
+          'IMPORTANT 2026-27 AMENDMENT: Post-Doctoral Research is omitted from 2026-27 onwards. '
+          'First priority is given to candidates with an unconditional offer of admission from Top 1,000 QS world-ranked foreign universities/institutes. '
+          'Ties decided by marks in the qualifying examination. Vacant slots filled via expert interview committee with preference for GRE/GMAT/TOEFL scores. '
+          'Candidate verification conducted through respective State/UT.',
       maxAmount: 2000000,
-      duration: 'Duration of the Course (max 4 years)',
+      duration: 'Duration of Course (Masters / Ph.D)',
       eligibilityCriteria: [
         'Must belong to a notified Scheduled Tribe (ST) category',
-        'Must have secured admission in a top-500 QS-ranked foreign university',
-        'Family annual income must not exceed ₹6.00 Lakh',
-        'Must hold a valid passport',
-        'Age should not exceed 35 years at the time of application',
-        'Must have minimum 60% in qualifying examination',
+        'Pursuing Masters or Ph.D abroad (Post-Doctoral Research omitted from 2026-27 onwards)',
+        'First priority: Offer of admission from Top 1,000 QS world-ranked foreign universities/institutes',
+        'Family annual income must not exceed ₹6.00 Lakh per annum',
+        'Must hold a valid Indian Passport',
+        'Tie-breaking based on marks/grades secured in the qualifying examination',
+        'Verification of selected candidates conducted through respective State/UT',
       ],
       requiredDocuments: [
-        'ST/Caste Certificate',
-        'Income Certificate',
-        'Foreign University Admission Offer',
+        'ST / Tribe Certificate issued by competent authority',
+        'Family Income Certificate',
+        'Unconditional Admission Offer from Top 1,000 QS-ranked foreign university',
         'Valid Passport',
-        'GRE/GMAT/IELTS/TOEFL Scorecard',
+        'Academic marksheets and degree certificates of qualifying examination',
+        'GRE / GMAT / TOEFL / IELTS scorecard (gives preference for vacant slot interviews)',
         'Aadhaar Card',
-        'Bank Passbook',
+        'Bank account details',
         'Passport Photo',
-        'Statement of Purpose',
       ],
       applicationDeadline: DateTime(2026, 4, 30),
       isOpen: true,
-      portalUrl: 'https://scholarships.gov.in',
+      portalUrl: 'https://overseas.tribal.gov.in',
     ),
   ];
 
