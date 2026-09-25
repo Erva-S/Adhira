@@ -83,7 +83,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                       width: 100,
                       height: 100,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: const Icon(
@@ -108,7 +108,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                       'Ministry of Tribal Affairs',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                         letterSpacing: 1,
                       ),
                     ),
@@ -118,7 +118,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                       height: 24,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                       ),
                     ),
                   ],

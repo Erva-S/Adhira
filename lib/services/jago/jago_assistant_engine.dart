@@ -33,7 +33,7 @@ class JagoAssistantEngine {
       "I don't have payment information for your application yet.";
 
   static const String serviceUnavailableMessage =
-      "JAGO is temporarily unavailable. Please try again shortly.";
+      'JAGO is temporarily unavailable. Please try again shortly.';
 
   static const String systemInstruction = '''
 You are JAGO, the official scholarship assistant inside Tribal Scholar Saathi for the Ministry of Tribal Affairs (MoTA).
@@ -79,35 +79,47 @@ Keep responses concise and student-friendly.
   }) async {
     try {
       String baseUrl = EnvironmentConfig.current.apiBaseUrl;
-      // In Android emulator, route localhost to host loopback 10.0.2.2
-      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android && baseUrl.contains('localhost')) {
-        baseUrl = baseUrl.replaceAll('localhost', '10.0.2.2');
-      }
+      // On Android, support physical phones (localhost with adb reverse) and emulators (10.0.2.2)
+      final List<Uri> candidateUrls = [
+        Uri.parse('$baseUrl${ApiEndpoints.jagoChat}'),
+        if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android && baseUrl.contains('localhost'))
+          Uri.parse('${baseUrl.replaceAll('localhost', '10.0.2.2')}${ApiEndpoints.jagoChat}'),
+      ];
 
-      final url = Uri.parse('$baseUrl${ApiEndpoints.jagoChat}');
-      final response = await http
-          .post(
-            url,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'message': message,
-              'conversationHistory': conversationHistory,
-              'userId': userId ?? student?.id ?? RelationalDataStore.demoUserId,
-              'applicationId': applicationId ?? (scholarshipService?.activeApplications.firstOrNull?.id),
-              'locale': locale,
-            }),
-          )
-          .timeout(const Duration(seconds: 8));
+      for (final targetUrl in candidateUrls) {
+        try {
+          final response = await http
+              .post(
+                targetUrl,
+                headers: {'Content-Type': 'application/json'},
+                body: jsonEncode({
+                  'message': message,
+                  'conversationHistory': conversationHistory,
+                  'userId': userId ?? student?.id ?? RelationalDataStore.demoUserId,
+                  'applicationId': applicationId ?? (scholarshipService?.activeApplications.firstOrNull?.id),
+                  'locale': locale,
+                }),
+              )
+              .timeout(const Duration(seconds: 8));
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body) as Map<String, dynamic>;
-        if (data['success'] == true && data['reply'] != null) {
-          return data['reply'] as String;
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body) as Map<String, dynamic>;
+            if (data['success'] == true && data['reply'] != null) {
+              return data['reply'] as String;
+            }
+          }
+        } catch (_) {
+          continue;
         }
       }
-      return serviceUnavailableMessage;
+
+      // If backend was unreachable or returned non-200, fallback to deterministic knowledge engine
+      return respond(
+        message,
+        scholarshipService: scholarshipService,
+        student: student,
+      );
     } catch (_) {
-      // If backend server is offline during development/tests, fallback to deterministic domain engine
       return respond(
         message,
         scholarshipService: scholarshipService,
@@ -134,7 +146,7 @@ Keep responses concise and student-friendly.
   }) {
     final cleanQuery = query.trim();
     if (cleanQuery.isEmpty) {
-      return "How can I help you with your scholarship today?";
+      return 'How can I help you with your scholarship today?';
     }
 
     final lower = cleanQuery.toLowerCase();
@@ -234,22 +246,22 @@ Keep responses concise and student-friendly.
 
     // J. Application Process / How to Apply
     if (_isProcessQuery(lower)) {
-      return "To apply for a scholarship in Tribal Scholar Saathi:\n"
-          "1. Complete your Profile (Personal, Tribal & Academic details).\n"
-          "2. Connect DigiLocker to fetch verified government documents.\n"
+      return 'To apply for a scholarship in Tribal Scholar Saathi:\n'
+          '1. Complete your Profile (Personal, Tribal & Academic details).\n'
+          '2. Connect DigiLocker to fetch verified government documents.\n'
           "3. Browse eligible MoTA schemes on the Dashboard and click 'Apply Now'.\n"
-          "4. Verify the auto-filled data and attach any additional certificates.\n"
-          "5. Submit your application for institutional and department verification.";
+          '4. Verify the auto-filled data and attach any additional certificates.\n'
+          '5. Submit your application for institutional and department verification.';
     }
 
     // K. Verification Stages Explanation
     if (_isVerificationStagesQuery(lower)) {
-      return "Scholarship verification passes through 5 key stages:\n"
-          "1. Application Submission: Form and certificates submitted.\n"
-          "2. Document Verification: Automated & manual check of Aadhaar, ST & income certificates.\n"
-          "3. Institute Verification: Verification of bonafide enrollment and course fee by your college/school.\n"
-          "4. Department Verification: State Tribal Welfare Department scrutiny and approval.\n"
-          "5. Sanction & DBT Disbursement: Sanction order generation and Direct Benefit Transfer via PFMS.";
+      return 'Scholarship verification passes through 5 key stages:\n'
+          '1. Application Submission: Form and certificates submitted.\n'
+          '2. Document Verification: Automated & manual check of Aadhaar, ST & income certificates.\n'
+          '3. Institute Verification: Verification of bonafide enrollment and course fee by your college/school.\n'
+          '4. Department Verification: State Tribal Welfare Department scrutiny and approval.\n'
+          '5. Sanction & DBT Disbursement: Sanction order generation and Direct Benefit Transfer via PFMS.';
     }
 
     // L. Student Profile Details
@@ -257,17 +269,17 @@ Keep responses concise and student-friendly.
       if (resolvedStudent == null) {
         return missingStudentDataMessage;
       }
-      return "Your Registered Profile:\n"
-          "• Name: ${resolvedStudent.fullName}\n"
+      return 'Your Registered Profile:\n'
+          '• Name: ${resolvedStudent.fullName}\n'
           "• Category: ${resolvedStudent.category ?? 'ST'}${resolvedStudent.tribeName != null ? ' (${resolvedStudent.tribeName})' : ''}\n"
           "• Course: ${resolvedStudent.currentCourse ?? 'N/A'}${resolvedStudent.currentYear != null ? ' (${resolvedStudent.currentYear})' : ''}\n"
           "• Institution: ${resolvedStudent.institutionName ?? 'N/A'}\n"
           "• State: ${resolvedStudent.state ?? 'N/A'}\n"
-          "• Profile Completion: ${(resolvedStudent.profileCompletionPercent * 100).toInt()}%";
+          '• Profile Completion: ${(resolvedStudent.profileCompletionPercent * 100).toInt()}%';
     }
 
-    // Fallback: If it mentions scholarship keywords but information isn't in our knowledge base
-    return unavailableInfoMessage;
+    // Fallback: If it is within scholarship domain, provide helpful guidance instead of hard error
+    return 'Generally, scholarship eligibility and benefits depend on factors such as academic level, annual family income, category, and institution. For specific official rules, please refer to the latest official MoTA scheme guidelines.';
   }
 
   // ── Injection & Out-of-Scope Detectors ──────────────────────────────────────
@@ -449,6 +461,9 @@ Keep responses concise and student-friendly.
   }
 
   static bool _isPaymentQuery(String text) {
+    if (text.contains('what is dbt') || text.contains('what does dbt mean') || text.trim() == 'dbt' || text.contains('explain dbt')) {
+      return false; // Route to scheme/concept handler
+    }
     return text.contains('payment') ||
         text.contains('dbt') ||
         text.contains('disburs') ||
@@ -488,11 +503,24 @@ Keep responses concise and student-friendly.
   static bool _isSchemeInfoQuery(String text) {
     return text.contains('tell me about') ||
         text.contains('what is') ||
+        text.contains('detail') ||
+        text.contains('explain') ||
+        text.contains('overview') ||
+        text.contains('information') ||
+        text.contains('about ') ||
         text.contains('schemes available') ||
         text.contains('list of scholarship') ||
         text.contains('available scholarship') ||
         text.contains('mota scholarship') ||
-        text.contains('which scholarships are available');
+        text.contains('which scholarships are available') ||
+        text.contains('pre-matric') ||
+        text.contains('pre matric') ||
+        text.contains('post-matric') ||
+        text.contains('post matric') ||
+        text.contains('top class') ||
+        text.contains('nfst') ||
+        text.contains('nos') ||
+        text.contains('dbt');
   }
 
   static bool _isProcessQuery(String text) {
@@ -544,10 +572,10 @@ Keep responses concise and student-friendly.
     final appNo = active.applicationNumber ?? active.id;
     final stageName = active.currentStage.label;
     final remarksText = (active.remarks != null && active.remarks!.isNotEmpty)
-        ? " Remarks: ${active.remarks}."
-        : "";
+        ? ' Remarks: ${active.remarks}.'
+        : '';
 
-    return "Your ${active.scholarshipName} application ($appNo) is currently under $stageName.$remarksText";
+    return 'Your ${active.scholarshipName} application ($appNo) is currently under $stageName.$remarksText';
   }
 
   static String _handlePendingActions(
@@ -570,11 +598,11 @@ Keep responses concise and student-friendly.
 
     if (rejectedDocs.isNotEmpty) {
       final doc = rejectedDocs.first;
-      final reason = doc.rejectionReason != null ? " Reason: ${doc.rejectionReason}" : "";
-      return "Your ${doc.name} is currently pending.$reason";
+      final reason = doc.rejectionReason != null ? ' Reason: ${doc.rejectionReason}' : '';
+      return 'Your ${doc.name} is currently pending.$reason';
     }
 
-    return "You have no pending documents or deficiencies at this time. All required documents are up to date.";
+    return 'You have no pending documents or deficiencies at this time. All required documents are up to date.';
   }
 
   static String _handlePaymentStatus(
@@ -591,17 +619,17 @@ Keep responses concise and student-friendly.
 
     if (disbursed.isNotEmpty && pending.isEmpty) {
       final p = disbursed.first;
-      return "Your scholarship payment of ₹${p.amount.toInt()} for ${p.scholarshipName} has been disbursed via DBT to your bank account.";
+      return 'Your scholarship payment of ₹${p.amount.toInt()} for ${p.scholarshipName} has been disbursed via DBT to your bank account.';
     }
 
     if (disbursed.isNotEmpty && pending.isNotEmpty) {
       final d = disbursed.first;
       final p = pending.first;
-      return "Your scholarship payment of ₹${d.amount.toInt()} for ${d.scholarshipName} has been disbursed via DBT. An upcoming installment of ₹${p.amount.toInt()} is currently pending approval.";
+      return 'Your scholarship payment of ₹${d.amount.toInt()} for ${d.scholarshipName} has been disbursed via DBT. An upcoming installment of ₹${p.amount.toInt()} is currently pending approval.';
     }
 
     if (pending.isNotEmpty) {
-      return "Your scholarship payment is currently pending.";
+      return 'Your scholarship payment is currently pending.';
     }
 
     return missingPaymentInfoMessage;
@@ -617,16 +645,16 @@ Keep responses concise and student-friendly.
 
     final app = applications.first;
     final appNo = app.applicationNumber ?? app.id;
-    return "You are applying for the ${app.scholarshipName} (Application No: $appNo).";
+    return 'You are applying for the ${app.scholarshipName} (Application No: $appNo).';
   }
 
   static String _handleDigiLockerDocs(List<Document> documents) {
     final digiDocs = documents.where((d) => d.isFromDigiLocker).toList();
     if (digiDocs.isEmpty) {
-      return "You do not have any DigiLocker documents linked in Tribal Scholar Saathi yet. You can link them from the Document Wallet.";
+      return 'You do not have any DigiLocker documents linked in Tribal Scholar Saathi yet. You can link them from the Document Wallet.';
     }
 
-    final names = digiDocs.map((d) => "• ${d.name} (${d.category.label})").join('\n');
+    final names = digiDocs.map((d) => '• ${d.name} (${d.category.label})').join('\n');
     return 'Your linked DigiLocker documents in Tribal Scholar Saathi:\n$names\n\nThese documents are government-verified and automatically accepted.';
   }
 
@@ -734,29 +762,60 @@ Keep responses concise and student-friendly.
   }
 
   static String _handleSchemeInfo(String text) {
+    // 1. General scholarship concept
+    if (text.contains('what is a scholarship') || text.contains('what is scholarship') || text.trim() == 'scholarship') {
+      return 'A scholarship is non-repayable financial aid awarded to students to support their education. Unlike loans, scholarships do not have to be paid back. Under the Ministry of Tribal Affairs (MoTA), scholarships are provided to Scheduled Tribe (ST) students covering school education (Classes 9-10), higher studies (Class 11 to PG/Ph.D), premier institutions (IITs/IIMs), and overseas studies.';
+    }
+
+    // 2. What is DBT?
+    if (text.contains('what is dbt') || text.contains('what does dbt mean') || text.trim() == 'dbt' || text.contains('explain dbt')) {
+      return 'DBT stands for Direct Benefit Transfer. It is the Government of India\'s mechanism to disburse scholarship funds and stipends directly into the verified, Aadhaar-seeded bank accounts of eligible students via Public Financial Management System (PFMS). This eliminates intermediaries and ensures transparent, timely financial support.';
+    }
+
+    // 3. Official Schemes
     if (text.contains('pre-matric') || text.contains('pre matric')) {
       final s = ScholarshipMockData.schemes.firstWhere((s) => s.type == ScholarshipType.preMatric);
-      return '${s.name}:\n${s.description}\nMax Amount: ₹${s.maxAmount?.toInt() ?? 10000} | Duration: ${s.duration}';
+      return '### ${s.name}\n\n'
+          '${s.detailedDescription}\n\n'
+          '**Eligibility:**\n${s.eligibilityCriteria.map((c) => '• $c').join('\n')}\n\n'
+          '**Required Documents:**\n${s.requiredDocuments.map((d) => '• $d').join('\n')}\n\n'
+          '**Official Portal:** ${s.portalUrl}';
     }
 
     if (text.contains('post-matric') || text.contains('post matric')) {
       final s = ScholarshipMockData.schemes.firstWhere((s) => s.type == ScholarshipType.postMatric);
-      return '${s.name}:\n${s.description}\nMax Amount: ₹${s.maxAmount?.toInt() ?? 70000} | Duration: ${s.duration}';
+      return '### ${s.name}\n\n'
+          '${s.detailedDescription}\n\n'
+          '**Eligibility:**\n${s.eligibilityCriteria.map((c) => '• $c').join('\n')}\n\n'
+          '**Required Documents:**\n${s.requiredDocuments.map((d) => '• $d').join('\n')}\n\n'
+          '**Official Portal:** ${s.portalUrl}';
     }
 
     if (text.contains('top class')) {
       final s = ScholarshipMockData.schemes.firstWhere((s) => s.type == ScholarshipType.topClass);
-      return '${s.name}:\n${s.description}\nMax Amount: ₹${s.maxAmount?.toInt() ?? 250000} | Duration: ${s.duration}';
+      return '### ${s.name}\n\n'
+          '${s.detailedDescription}\n\n'
+          '**Eligibility:**\n${s.eligibilityCriteria.map((c) => '• $c').join('\n')}\n\n'
+          '**Required Documents:**\n${s.requiredDocuments.map((d) => '• $d').join('\n')}\n\n'
+          '**Official Portal:** ${s.portalUrl}';
     }
 
     if (text.contains('nfst') || text.contains('fellowship')) {
       final s = ScholarshipMockData.schemes.firstWhere((s) => s.type == ScholarshipType.nfst);
-      return '${s.name}:\n${s.description}\nFellowship: ₹${s.maxAmount?.toInt() ?? 42000}/mo | Duration: ${s.duration}';
+      return '### ${s.name}\n\n'
+          '${s.detailedDescription}\n\n'
+          '**Eligibility:**\n${s.eligibilityCriteria.map((c) => '• $c').join('\n')}\n\n'
+          '**Required Documents:**\n${s.requiredDocuments.map((d) => '• $d').join('\n')}\n\n'
+          '**Official Portal:** ${s.portalUrl}';
     }
 
     if (text.contains('nos') || text.contains('overseas')) {
       final s = ScholarshipMockData.schemes.firstWhere((s) => s.type == ScholarshipType.nos);
-      return '${s.name}:\n${s.description}\nGrant: Up to ₹${s.maxAmount?.toInt() ?? 1500000} | Duration: ${s.duration}';
+      return '### ${s.name}\n\n'
+          '${s.detailedDescription}\n\n'
+          '**Eligibility:**\n${s.eligibilityCriteria.map((c) => '• $c').join('\n')}\n\n'
+          '**Required Documents:**\n${s.requiredDocuments.map((d) => '• $d').join('\n')}\n\n'
+          '**Official Portal:** ${s.portalUrl}';
     }
 
     // Check if query is asking for a list of all available schemes
@@ -773,8 +832,7 @@ Keep responses concise and student-friendly.
       return 'Available MoTA Scholarship Schemes in Tribal Scholar Saathi:\n$list';
     }
 
-    // If query asks "tell me about X" or "what is X" and X is not recognized:
-    return unavailableInfoMessage;
+    return 'Generally, scholarship eligibility and benefits depend on factors such as academic level, annual family income, category, and institution. For specific official rules, please refer to the latest official MoTA scheme guidelines.';
   }
 }
 

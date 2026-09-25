@@ -80,7 +80,7 @@ class ApplicationDetailPage extends StatelessWidget {
                     border: Border.all(color: AppColors.border),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withValues(alpha: 0.04),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -161,7 +161,7 @@ class ApplicationDetailPage extends StatelessWidget {
                         color: AppColors.warningLight,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: AppColors.warning.withOpacity(0.4),
+                          color: AppColors.warning.withValues(alpha: 0.4),
                         ),
                       ),
                       child: Column(
@@ -420,7 +420,7 @@ class ApplicationDetailPage extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Card(
-                    color: AppColors.primary.withOpacity(0.05),
+                    color: AppColors.primary.withValues(alpha: 0.05),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Row(

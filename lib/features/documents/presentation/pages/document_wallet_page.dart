@@ -7,7 +7,6 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
 import '../../../../core/localization/app_localizations_extension.dart';
-import '../../../../core/localization/localized_helpers.dart';
 import '../../../../services/scholarship/scholarship_data_service.dart';
 import '../../../../shared/widgets/app_bottom_nav.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -291,7 +290,7 @@ class _DocumentWalletPageState extends State<DocumentWalletPage> {
 
                     // Category Dropdown
                     DropdownButtonFormField<DocumentCategory>(
-                      value: selectedCat,
+                      initialValue: selectedCat,
                       isExpanded: true,
                       decoration: const InputDecoration(
                         labelText: 'Category *',
@@ -490,7 +489,7 @@ class _DocumentWalletPageState extends State<DocumentWalletPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.folder_open_outlined, size: 64, color: AppColors.textSecondary.withOpacity(0.4)),
+                            Icon(Icons.folder_open_outlined, size: 64, color: AppColors.textSecondary.withValues(alpha: 0.4)),
                             const SizedBox(height: 12),
                             Text(
                               _selectedCategory == 'All'
@@ -560,9 +559,9 @@ class _DocStat extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
         ),
         child: Column(
           children: [

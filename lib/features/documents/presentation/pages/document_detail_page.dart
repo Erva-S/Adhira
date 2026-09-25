@@ -99,7 +99,7 @@ class DocumentDetailPage extends StatelessWidget {
                       ],
                     ),
                     const Divider(height: 20),
-                    _MetaRow(label: 'Uploaded On', value: '16 Aug 2025'),
+                    const _MetaRow(label: 'Uploaded On', value: '16 Aug 2025'),
                     const Divider(height: 20),
                     _MetaRow(label: 'Source', value: isFromDigiLocker ? 'DigiLocker Verified' : 'Manual Upload'),
                   ],

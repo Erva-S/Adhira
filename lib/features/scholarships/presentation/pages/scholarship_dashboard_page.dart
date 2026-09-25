@@ -111,7 +111,7 @@ class ScholarshipDashboardPage extends StatelessWidget {
                         const SizedBox(height: 24),
 
                         // ── Recent Activity Feed ─────────────────────────────
-                        SectionHeader(title: 'Recent Activity'),
+                        const SectionHeader(title: 'Recent Activity'),
                         if (recentActivity.isEmpty)
                           const Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -163,7 +163,7 @@ class ScholarshipDashboardPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.25),
+            color: AppColors.primary.withValues(alpha: 0.25),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -177,7 +177,7 @@ class ScholarshipDashboardPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(Icons.school, color: Colors.white, size: 22),
@@ -211,7 +211,7 @@ class ScholarshipDashboardPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.12),
+              color: Colors.white.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -347,9 +347,9 @@ class ScholarshipDashboardPage extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -377,7 +377,7 @@ class ScholarshipDashboardPage extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            Icon(Icons.assignment_outlined, size: 44, color: AppColors.textTertiary),
+            const Icon(Icons.assignment_outlined, size: 44, color: AppColors.textTertiary),
             const SizedBox(height: 8),
             const Text(
               'No active scholarship applications',
@@ -484,7 +484,7 @@ class ScholarshipDashboardPage extends StatelessWidget {
                         : 'Open',
                   },
                 ),
-                child: Text(
+                child: const Text(
                   'Details →',
                   style: TextStyle(
                     color: AppColors.primary,
@@ -526,7 +526,7 @@ class ScholarshipDashboardPage extends StatelessWidget {
     return ListTile(
       leading: CircleAvatar(
         radius: 18,
-        backgroundColor: iconColor.withOpacity(0.12),
+        backgroundColor: iconColor.withValues(alpha: 0.12),
         child: Icon(icon, color: iconColor, size: 18),
       ),
       title: Text(

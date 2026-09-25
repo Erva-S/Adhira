@@ -4,7 +4,6 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
 import '../../../../services/scholarship/scholarship_data_service.dart';
-import '../../../../shared/models/payment.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/status_badge.dart';
 
@@ -77,7 +76,7 @@ class PaymentsPage extends StatelessWidget {
                     child: Center(
                       child: Column(
                         children: [
-                          Icon(Icons.payment_outlined, size: 48, color: AppColors.textSecondary.withOpacity(0.4)),
+                          Icon(Icons.payment_outlined, size: 48, color: AppColors.textSecondary.withValues(alpha: 0.4)),
                           const SizedBox(height: 12),
                           const Text(
                             'No payment or disbursement records yet.',

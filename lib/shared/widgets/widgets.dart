@@ -1,4 +1,5 @@
 /// Barrel export for all shared widgets.
+library;
 export 'status_badge.dart';
 export 'app_button.dart';
 export 'app_text_field.dart';

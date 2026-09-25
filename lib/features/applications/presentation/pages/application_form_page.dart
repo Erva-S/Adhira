@@ -261,7 +261,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
         _buildSectionTitle('Select Scholarship Scheme', 'Choose the MoTA scheme you wish to apply for.'),
         const SizedBox(height: 12),
         DropdownButtonFormField<ScholarshipType>(
-          value: _selectedType,
+          initialValue: _selectedType,
           isExpanded: true,
           decoration: const InputDecoration(
             labelText: 'MoTA Scheme *',
@@ -329,7 +329,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
-                    value: _gender,
+                    initialValue: _gender,
                     isExpanded: true,
                     decoration: const InputDecoration(
                       prefixIcon: Icon(Icons.wc_outlined),
@@ -408,7 +408,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                   ),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
-                    value: _state,
+                    initialValue: _state,
                     isExpanded: true,
                     items: IndiaLocationData.states
                         .map((s) => DropdownMenuItem(
@@ -442,7 +442,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String>(
                     key: ValueKey('district_dropdown_$_state'),
-                    value: (_district != null && districts.contains(_district)) ? _district : null,
+                    initialValue: (_district != null && districts.contains(_district)) ? _district : null,
                     isExpanded: true,
                     hint: Text(
                       _state == null ? 'Select state first' : 'Select district',
@@ -554,7 +554,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              value: _academicYear,
+              initialValue: _academicYear,
               isExpanded: true,
               items: ['2025-26', '2024-25']
                   .map((y) => DropdownMenuItem(value: y, child: Text(y)))

@@ -55,7 +55,7 @@ class TimelineStage extends StatelessWidget {
                       ? const Icon(Icons.check, size: 8, color: Colors.white)
                       : null,
                 ),
-                if (!isLast) Expanded(child: Container(width: 2, color: dotColor.withOpacity(0.3))),
+                if (!isLast) Expanded(child: Container(width: 2, color: dotColor.withValues(alpha: 0.3))),
               ],
             ),
           ),

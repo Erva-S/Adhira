@@ -155,7 +155,7 @@ class ApplicationTrackingPage extends StatelessWidget {
                                 status: VerificationStatus.verified,
                                 isFirst: true,
                               ),
-                              TimelineStage(
+                              const TimelineStage(
                                 title: 'Document Verification',
                                 subtitle: 'Under verification by authorities',
                                 status: VerificationStatus.inProgress,

@@ -64,7 +64,7 @@ class _ScholarshipDiscoveryPageState extends State<ScholarshipDiscoveryPage> {
                     label: Text(filterItem.$2),
                     selected: isSelected,
                     onSelected: (_) => setState(() => _selectedFilter = filterItem.$1),
-                    selectedColor: AppColors.primary.withOpacity(0.15),
+                    selectedColor: AppColors.primary.withValues(alpha: 0.15),
                     labelStyle: TextStyle(
                       color: isSelected ? AppColors.primary : AppColors.textSecondary,
                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,

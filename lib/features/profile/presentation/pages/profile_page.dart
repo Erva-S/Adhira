@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
 import '../../../../services/authentication/auth_provider.dart';
-import '../../../../shared/models/student.dart';
 import '../../../../shared/widgets/app_bottom_nav.dart';
 import '../../../../core/localization/app_localizations_extension.dart';
 

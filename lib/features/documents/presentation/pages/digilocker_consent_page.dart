@@ -959,7 +959,7 @@ class _DigiLockerConsentPageState extends State<DigiLockerConsentPage>
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
+                    const Text(
                       'Tap card to preview • Checkbox to select',
                       style: TextStyle(
                         fontSize: 11,
