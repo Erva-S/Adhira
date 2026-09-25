@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/enums/app_enums.dart';
 import '../../../../core/localization/app_localizations_extension.dart';
-import '../../../../core/localization/localized_helpers.dart';
 import '../../../../services/integrations/digilocker/digilocker_service.dart';
 import '../../../../services/scholarship/scholarship_data_service.dart';
 
@@ -101,14 +100,33 @@ class _DigiLockerConsentPageState extends State<DigiLockerConsentPage>
           _state = DigiLockerState.noDocuments;
         });
       } else {
+        if (widget.autoImportToWallet) {
+          final service = context.read<ScholarshipDataService>();
+          for (final doc in docs) {
+            try {
+              final data =
+                  await _service.importDocument(doc.uri, service.currentUserId);
+              if (data != null) {
+                await service.uploadDocument(
+                  name: doc.name,
+                  category: _mapDocTypeToCategory(doc.docType),
+                  documentType: doc.docType,
+                  fileName: '${doc.docType.toLowerCase()}.pdf',
+                  bytes: data.bytes,
+                );
+              }
+            } catch (_) {}
+          }
+        }
+
+        if (!mounted) return;
         setState(() {
           _docs = docs;
-          _state = DigiLockerState.documentsAvailable;
-          // Pre-select required documents
           _selected.clear();
-          _selected.addAll(
-            docs.where((d) => d.requiredForScholarship).map((d) => d.uri),
-          );
+          _selected.addAll(docs.map((d) => d.uri));
+          _state = DigiLockerState.done;
+          _statusMsg =
+              'Your DigiLocker has been successfully connected. You can now continue with your scholarship application.';
         });
       }
     } catch (_) {
@@ -1475,16 +1493,21 @@ class _DigiLockerConsentPageState extends State<DigiLockerConsentPage>
             ),
             const SizedBox(height: 24),
             const Text(
-              'Import Complete!',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+              'Successfully Connected',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
+              ),
             ),
             const SizedBox(height: 10),
-            Text(
-              _statusMsg,
+            const Text(
+              'Your DigiLocker has been successfully connected. You can now continue with your scholarship application.',
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,
+                height: 1.4,
               ),
             ),
             const SizedBox(height: 8),
@@ -1497,18 +1520,19 @@ class _DigiLockerConsentPageState extends State<DigiLockerConsentPage>
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: () => Navigator.pop(context, true),
-                icon: const Icon(Icons.check_circle_outline, size: 18),
+                icon: const Icon(Icons.arrow_forward_rounded, size: 18),
                 label: const Text(
-                  'Continue with Linked Documents',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  'Continue',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: const Color(0xFF0B57D0),
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  elevation: 3,
                 ),
               ),
             ),
