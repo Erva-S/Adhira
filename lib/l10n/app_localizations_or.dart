@@ -9,7 +9,7 @@ class AppLocalizationsOr extends AppLocalizations {
   AppLocalizationsOr([String locale = 'or']) : super(locale);
 
   @override
-  String get appTitle => 'ଟ୍ରାଇବାଲ ସ୍କଲାର ସାଥୀ';
+  String get appTitle => 'Adhira';
 
   @override
   String get motaTitle => 'ଜନଜାତି ବ୍ୟାପାର ମନ୍ତ୍ରଣାଳୟ';
