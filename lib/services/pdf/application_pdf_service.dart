@@ -539,7 +539,7 @@ class ApplicationPdfService {
                   style: pw.TextStyle(font: fontBold, fontSize: 13, color: PdfColor.fromHex('#1B4F72')),
                 ),
                 pw.Text(
-                  'Tribal Scholar Saathi - Direct Benefit Transfer Portal',
+                  'Adhira - Direct Benefit Transfer Portal',
                   style: pw.TextStyle(font: fontSemiBold, fontSize: 9, color: PdfColors.grey600),
                 ),
               ],

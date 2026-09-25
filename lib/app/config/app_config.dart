@@ -2,7 +2,7 @@
 class AppConfig {
   AppConfig._();
 
-  static const String appName = 'Tribal Scholar Saathi';
+  static const String appName = 'Adhira';
   static const String appTagline = 'Ministry of Tribal Affairs Scholarship Portal';
   static const String appVersion = '1.0.0';
   static const String buildNumber = '1';

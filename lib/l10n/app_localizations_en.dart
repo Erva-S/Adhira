@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Tribal Scholar Saathi';
+  String get appTitle => 'Adhira';
 
   @override
   String get motaTitle => 'Ministry of Tribal Affairs';

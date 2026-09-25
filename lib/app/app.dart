@@ -21,7 +21,7 @@ class TribalScholarApp extends StatelessWidget {
       child: Consumer<LocaleProvider>(
         builder: (context, localeProvider, _) {
           return MaterialApp.router(
-            title: 'Tribal Scholar Saathi',
+            title: 'Adhira',
             theme: AppTheme.light,
             darkTheme: AppTheme.dark,
             routerConfig: AppRouter.router,
