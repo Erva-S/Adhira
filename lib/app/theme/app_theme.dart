@@ -116,7 +116,7 @@ class AppTheme {
         ),
         chipTheme: ChipThemeData(
           backgroundColor: AppColors.surfaceVariant,
-          selectedColor: AppColors.primaryLight.withOpacity(0.15),
+          selectedColor: AppColors.primaryLight.withValues(alpha: 0.15),
           labelStyle: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500),
           side: const BorderSide(color: AppColors.border),
           shape: RoundedRectangleBorder(

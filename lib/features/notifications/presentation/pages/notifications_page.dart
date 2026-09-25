@@ -6,7 +6,6 @@ import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
 import '../../../../core/localization/app_localizations_extension.dart';
 import '../../../../services/scholarship/scholarship_data_service.dart';
-import '../../../../shared/models/notification_item.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 
 /// Notifications list page — dynamically connected to NotificationRepository.
@@ -53,7 +52,7 @@ class NotificationsPage extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.notifications_none_outlined, size: 64, color: AppColors.textSecondary.withOpacity(0.5)),
+                      Icon(Icons.notifications_none_outlined, size: 64, color: AppColors.textSecondary.withValues(alpha: 0.5)),
                       const SizedBox(height: 16),
                       Text(
                         l10n.noNotifications,
@@ -75,7 +74,7 @@ class NotificationsPage extends StatelessWidget {
                     final formattedTime = _formatTime(notif.timestamp);
 
                     return Material(
-                      color: notif.isRead ? Colors.transparent : AppColors.primary.withOpacity(0.04),
+                      color: notif.isRead ? Colors.transparent : AppColors.primary.withValues(alpha: 0.04),
                       child: ListTile(
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         onTap: () {
@@ -94,7 +93,7 @@ class NotificationsPage extends StatelessWidget {
                           width: 40,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: _getColor(notif.type).withOpacity(0.12),
+                            color: _getColor(notif.type).withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Icon(_getIcon(notif.type), color: _getColor(notif.type), size: 20),
@@ -134,7 +133,7 @@ class NotificationsPage extends StatelessWidget {
                             const SizedBox(height: 4),
                             Text(
                               formattedTime,
-                              style: TextStyle(fontSize: 11, color: AppColors.textSecondary.withOpacity(0.7)),
+                              style: TextStyle(fontSize: 11, color: AppColors.textSecondary.withValues(alpha: 0.7)),
                             ),
                           ],
                         ),

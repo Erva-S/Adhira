@@ -52,7 +52,7 @@ class ChatBubble extends StatelessWidget {
                 timestamp!,
                 style: TextStyle(
                   color: isUser
-                      ? Colors.white.withOpacity(0.7)
+                      ? Colors.white.withValues(alpha: 0.7)
                       : AppColors.textTertiary,
                   fontSize: 11,
                 ),

@@ -6,7 +6,7 @@ const RESPONSES = {
   UNAVAILABLE: 'JAGO is temporarily unavailable. Please try again shortly.',
   DATA_UNAVAILABLE: "I couldn't retrieve that information from your application right now.",
   NOT_FOUND: "I don't have verified information about that in the scholarship documents.",
-  OUT_OF_DOMAIN: "I'm JAGO, your scholarship assistant. I can help with scholarship schemes, eligibility, documents, applications, verification, and application status."
+  OUT_OF_DOMAIN: "I'm JAGO, the scholarship assistant. I can help with scholarship schemes, eligibility, applications, documents, verification, DBT, and application status."
 };
 
 // ── Tool / Function Declarations for Gemini Function Calling ───────────────────
@@ -178,53 +178,98 @@ class GeminiService {
     return `
 You are JAGO, the official AI scholarship assistant inside the "Tribal Scholar Saathi" mobile application for the Ministry of Tribal Affairs (MoTA), Government of India.
 
-ROLE & CLOSED DOMAIN BOUNDARY:
-- You are a strictly closed-domain scholarship assistant for Scheduled Tribe (ST) students.
-- Your knowledge is STRICTLY GROUNDED in the official MoTA scheme guidelines and the student's active application data:
-  1. Pre-Matric Scholarship for ST Students (Classes IX & X) [Source: Pre_Matric_Scholarship_Guidelines_2021-26.pdf]
-  2. Post-Matric Scholarship for ST Students (Class XI to Post-Graduation) [Source: Post_Matric_Scholarship_Guidelines_2022.pdf]
-  3. Top Class Education for ST Students (UG/PG in 252 notified premier institutes) [Source: National_Fellowship_and_Scholarship_Higher_Education_Guidelines_2021-26.pdf, Part-B]
-  4. National Fellowship for ST Students (NFST, for M.Phil and Ph.D) [Source: National_Fellowship_and_Scholarship_Higher_Education_Guidelines_2021-26.pdf, Part-A]
-  5. National Overseas Scholarship (NOS, for Masters and Ph.D in Top 1,000 QS ranked institutions; Note: Post-Doctoral Research omitted from 2026-27) [Source: NOS_Scheme_Amendment_Order_2026-27.pdf]
-- DO NOT answer questions about unrelated topics (celebrities, coding, jokes, weather, science, general chit-chat). If asked, respond with:
-  "${RESPONSES.OUT_OF_DOMAIN}"
-- STRICT NO-HALLUCINATION RULE:
-  * NEVER invent or guess scholarship amounts, eligibility rules, income ceilings, deadlines, or documents.
-  * If the answer is not present in the trusted database or tool outputs, you MUST reply:
-    "I don't have verified information about that in the scholarship documents."
-  * Do NOT let general external knowledge fill in details.
+ROLE & PERSONALITY:
+- You are a knowledgeable, friendly, polite, and natural AI assistant (like ChatGPT / Gemini) specialized in the scholarship and educational financial aid domain for Scheduled Tribe (ST) students.
+- You speak clearly, professionally, and naturally.
+- You are BROAD inside the scholarship domain:
+  * You explain general concepts freely (e.g. "What is a scholarship?", "What is DBT?", "What is DigiLocker?", "How does verification work?", "Why do scholarships require income certificates?", "What is the difference between Pre-Matric and Post-Matric?").
+  * You provide comprehensive, structured overviews when asked for details of any scheme (e.g., Overview, Eligibility, Financial Benefits/Stipends, Required Documents, Where to Apply, Important Conditions).
+  * You help students check their eligibility. If they ask "Am I eligible?", compare their information against the scheme criteria, or if information is missing (like current class or family income), politely ask them for the missing details.
+- You are STRICTLY DOMAIN-RESTRICTED outside the scholarship domain:
+  * If the user asks about completely unrelated topics (coding in Python/C++, celebrities, cricket scores, weather, movies, general chit-chat), DO NOT answer using general knowledge. Instead respond:
+    "${RESPONSES.OUT_OF_DOMAIN}"
 
-SOURCE-AWARE CITATIONS:
-- When stating scheme rules, allowances, eligibility criteria, required documents, or application procedures, cite the official source clearly and cleanly, e.g.:
-  "[Source: <Document Name>, <Section/Page>]"
-- For example:
-  "According to the Post-Matric Scholarship guidelines, the family income ceiling is ₹2.50 Lakh per annum [Source: Post_Matric_Scholarship_Guidelines_2022.pdf, Para 3.3]."
+AUTHORITATIVE MOTA SCHOLARSHIP GUIDELINES (Use as your trusted ground truth):
+1. Pre-Matric Scholarship for ST Students (Classes IX & X) [Source: Pre_Matric_Scholarship_Guidelines_2021-26.pdf]:
+   - Scheme Type: Centrally Sponsored Scheme (75% Centre, 25% State; 90:10 for North-East & Hilly States; 100% for UTs without legislature).
+   - Target Audience: ST students studying in Classes 9 and 10 in Government Schools or schools recognized by Govt or Central/State Boards.
+   - Eligibility: Domicile ST student, Family annual income <= ₹2.50 Lakh from all sources (orphan supported by guardian has no income limit). Available for only 1 year per class (repeating a class is not funded).
+   - Benefits:
+     * Day Scholars: ₹225/month for 10 months (₹2,250/yr) + ₹750 annual book grant = ₹3,000/yr.
+     * Hostellers: ₹525/month for 10 months (₹5,250/yr) + ₹1,000 annual book grant = ₹6,250/yr.
+     * Additional Disability Allowance: ₹800/mo (Hosteller) or ₹600/mo (Day Scholar) for all 12 months.
+   - Income Certificate Rule: Taken ONCE at admission to Class 9 and remains valid for Class 10. Self-declarations/affidavits are strictly NOT acceptable.
+   - Required Documents: Aadhaar Number, Domicile Certificate, ST Certificate, Income Certificate (from competent revenue authority), Disability Certificate (if applicable), Passport Photo, School Bonafide/UDISE details, Bank Passbook (Aadhaar linked).
+   - Portals: National Scholarship Portal (scholarships.gov.in) or State Portal.
 
-CONVERSATIONAL CONTEXT & MULTI-TURN:
-- Maintain conversation history. Understand pronouns and references:
-  * If the user previously asked about "Post-Matric" and now asks "What documents do I need?" or "What about income?", answer specifically for Post-Matric without requiring them to repeat the scheme.
-  * If the user's question is completely ambiguous with no established scheme context (e.g., "Am I eligible?"), ask which scholarship scheme they are inquiring about.
+2. Post-Matric Scholarship for ST Students (Class XI to Post-Graduation) [Source: Post_Matric_Scholarship_Guidelines_2022.pdf]:
+   - Scope: ST students pursuing Class 11, 12, ITI, Diploma, Polytechnic, Graduate, PG, M.Phil, Ph.D in India.
+   - Eligibility: Passed Class 10 or 12, Family annual income <= ₹2.50 Lakh. One scholarship at a time. Candidates who complete a degree in one stream cannot take another course in a different stream at the same level.
+   - Benefits: Compulsory non-refundable course fees + Monthly maintenance stipend for up to 10 months/year:
+     * Group I (Professional Degree/PG - Engg/Medical/Tech): Hosteller ₹1,200/mo; Day Scholar ₹550/mo. (Fee cap in private institutes: ₹2.50L Engg, ₹6.00L Medical).
+     * Group II (Non-professional BA, BSc, BCom, MA, MSc, MCom): Hosteller ₹820/mo; Day Scholar ₹530/mo.
+     * Group III (Diploma, 3-yr Polytechnic, ITI): Hosteller ₹570/mo; Day Scholar ₹300/mo.
+     * Group IV (Class XI & XII, non-degree): Hosteller ₹380/mo; Day Scholar ₹230/mo.
+   - Income Certificate Rule: Taken ONCE at admission, valid for ENTIRE course duration. Fresh income certificate NOT required for renewal in 2nd or subsequent years.
+   - Portals: scholarships.gov.in or State Portal.
 
-FUNCTION CALLING & DATA USAGE:
-- You have access to backend tools to query the official PDF-derived knowledge base and authenticated student records:
-  * getScholarshipSchemes()
-  * getScholarshipDetails({ scheme })
-  * getEligibilityCriteria({ scheme })
-  * getRequiredDocuments({ scheme })
-  * getApplicationStatus({ applicationId })
-  * getPendingActions({ applicationId })
-  * getDeficiencies({ applicationId })
-  * getDBTStatus({ applicationId })
-  * getUserScholarshipProfile()
-- Always call the appropriate function before answering scheme facts or user status.
-- Differentiate between official scheme criteria (from PDFs) and user profile status (from database). Do not claim a student is officially approved unless the database records indicate official approval.
+3. Top Class Education for ST Students [Source: National_Fellowship_and_Scholarship_Higher_Education_Guidelines_2021-26.pdf, Part-B]:
+   - Scope: 100% Central Sector Scheme for ST students admitted on merit to 252 notified premier institutes (all IITs, NITs, IIMs, AIIMS, NLUs, etc.).
+   - Eligibility: Family annual income <= ₹6.00 Lakh (spousal income included if married). NO SLOTS CEILING (all eligible verified students are funded). Students under Management Quota in private institutes are excluded.
+   - Benefits: Full tuition & admission fees in Govt institutes (private cap ₹2.50L/yr), ₹5,000/yr books/stationery, ₹3,000/month living stipend, ₹45,000 one-time computer/accessories grant.
+   - Portals: scholarships.gov.in (NSP).
 
-LANGUAGE & STYLE:
-- The user's requested application language is: "${locale}".
-- Respond in the user's language matching "${locale}".
-- Preserve official acronyms: MoTA, NFST, NOS, DBT, PFMS, DigiLocker, AISHE, QS.
-- Keep answers polite, clear, structured, and student-friendly. Use bullet points for requirements.
+4. National Fellowship for ST Students (NFST, M.Phil & Ph.D) [Source: National_Fellowship_and_Scholarship_Higher_Education_Guidelines_2021-26.pdf, Part-A]:
+   - Scope: 750 fresh fellowships/year (38 Divyangjan, 25 PVTG, 225 Female, 462 ST Others).
+   - Eligibility: Master's degree with min 55% marks, full-time M.Phil/Ph.D in UGC/INI institutions. Age limit: max 36 years as of 1st July.
+   - CRUCIAL: NO INCOME CRITERIA (No income ceiling for eligibility!).
+   - Rates: M.Phil ₹31,000/mo; Ph.D ₹31,000/mo (first 2 yrs) & ₹35,000/mo (next 3 yrs). Contingency ₹10,000 - ₹25,000/yr. HRA at UGC rates (8%, 16%, 24%).
+   - Portals: fellowship.tribal.gov.in.
+
+5. National Overseas Scholarship (NOS) [Source: NOS_Scheme_Amendment_Order_2026-27.pdf]:
+   - Scope: Masters and Ph.D abroad. (Post-Doctoral Research was OMITTED from 2026-27 onwards).
+   - Eligibility: First priority: Unconditional admission offer from Top 1,000 QS world-ranked foreign universities. Family income <= ₹6.00 Lakh. Valid Indian passport.
+   - Benefits: Tuition fees, living allowance ($15,400 / £9,900), economy airfare, visa and health insurance.
+   - Portals: overseas.tribal.gov.in.
+
+CONVERSATIONAL CONTEXT:
+- Keep track of conversation context. When the user asks follow-up questions ("Who can apply?", "What documents?", "What about income?", "How much?"), maintain the context of the scheme discussed previously without forcing them to repeat the scheme name.
+
+LIVE DATABASE TOOLS (Call these for live student application data):
+- getApplicationStatus({ applicationId }) -> Check live application stage, remarks, status.
+- getDeficiencies({ applicationId }) -> Check rejected documents, defect reasons.
+- getPendingActions({ applicationId }) -> Check pending tasks required from the student.
+- getDBTStatus({ applicationId }) -> Check live payment disbursement, transaction IDs, UTRs.
+- getUserScholarshipProfile() -> Get authenticated student category, course, institution.
+
+USER LANGUAGE & FORMAT:
+- User application locale: "${locale}". Reply in the corresponding language.
+- Structure long responses clearly with headers, bullet points, and clean highlights.
 `;
+  }
+
+  async generateWithModelFallback(payload, models = null) {
+    const candidateModels = models || [
+      this.modelName,
+      'gemini-3.5-flash-lite',
+      'gemini-flash-latest',
+      'gemini-3.8-flash'
+    ].filter(Boolean);
+
+    let lastError = null;
+    for (const m of candidateModels) {
+      try {
+        const res = await this.ai.models.generateContent({
+          ...payload,
+          model: m
+        });
+        return res;
+      } catch (err) {
+        lastError = err;
+        console.warn(`[JAGO Backend] Model '${m}' failed (${err.message}). Trying fallback model...`);
+      }
+    }
+    throw lastError || new Error('All candidate Gemini models failed.');
   }
 
   async processChat({
@@ -252,8 +297,6 @@ LANGUAGE & STYLE:
 
     // Step 2: Check Gemini Client Availability
     if (!this.ai || !this.apiKey) {
-      // If developer hasn't set GEMINI_API_KEY, return standard unavailable message
-      // or evaluate offline data for local developer test if configured
       if (process.env.NODE_ENV === 'test' || process.env.ALLOW_LOCAL_FALLBACK === 'true') {
         return this.localDeterministicFallback({ message: cleanMessage, conversationHistory, userId, applicationId, locale });
       }
@@ -296,13 +339,12 @@ LANGUAGE & STYLE:
       while (iteration < maxIterations) {
         iteration++;
 
-        const response = await this.ai.models.generateContent({
-          model: this.modelName,
+        const response = await this.generateWithModelFallback({
           contents: contents,
           config: {
             systemInstruction: this.getSystemInstruction(locale),
             tools: [{ functionDeclarations }],
-            temperature: 0.2
+            temperature: 0.3
           }
         });
 
@@ -319,7 +361,6 @@ LANGUAGE & STYLE:
         }
 
         // Process each function call requested by Gemini
-        // Add model's response candidate to history
         if (response.candidates && response.candidates[0] && response.candidates[0].content) {
           contents.push(response.candidates[0].content);
         }
@@ -350,14 +391,15 @@ LANGUAGE & STYLE:
           functionResponseParts.push({
             functionResponse: {
               name: fnName,
-              response: { result: functionResult }
+              response: { result: functionResult },
+              id: call.id
             }
           });
         }
 
-        // Push tool execution results back to contents
+        // Push tool execution results back to contents with valid role: 'user'
         contents.push({
-          role: 'tool',
+          role: 'user',
           parts: functionResponseParts
         });
       }
@@ -368,6 +410,11 @@ LANGUAGE & STYLE:
       };
     } catch (err) {
       console.error('[JAGO Backend] Gemini API Execution Error:', err.message);
+      // Fallback to rich deterministic knowledge layer if API fails
+      if (process.env.ALLOW_LOCAL_FALLBACK === 'true') {
+        console.log('[JAGO Backend] Using local deterministic knowledge fallback...');
+        return this.localDeterministicFallback({ message: cleanMessage, conversationHistory, userId, applicationId, locale });
+      }
       return {
         reply: RESPONSES.UNAVAILABLE,
         toolCalls: recordedToolCalls,
@@ -447,6 +494,85 @@ LANGUAGE & STYLE:
       };
     }
 
+    // General educational / scholarship concept explanations
+    if (lower.includes('what is a scholarship') || lower === 'scholarship' || lower.includes('explain scholarship')) {
+      return {
+        reply: 'A scholarship is non-repayable financial aid awarded to students to support their education. Unlike loans, scholarships do not have to be paid back. Under the Ministry of Tribal Affairs (MoTA), scholarships are provided to Scheduled Tribe (ST) students covering school education (Classes 9-10), higher studies (Class 11 to PG/Ph.D), premier institutions (IITs/IIMs), and overseas studies.',
+        toolCalls: []
+      };
+    }
+
+    if (lower.includes('what is dbt') || lower.includes('what does dbt mean') || lower === 'dbt' || lower.includes('explain dbt')) {
+      return {
+        reply: 'DBT stands for Direct Benefit Transfer. It is the Government of India\'s mechanism to disburse scholarship funds and stipends directly into the verified, Aadhaar-seeded bank accounts of eligible students via Public Financial Management System (PFMS). This eliminates intermediaries and ensures transparent, timely financial support.',
+        toolCalls: []
+      };
+    }
+
+    if (lower.includes('digilocker') || lower.includes('digi locker')) {
+      return {
+        reply: 'DigiLocker is the Government of India\'s secure cloud-based platform for issuing and verifying official documents (like Aadhaar, Caste Certificates, Marksheets). In Tribal Scholar Saathi, linking your DigiLocker allows automatic document fetching and instant government verification without needing physical copies.',
+        toolCalls: []
+      };
+    }
+
+    if (lower.includes('how does verification work') || lower.includes('verification process') || lower.includes('what happens after verification')) {
+      return {
+        reply: 'Scholarship verification operates through a multi-tier hierarchy:\n1. Institute Level: Institute Nodal Officer (INO) verifies application details and uploaded documents against academic records.\n2. District/State Level: District/State Nodal Officer reviews and scrutinizes applications for eligibility.\n3. Ministry Level: Central verification and sanctioning of funds.\nOnce approved, scholarship amounts are credited directly via PFMS-DBT to the student\'s Aadhaar-seeded account.',
+        toolCalls: []
+      };
+    }
+
+    if (lower.includes('difference between pre-matric and post-matric') || lower.includes('pre-matric vs post-matric')) {
+      return {
+        reply: 'Difference between Pre-Matric and Post-Matric Scholarships:\n• Pre-Matric: For ST students in Classes 9 and 10 to prevent dropouts during school education (Family income ceiling: ₹2.50 Lakh/yr).\n• Post-Matric: For ST students from Class 11 upwards, including ITI, Diploma, Undergraduate, Postgraduate, and Doctoral courses (Family income ceiling: ₹2.50 Lakh/yr, covers tuition fees + monthly stipend).',
+        toolCalls: []
+      };
+    }
+
+    if (lower.includes('why do scholarships require income') || lower.includes('why income certificate')) {
+      return {
+        reply: 'Income certificates are required to verify that financial assistance reaches economically disadvantaged students who need it most. Under MoTA guidelines, family income ceilings (such as ₹2.50 Lakh for Pre/Post-Matric or ₹6.00 Lakh for Top Class) ensure the scheme remains targeted and fair.',
+        toolCalls: []
+      };
+    }
+
+    if (lower.includes('am i eligible') && !lower.includes('post-matric') && !lower.includes('pre-matric') && !lower.includes('top class') && !lower.includes('nfst') && !lower.includes('nos')) {
+      return {
+        reply: 'I can help check your eligibility! Which scholarship scheme are you inquiring about (Pre-Matric, Post-Matric, Top Class, NFST, or NOS)? Please also share your current class/course and annual family income.',
+        toolCalls: []
+      };
+    }
+
+    // Specific MoTA Schemes Handling
+    if (lower.includes('pre-matric') || lower.includes('pre matric') || (historyText.includes('pre-matric') && !lower.includes('post-matric') && !lower.includes('top class') && !lower.includes('nfst') && !lower.includes('nos'))) {
+      if (lower.includes('document')) {
+        const docData = await dataStore.getRequiredDocuments({ scheme: 'pre-matric' });
+        return {
+          reply: `Required documents for ${docData.schemeName} [Source: ${docData.sourceDocument}, ${docData.sourceSections}]:\n` + docData.requiredDocuments.map((d) => `• ${d}`).join('\n'),
+          toolCalls: [{ name: 'getRequiredDocuments', args: { scheme: 'pre-matric' } }]
+        };
+      }
+      if (lower.includes('eligib') || lower.includes('criteria') || lower.includes('who can apply')) {
+        const elData = await dataStore.getEligibilityCriteria({ scheme: 'pre-matric' });
+        return {
+          reply: `Eligibility Criteria for ${elData.schemeName} [Source: ${elData.sourceDocument}, ${elData.sourceSections}]:\n` + elData.eligibilityCriteria.map((c) => `• ${c}`).join('\n'),
+          toolCalls: [{ name: 'getEligibilityCriteria', args: { scheme: 'pre-matric' } }]
+        };
+      }
+      // Comprehensive scheme details
+      const details = await dataStore.getScholarshipDetails({ scheme: 'pre-matric' });
+      return {
+        reply: `### ${details.name}\n[Source: ${details.sourceReference.file}, ${details.sourceReference.sections[0]}]\n\n` +
+          `**1. Scope & Objective:** Centrally Sponsored Scheme (75:25 funding; 90:10 for North-East & Hilly States) supporting ST students in Classes IX & X.\n\n` +
+          `**2. Eligibility:**\n• Category: Scheduled Tribe belonging to Domicile State/UT\n• Classes: Studying in Class 9 or 10 in Government or recognized schools\n• Income Limit: Family annual income <= ₹2.50 Lakh from all sources (valid for Class 10 without fresh certificate)\n• Repetition: Available for 1 year per class (no funding for repeating same class)\n\n` +
+          `**3. Financial Benefits:**\n• Day Scholars: ₹225/month (10 months = ₹2,250) + ₹750 annual book grant = ₹3,000/year\n• Hostellers: ₹525/month (10 months = ₹5,250) + ₹1,000 annual book grant = ₹6,250/year\n• Disability Allowance: ₹800/mo (Hosteller) or ₹600/mo (Day Scholar) for all 12 months\n\n` +
+          `**4. Required Documents:**\n• Aadhaar Card & Domicile Certificate\n• ST / Caste Certificate from competent authority\n• Family Income Certificate (self-affidavits not accepted)\n• School Bonafide Certificate / UDISE details\n• Bank Passbook (Aadhaar linked for DBT)\n\n` +
+          `**5. Where to Apply:** National Scholarship Portal (scholarships.gov.in) or respective State Scholarship Portal.`,
+        toolCalls: [{ name: 'getScholarshipDetails', args: { scheme: 'pre-matric' } }]
+      };
+    }
+
     if (lower.includes('post-matric') || lower.includes('post matric') || (historyText.includes('post-matric') && !lower.includes('pre-matric') && !lower.includes('top class') && !lower.includes('nfst') && !lower.includes('nos'))) {
       if (lower.includes('document')) {
         const docData = await dataStore.getRequiredDocuments({ scheme: 'post-matric' });
@@ -455,25 +581,22 @@ LANGUAGE & STYLE:
           toolCalls: [{ name: 'getRequiredDocuments', args: { scheme: 'post-matric' } }]
         };
       }
-      const elData = await dataStore.getEligibilityCriteria({ scheme: 'post-matric' });
-      return {
-        reply: `Eligibility Criteria for ${elData.schemeName} [Source: ${elData.sourceDocument}, ${elData.sourceSections}]:\n` + elData.eligibilityCriteria.map((c) => `• ${c}`).join('\n'),
-        toolCalls: [{ name: 'getEligibilityCriteria', args: { scheme: 'post-matric' } }]
-      };
-    }
-
-    if (lower.includes('pre-matric') || lower.includes('pre matric') || (historyText.includes('pre-matric') && !lower.includes('post-matric'))) {
-      if (lower.includes('document')) {
-        const docData = await dataStore.getRequiredDocuments({ scheme: 'pre-matric' });
+      if (lower.includes('eligib') || lower.includes('criteria') || lower.includes('who can apply')) {
+        const elData = await dataStore.getEligibilityCriteria({ scheme: 'post-matric' });
         return {
-          reply: `Required documents for ${docData.schemeName} [Source: ${docData.sourceDocument}, ${docData.sourceSections}]:\n` + docData.requiredDocuments.map((d) => `• ${d}`).join('\n'),
-          toolCalls: [{ name: 'getRequiredDocuments', args: { scheme: 'pre-matric' } }]
+          reply: `Eligibility Criteria for ${elData.schemeName} [Source: ${elData.sourceDocument}, ${elData.sourceSections}]:\n` + elData.eligibilityCriteria.map((c) => `• ${c}`).join('\n'),
+          toolCalls: [{ name: 'getEligibilityCriteria', args: { scheme: 'post-matric' } }]
         };
       }
-      const elData = await dataStore.getEligibilityCriteria({ scheme: 'pre-matric' });
+      const details = await dataStore.getScholarshipDetails({ scheme: 'post-matric' });
       return {
-        reply: `Eligibility Criteria for ${elData.schemeName} [Source: ${elData.sourceDocument}, ${elData.sourceSections}]:\n` + elData.eligibilityCriteria.map((c) => `• ${c}`).join('\n'),
-        toolCalls: [{ name: 'getEligibilityCriteria', args: { scheme: 'pre-matric' } }]
+        reply: `### ${details.name}\n[Source: ${details.sourceReference.file}, ${details.sourceReference.sections[0]}]\n\n` +
+          `**1. Scope:** MoTA flagship scheme for ST students pursuing Class 11 to Post-Graduation, ITI, Diploma, Medical, and Engineering courses.\n\n` +
+          `**2. Eligibility:**\n• Domicile ST student who has passed Matriculation (Class 10) or Higher Secondary\n• Family annual income <= ₹2.50 Lakh (income certificate taken once at admission is valid for entire course duration)\n• Cannot change streams at the same level (e.g. no B.Com after B.A.)\n\n` +
+          `**3. Benefits:** Compulsory non-refundable course fees + monthly maintenance stipends across 4 groups:\n• Group I (Professional Degree/PG): Hosteller ₹1,200/mo; Day Scholar ₹550/mo\n• Group II (BA, BSc, BCom, MA): Hosteller ₹820/mo; Day Scholar ₹530/mo\n• Group III (Diploma, ITI, 3-yr Polytechnic): Hosteller ₹570/mo; Day Scholar ₹300/mo\n• Group IV (Class XI & XII non-degree): Hosteller ₹380/mo; Day Scholar ₹230/mo\n\n` +
+          `**4. Required Documents:** Aadhaar, Domicile, ST certificate, Income certificate, qualifying marksheets, Bonafide certificate, Bank passbook.\n\n` +
+          `**5. Where to Apply:** scholarships.gov.in (NSP) or State Portal.`,
+        toolCalls: [{ name: 'getScholarshipDetails', args: { scheme: 'post-matric' } }]
       };
     }
 
@@ -485,14 +608,18 @@ LANGUAGE & STYLE:
           toolCalls: [{ name: 'getRequiredDocuments', args: { scheme: 'top-class' } }]
         };
       }
-      const elData = await dataStore.getEligibilityCriteria({ scheme: 'top-class' });
+      const details = await dataStore.getScholarshipDetails({ scheme: 'top-class' });
       return {
-        reply: `Eligibility Criteria for ${elData.schemeName} [Source: ${elData.sourceDocument}, ${elData.sourceSections}]:\n` + elData.eligibilityCriteria.map((c) => `• ${c}`).join('\n'),
-        toolCalls: [{ name: 'getEligibilityCriteria', args: { scheme: 'top-class' } }]
+        reply: `### ${details.name}\n[Source: ${details.sourceReference.file}, ${details.sourceReference.sections[0]}]\n\n` +
+          `**1. Scope:** 100% Central Sector Scheme for ST students admitted on merit to 252 notified premier institutes (IITs, NITs, IIMs, AIIMS, NLUs, etc.).\n\n` +
+          `**2. Eligibility:**\n• ST students admitted on merit to 252 notified institutes\n• Total family income <= ₹6.00 Lakh/year (spousal income included if married)\n• NO SLOTS CEILING (all eligible verified ST students funded; Management Quota excluded)\n\n` +
+          `**3. Benefits:**\n• Full admission & tuition fees in Government institutes (private institute ceiling: ₹2.50 Lakh/year)\n• Books & Stationery: ₹5,000/year (without bills)\n• Living Stipend: ₹3,000/month (₹36,000/year)\n• Computer & Accessories: ₹45,000 one-time grant for laptop/desktop\n\n` +
+          `**4. Where to Apply:** scholarships.gov.in (NSP).`,
+        toolCalls: [{ name: 'getScholarshipDetails', args: { scheme: 'top-class' } }]
       };
     }
 
-    if (lower.includes('nfst') || lower.includes('fellowship') || lower.includes('m.phil') || lower.includes('ph.d') || lower.includes('phd')) {
+    if (lower.includes('nfst') || lower.includes('national fellowship') || lower.includes('fellowship') || lower.includes('m.phil') || lower.includes('ph.d') || lower.includes('phd')) {
       if (lower.includes('document')) {
         const docData = await dataStore.getRequiredDocuments({ scheme: 'nfst' });
         return {
@@ -500,10 +627,14 @@ LANGUAGE & STYLE:
           toolCalls: [{ name: 'getRequiredDocuments', args: { scheme: 'nfst' } }]
         };
       }
-      const elData = await dataStore.getEligibilityCriteria({ scheme: 'nfst' });
+      const details = await dataStore.getScholarshipDetails({ scheme: 'nfst' });
       return {
-        reply: `Eligibility Criteria for ${elData.schemeName} [Source: ${elData.sourceDocument}, ${elData.sourceSections}]:\n` + elData.eligibilityCriteria.map((c) => `• ${c}`).join('\n'),
-        toolCalls: [{ name: 'getEligibilityCriteria', args: { scheme: 'nfst' } }]
+        reply: `### ${details.name}\n[Source: ${details.sourceReference.file}, ${details.sourceReference.sections[0]}]\n\n` +
+          `**1. Scope:** 750 fresh fellowships annually for ST scholars pursuing full-time M.Phil (2 yrs) and Ph.D (5 yrs) in UGC/INI institutions.\n\n` +
+          `**2. Eligibility:**\n• ST scholars with minimum 55% marks in Post-Graduation / Master's degree\n• Age Limit: Maximum 36 years as of 1st July of award year\n• NO INCOME CRITERIA: There is no income ceiling for eligibility!\n• Slots breakdown: 38 Divyangjan, 25 PVTG, 225 Female, 462 ST Others\n\n` +
+          `**3. Benefits:**\n• Fellowship: ₹31,000/month for M.Phil; for Ph.D ₹31,000/month (first 2 yrs) and ₹35,000/month (next 3 yrs)\n• Annual Contingency: ₹10,000 - ₹25,000/year\n• HRA at UGC rates (8%, 16%, or 24%)\n• Escort allowance for Divyangjan: ₹2,000/month\n\n` +
+          `**4. Where to Apply:** fellowship.tribal.gov.in (uploaded via DigiLocker).`,
+        toolCalls: [{ name: 'getScholarshipDetails', args: { scheme: 'nfst' } }]
       };
     }
 
@@ -515,10 +646,14 @@ LANGUAGE & STYLE:
           toolCalls: [{ name: 'getRequiredDocuments', args: { scheme: 'nos' } }]
         };
       }
-      const elData = await dataStore.getEligibilityCriteria({ scheme: 'nos' });
+      const details = await dataStore.getScholarshipDetails({ scheme: 'nos' });
       return {
-        reply: `Eligibility Criteria for ${elData.schemeName} [Source: ${elData.sourceDocument}, ${elData.sourceSections}]:\n` + elData.eligibilityCriteria.map((c) => `• ${c}`).join('\n'),
-        toolCalls: [{ name: 'getEligibilityCriteria', args: { scheme: 'nos' } }]
+        reply: `### ${details.name}\n[Source: ${details.sourceReference.file}, ${details.sourceReference.sections[0]}]\n\n` +
+          `**1. Scope:** Financial support for ST scholars pursuing Masters and Ph.D level courses abroad.\n*Important 2026-27 Amendment:* Post-Doctoral Research was omitted from 2026-27 onwards.\n\n` +
+          `**2. Eligibility:**\n• First priority: Unconditional admission offer from Top 1,000 QS world-ranked foreign universities\n• Total family annual income <= ₹6.00 Lakh\n• Must hold a valid Indian passport\n• Age limit: Below 35 years as on 1st day of application year\n\n` +
+          `**3. Benefits:** Full tuition fees, annual maintenance ($15,400 / £9,900), economy airfare, visa and insurance fees.\n\n` +
+          `**4. Where to Apply:** overseas.tribal.gov.in.`,
+        toolCalls: [{ name: 'getScholarshipDetails', args: { scheme: 'nos' } }]
       };
     }
 
@@ -531,7 +666,7 @@ LANGUAGE & STYLE:
     }
 
     return {
-      reply: RESPONSES.NOT_FOUND,
+      reply: "I don't have verified information about that in the scholarship documents. Generally, MoTA scholarships cover Pre-Matric (Classes 9-10), Post-Matric (Class 11 to PG), Top Class Education (252 premier institutes), NFST (M.Phil/Ph.D), and NOS (overseas studies). For specific rules, please refer to the latest official MoTA scheme guidelines.",
       toolCalls: []
     };
   }

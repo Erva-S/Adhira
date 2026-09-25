@@ -55,7 +55,7 @@ class ApplicationCard extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: schemeColor.withOpacity(0.12),
+                      color: schemeColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
@@ -98,7 +98,7 @@ class ApplicationCard extends StatelessWidget {
                   children: [
                     const SizedBox(width: 16), // align with content
                     if (lastUpdated != null) ...[
-                      Icon(Icons.access_time, size: 13, color: AppColors.textTertiary),
+                      const Icon(Icons.access_time, size: 13, color: AppColors.textTertiary),
                       const SizedBox(width: 4),
                       Text(
                         lastUpdated!,
@@ -119,11 +119,11 @@ class ApplicationCard extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.warning_amber_rounded, size: 12, color: AppColors.warning),
+                            const Icon(Icons.warning_amber_rounded, size: 12, color: AppColors.warning),
                             const SizedBox(width: 4),
                             Text(
                               '$pendingActionsCount pending',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.warningDark,

@@ -37,7 +37,7 @@ class VerificationCard extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: _getStatusColor().withOpacity(0.15),
+                  color: _getStatusColor().withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(

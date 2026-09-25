@@ -37,7 +37,7 @@ class NotificationDetailPage extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: _getColor(type).withOpacity(0.12),
+                    color: _getColor(type).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(_getIcon(type), color: _getColor(type), size: 24),

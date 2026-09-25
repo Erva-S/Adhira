@@ -65,7 +65,7 @@ class AuthProvider extends ChangeNotifier {
       }
       return result;
     } catch (e) {
-      final res = OtpSendResult(
+      const res = OtpSendResult(
         success: false,
         message: 'An unexpected error occurred. Please try again.',
       );
@@ -94,7 +94,7 @@ class AuthProvider extends ChangeNotifier {
       }
       return result;
     } catch (e) {
-      final res = const AuthResult(
+      const res = AuthResult(
         success: false,
         errorMessage: 'Verification failed. Please check network connection.',
       );

@@ -120,7 +120,7 @@ class DashboardPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(4),
                             child: LinearProgressIndicator(
                               value: (student?.profileCompletionPercent ?? 0.72).clamp(0.0, 1.0),
-                              backgroundColor: Colors.white.withOpacity(0.2),
+                              backgroundColor: Colors.white.withValues(alpha: 0.2),
                               valueColor: const AlwaysStoppedAnimation(Colors.white),
                               minHeight: 6,
                             ),
@@ -130,7 +130,7 @@ class DashboardPage extends StatelessWidget {
                             profilePercent < 100
                                 ? 'Complete all profile details to fast-track verification'
                                 : 'Profile 100% complete — verified for all schemes',
-                            style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12),
+                            style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 12),
                           ),
                         ],
                       ),
@@ -145,18 +145,18 @@ class DashboardPage extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: AppColors.warningLight.withOpacity(0.3),
+                          color: AppColors.warningLight.withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: AppColors.warning),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
+                            const Row(
                               children: [
-                                const Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 20),
-                                const SizedBox(width: 8),
-                                const Text(
+                                Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 20),
+                                SizedBox(width: 8),
+                                Text(
                                   'Action Required (Deficiency)',
                                   style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFFB78103)),
                                 ),
@@ -460,9 +460,9 @@ class _QuickAction extends StatelessWidget {
           width: 80,
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.08),
+            color: color.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withOpacity(0.2)),
+            border: Border.all(color: color.withValues(alpha: 0.2)),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -524,16 +524,16 @@ class _SchemeChip extends StatelessWidget {
           width: 100,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.08),
+            color: color.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: color.withOpacity(0.2)),
+            border: Border.all(color: color.withValues(alpha: 0.2)),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: color.withOpacity(0.15), shape: BoxShape.circle),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.15), shape: BoxShape.circle),
                 child: Icon(icon, size: 24, color: color),
               ),
               const SizedBox(height: 10),

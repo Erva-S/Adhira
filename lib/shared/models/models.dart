@@ -1,4 +1,5 @@
 /// Barrel export for all shared models.
+library;
 export 'student.dart';
 export 'scholarship.dart';
 export 'scholarship_application.dart';

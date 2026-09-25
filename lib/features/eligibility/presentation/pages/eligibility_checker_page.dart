@@ -18,19 +18,19 @@ class _EligibilityCheckerPageState extends State<EligibilityCheckerPage> {
   final Map<int, int> _answers = {};
 
   final List<_EligibilityQuestion> _questions = [
-    _EligibilityQuestion(
+    const _EligibilityQuestion(
       question: 'Do you belong to a Scheduled Tribe (ST)?',
       options: ['Yes', 'No', 'Applied for certificate'],
     ),
-    _EligibilityQuestion(
+    const _EligibilityQuestion(
       question: 'What is your current education level?',
       options: ['Class 9-10', 'Class 11-12', 'Undergraduate', 'Postgraduate', 'M.Phil/Ph.D'],
     ),
-    _EligibilityQuestion(
+    const _EligibilityQuestion(
       question: 'What is your family annual income?',
       options: ['Below ₹2 Lakh', '₹2-3.5 Lakh', '₹3.5-6 Lakh', 'Above ₹6 Lakh'],
     ),
-    _EligibilityQuestion(
+    const _EligibilityQuestion(
       question: 'Where do you wish to study?',
       options: ['India — Government', 'India — Private (Top)', 'India — Other', 'Abroad'],
     ),
@@ -103,7 +103,7 @@ class _EligibilityCheckerPageState extends State<EligibilityCheckerPage> {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primary.withOpacity(0.08) : AppColors.surface,
+                        color: isSelected ? AppColors.primary.withValues(alpha: 0.08) : AppColors.surface,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isSelected ? AppColors.primary : AppColors.border,
