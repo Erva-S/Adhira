@@ -196,7 +196,7 @@ class DashboardPage extends StatelessWidget {
                   // ── Quick Actions ────────────────────────────────────
                   SectionHeader(title: context.l10n.quickActions),
                   SizedBox(
-                    height: 90,
+                    height: 94,
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -347,7 +347,7 @@ class DashboardPage extends StatelessWidget {
                   // ── Eligible Schemes ─────────────────────────────────
                   SectionHeader(title: context.l10n.allSchemes, actionText: 'See All', onAction: () => context.go(RouteNames.scholarshipDiscovery)),
                   SizedBox(
-                    height: 120,
+                    height: 142,
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -467,9 +467,19 @@ class _QuickAction extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 24, color: color),
-              const SizedBox(height: 6),
-              Text(label, style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w600), textAlign: TextAlign.center),
+              Icon(icon, size: 22, color: color),
+              const SizedBox(height: 4),
+              Expanded(
+                child: Center(
+                  child: Text(
+                    label,
+                    style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w600, height: 1.15),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -521,8 +531,8 @@ class _SchemeChip extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(14),
         child: Container(
-          width: 100,
-          padding: const EdgeInsets.all(12),
+          width: 106,
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(14),
@@ -532,12 +542,27 @@ class _SchemeChip extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(color: color.withValues(alpha: 0.15), shape: BoxShape.circle),
-                child: Icon(icon, size: 24, color: color),
+                child: Icon(icon, size: 22, color: color),
               ),
-              const SizedBox(height: 10),
-              Text(name, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color), textAlign: TextAlign.center),
+              const SizedBox(height: 6),
+              Expanded(
+                child: Center(
+                  child: Text(
+                    name,
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      color: color,
+                      height: 1.15,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
