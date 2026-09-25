@@ -213,7 +213,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
           // Step Form Body
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
               child: _buildCurrentStep(),
             ),
           ),
@@ -666,9 +666,11 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                         children: [
                           Icon(Icons.recycling, color: AppColors.success, size: 20),
                           SizedBox(width: 8),
-                          Text(
-                            'Use Existing Verified Documents',
-                            style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E8449), fontSize: 13),
+                          Expanded(
+                            child: Text(
+                              'Use Existing Verified Documents',
+                              style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E8449), fontSize: 13),
+                            ),
                           ),
                         ],
                       ),
@@ -684,7 +686,13 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                               children: [
                                 const Icon(Icons.check_circle, color: AppColors.success, size: 14),
                                 const SizedBox(width: 6),
-                                Text(d.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
+                                Expanded(
+                                  child: Text(
+                                    d.name,
+                                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
                                 const SizedBox(width: 6),
                                 const Text('(Verified)', style: TextStyle(color: AppColors.success, fontSize: 11)),
                               ],
@@ -784,7 +792,17 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                   ),
                 );
                 if (result == true && mounted) {
-                  setState(() => _digiLockerLinked = true);
+                  setState(() {
+                    _digiLockerLinked = true;
+                    _docAadhaar = true;
+                    _docSTCert = true;
+                    _docMarksheet = true;
+                    _docIncome = true;
+                    _docBonafide = true;
+                    if (_currentStep == 3) {
+                      _currentStep = 4;
+                    }
+                  });
                 }
               },
               icon: const Icon(Icons.link_rounded, size: 18),
@@ -1141,6 +1159,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
       ),
       child: SafeArea(
         top: false,
+        bottom: true,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
@@ -1148,10 +1167,10 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
               if (_currentStep > 0) ...[
                 OutlinedButton.icon(
                   onPressed: () => setState(() => _currentStep--),
-                  icon: const Icon(Icons.arrow_back, size: 18),
+                  icon: const Icon(Icons.arrow_back, size: 16),
                   label: Text(context.l10n.back),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     side: const BorderSide(color: AppColors.primary, width: 1.5),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
@@ -1182,13 +1201,14 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                     size: 20,
                   ),
                   label: Text(
-                    isLastStep ? context.l10n.reviewAndSubmit : context.l10n.nextStep,
+                    isLastStep ? 'Submit Application' : context.l10n.nextStep,
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
                     elevation: 3,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
@@ -1308,9 +1328,11 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                 children: [
                   const Icon(Icons.receipt_long, size: 20, color: AppColors.primary),
                   const SizedBox(width: 8),
-                  Text(
-                    '${_selectedType.shortCode}-${DateTime.now().year}-00004',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  Expanded(
+                    child: Text(
+                      '${_selectedType.shortCode}-${DateTime.now().year}-00004',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
                   ),
                 ],
               ),

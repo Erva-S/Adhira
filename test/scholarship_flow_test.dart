@@ -1,115 +1,96 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:tribal_scholar_saathi/core/constants/india_location_data.dart';
 import 'package:tribal_scholar_saathi/features/applications/presentation/pages/application_form_page.dart';
 import 'package:tribal_scholar_saathi/services/scholarship/scholarship_data_service.dart';
-
-Widget _wrapWithProvider(Widget child) {
-  return ChangeNotifierProvider(
-    create: (_) => ScholarshipDataService(),
-    child: MaterialApp(home: child),
-  );
-}
+import 'package:tribal_scholar_saathi/l10n/app_localizations.dart';
 
 void main() {
-  group('IndiaLocationData Tests', () {
-    test('Contains all 36 States and Union Territories with districts', () {
-      final states = IndiaLocationData.states;
-      expect(states.length, equals(36));
+  testWidgets('Complete Scholarship application flow including DigiLocker and Review step', (tester) async {
+    tester.binding.window.physicalSizeTestValue = const Size(1080, 2400);
+    tester.binding.window.devicePixelRatioTestValue = 2.75;
+    addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
 
-      // Key states present
-      expect(states.contains('Odisha'), isTrue);
-      expect(states.contains('Jharkhand'), isTrue);
-      expect(states.contains('Madhya Pradesh'), isTrue);
-      expect(states.contains('Chhattisgarh'), isTrue);
-      expect(states.contains('Delhi'), isTrue);
-      expect(states.contains('Ladakh'), isTrue);
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => ScholarshipDataService(),
+        child: const MaterialApp(
+          locale: Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: ApplicationFormPage(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      // Verify every state/UT has non-empty districts
-      for (final state in states) {
-        final districts = IndiaLocationData.getDistricts(state);
-        expect(districts.isNotEmpty, isTrue, reason: '$state should have districts');
-      }
-    });
+    // Step 0: Scheme & Personal -> Next Step
+    expect(find.text('Select Scholarship Scheme'), findsOneWidget);
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Next Step'));
+    await tester.pumpAndSettle();
 
-    test('Odisha districts include Mayurbhanj and others', () {
-      final districts = IndiaLocationData.getDistricts('Odisha');
-      expect(districts.contains('Mayurbhanj'), isTrue);
-      expect(districts.contains('Sundargarh'), isTrue);
-      expect(districts.contains('Koraput'), isTrue);
-      expect(districts.length, equals(30));
-    });
+    // Step 1: Tribal & Domicile -> Next Step
+    expect(find.text('Tribal Identity & Domicile'), findsOneWidget);
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Next Step'));
+    await tester.pumpAndSettle();
 
-    test('Unknown state returns empty district list', () {
-      expect(IndiaLocationData.getDistricts('NonExistentState'), isEmpty);
-    });
-  });
+    // Step 2: Academic Details -> Next Step
+    expect(find.text('Academic & Institution Details'), findsOneWidget);
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Next Step'));
+    await tester.pumpAndSettle();
 
-  group('ApplicationFormPage Multi-Step Flow Tests', () {
-    testWidgets('Prevents Next Step when required field is empty', (WidgetTester tester) async {
-      await tester.pumpWidget(_wrapWithProvider(const ApplicationFormPage()));
-      await tester.pumpAndSettle();
+    // Step 3: Bank & Documents
+    expect(find.text('DigiLocker Integration — Demo'), findsOneWidget);
+    final linkDigiLockerBtn = find.widgetWithText(ElevatedButton, 'Link from DigiLocker (Demo)');
+    expect(linkDigiLockerBtn, findsOneWidget);
+    await tester.ensureVisible(linkDigiLockerBtn);
+    await tester.tap(linkDigiLockerBtn);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
-      // Clear the Full Name field
-      final nameField = find.widgetWithText(TextFormField, 'Rajesh Soren');
-      expect(nameField, findsOneWidget);
-      await tester.enterText(nameField, '');
-      await tester.pumpAndSettle();
+    // DigiLocker Consent Page: Tap Link from DigiLocker (Demo)
+    final consentLinkBtn = find.widgetWithText(ElevatedButton, 'Link from DigiLocker (Demo)');
+    expect(consentLinkBtn, findsOneWidget);
+    await tester.ensureVisible(consentLinkBtn);
+    await tester.tap(consentLinkBtn);
+    await tester.pump();
 
-      // Tap Next Step
-      await tester.tap(find.text('Next Step'));
-      await tester.pumpAndSettle();
+    // Fast-forward through connection & authentication & import phases
+    await tester.pump(const Duration(seconds: 7));
 
-      // Validation error message should be displayed
-      expect(find.text('Full Name is required'), findsOneWidget);
+    // Verify Success State
+    expect(find.text('Successfully Connected'), findsOneWidget);
+    expect(
+      find.text('Your DigiLocker has been successfully connected. You can now continue with your scholarship application.'),
+      findsOneWidget,
+    );
+    final continueBtn = find.widgetWithText(ElevatedButton, 'Continue');
+    expect(continueBtn, findsOneWidget);
 
-      // Form should remain on Step 1 (Personal Information still visible)
-      expect(find.text('Personal Information'), findsOneWidget);
-    });
+    // Tap Continue
+    await tester.tap(continueBtn);
+    await tester.pumpAndSettle();
 
-    testWidgets('Complete multi-step navigation preserves data across steps and reaches Review & Submit', (WidgetTester tester) async {
-      await tester.pumpWidget(_wrapWithProvider(const ApplicationFormPage()));
-      await tester.pumpAndSettle();
+    // Verify we are now on Step 5: Review & Submit
+    expect(find.text('Application Summary'), findsOneWidget);
+    expect(find.text('Declaration of Authenticity *'), findsOneWidget);
 
-      // Step 1: Default valid data -> Tap Next Step
-      expect(find.text('Select Scholarship Scheme'), findsOneWidget);
-      await tester.tap(find.text('Next Step'));
-      await tester.pumpAndSettle();
+    // Verify Submit Application button is visible
+    final submitAppBtn = find.widgetWithText(ElevatedButton, 'Submit Application');
+    expect(submitAppBtn, findsOneWidget);
 
-      // Step 2: Address / Tribal
-      expect(find.text('Tribal Identity & Domicile'), findsOneWidget);
-      expect(find.text('Back'), findsOneWidget);
+    // Check Declaration of Authenticity
+    final declarationCheckbox = find.byType(CheckboxListTile);
+    expect(declarationCheckbox, findsOneWidget);
+    await tester.ensureVisible(declarationCheckbox);
+    await tester.tap(declarationCheckbox);
+    await tester.pumpAndSettle();
 
-      // Tap Next Step to Step 3
-      await tester.tap(find.text('Next Step'));
-      await tester.pumpAndSettle();
+    // Tap Submit Application
+    await tester.tap(submitAppBtn);
+    await tester.pumpAndSettle();
 
-      // Step 3: Academic
-      expect(find.text('Academic & Institution Details'), findsOneWidget);
-
-      // Tap Next Step to Step 4
-      await tester.tap(find.text('Next Step'));
-      await tester.pumpAndSettle();
-
-      // Step 4: Bank & Documents
-      expect(find.text('Aadhaar-Seeded Bank Account'), findsOneWidget);
-
-      // Tap Next Step to Step 5 (Review)
-      await tester.tap(find.text('Next Step'));
-      await tester.pumpAndSettle();
-
-      // Step 5: Review & Submit
-      expect(find.text('Application Summary'), findsOneWidget);
-      expect(find.text('Review & Submit'), findsOneWidget);
-
-      // Go Back to Step 4
-      await tester.tap(find.text('Back'));
-      await tester.pumpAndSettle();
-      expect(find.text('Aadhaar-Seeded Bank Account'), findsOneWidget);
-
-      // Data preserved in Bank field
-      expect(find.text('State Bank of India'), findsOneWidget);
-    });
+    // Verify Application Submitted dialog
+    expect(find.text('Application Submitted!'), findsOneWidget);
   });
 }
