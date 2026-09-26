@@ -469,12 +469,7 @@ class _JagoChatPageState extends State<JagoChatPage> {
                     onPressed: _isGenerating
                         ? null
                         : () {
-                            // Eligibility suggestion opens the checker page
-                            if (suggestion == l10n.jagoSuggestionEligibility) {
-                              context.push(RouteNames.eligibilityChecker);
-                            } else {
-                              _sendMessage(suggestion);
-                            }
+                            _sendMessage(suggestion);
                           },
                   ),
                 );

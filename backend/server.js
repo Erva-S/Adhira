@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const { GeminiService, RESPONSES } = require('./services/gemini_service');
 const dataStore = require('./database/data_store');
+const websiteScraperService = require('./services/website_scraper_service');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -47,6 +48,21 @@ app.get('/api/jago/suggestions', (req, res) => {
       'Which scholarship am I applying for?'
     ]
   });
+});
+
+// Trusted Official Website Knowledge Endpoint (tribal.nic.in/ScholarshiP.aspx)
+app.get('/api/jago/website-knowledge', async (req, res) => {
+  try {
+    const { refresh = 'false', query } = req.query;
+    if (query) {
+      const relevant = await websiteScraperService.findRelevantContent(query);
+      return res.json({ success: true, data: relevant });
+    }
+    const knowledge = await websiteScraperService.getKnowledge({ forceRefresh: refresh === 'true' });
+    res.json({ success: true, data: knowledge });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 // Main Chat Endpoint

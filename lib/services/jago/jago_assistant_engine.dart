@@ -846,11 +846,20 @@ Keep responses concise and student-friendly.
 
     // 6. Conversational response for "Am I eligible?" / "Check my eligibility"
     if (student != null) {
-      return 'Let me check your profile against the eligibility criteria. '
-          'Please select the scholarship you want to check, or use Quick Actions → Eligibility Check.\n\n'
-          'Eligibility Summary for ${student.fullName}:\n'
-          '• Post-Matric Scholarship: Eligible as an ST student in ${student.currentCourse ?? 'Higher Education'} (Family income <= ₹2.50 Lakh).\n'
-          '• Top Class Education: Eligible if enrolled in a notified premier institute like ${student.institutionName ?? 'IITs/NITs'} (Family income <= ₹6.00 Lakh).';
+      final buffer = StringBuffer('📋 **Automatic Eligibility Assessment for ${student.fullName}:**\n\n');
+      for (final s in ScholarshipMockData.schemes) {
+        final res = ScholarshipEligibilityService.evaluate(scholarship: s, student: student);
+        final statusIcon = res.status == EligibilityStatus.eligible
+            ? '✅'
+            : (res.status == EligibilityStatus.notEligible ? '❌' : '⚠️');
+        final statusLabel = res.status == EligibilityStatus.eligible
+            ? 'Eligible'
+            : (res.status == EligibilityStatus.notEligible ? 'Ineligible' : 'Needs Info');
+        buffer.writeln('$statusIcon **${s.name}**: $statusLabel');
+        buffer.writeln('   • ${res.summaryMessage}\n');
+      }
+      buffer.write('Official Source: Ministry of Tribal Affairs (MoTA) Guidelines (tribal.nic.in)');
+      return buffer.toString().trim();
     }
 
     return 'General MoTA Scholarship Eligibility:\n'
