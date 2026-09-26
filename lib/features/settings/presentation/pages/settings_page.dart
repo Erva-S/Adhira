@@ -6,8 +6,7 @@ import '../../../../app/router/route_names.dart';
 import '../../../../services/authentication/auth_provider.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../core/localization/app_localizations_extension.dart';
-import '../../../../core/localization/locale_provider.dart';
-import '../../../../shared/widgets/language_selector_sheet.dart';
+
 
 /// Settings page with real session logout and confirmation.
 class SettingsPage extends StatelessWidget {
@@ -59,11 +58,6 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    LocaleProvider? localeProvider;
-    try {
-      localeProvider = Provider.of<LocaleProvider>(context, listen: true);
-    } catch (_) {}
-    final currentLang = localeProvider?.currentLanguage ?? LocaleProvider.supportedLanguages.first;
 
     return Scaffold(
       appBar: AppBar(
@@ -73,12 +67,6 @@ class SettingsPage extends StatelessWidget {
       body: ListView(
         children: [
           _SettingsSection(title: l10n.preferences, items: [
-            _SettingsTile(
-              icon: Icons.language,
-              title: l10n.language,
-              subtitle: '${currentLang.nativeName} (${currentLang.englishName})',
-              onTap: () => showLanguageSelectorSheet(context),
-            ),
             _SettingsTile(icon: Icons.notifications_none, title: 'Notification Preferences', onTap: () {}),
             _SettingsTile(icon: Icons.dark_mode_outlined, title: 'Theme', subtitle: 'System Default', onTap: () {}),
           ]),

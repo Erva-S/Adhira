@@ -175,6 +175,11 @@ class AppRouter {
         builder: (context, state) => const DocumentWalletPage(),
       ),
       GoRoute(
+        path: RouteNames.documentUpload,
+        name: 'documentUpload',
+        builder: (context, state) => const DocumentWalletPage(),
+      ),
+      GoRoute(
         path: RouteNames.documentDetails,
         name: 'documentDetails',
         builder: (context, state) {

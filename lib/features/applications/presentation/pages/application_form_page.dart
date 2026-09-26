@@ -12,6 +12,7 @@ import '../../../../shared/models/models.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/step_progress_bar.dart';
 import '../../../documents/presentation/pages/digilocker_consent_page.dart';
+import '../../../documents/presentation/widgets/upload_document_dialog.dart';
 import '../../../../shared/widgets/digilocker_preview_sheet.dart';
 import '../../../../core/localization/app_localizations_extension.dart';
 
@@ -706,10 +707,10 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
         ),
         const SizedBox(height: 20),
 
-        // ── DigiLocker Document Linking (Demo) ────────────────
+        // ── Document Linking & Upload ──────────────────────────
         _buildSectionTitle(
-          'Link Documents via DigiLocker',
-          'Attach government-issued documents from your DigiLocker — Demo',
+          'Attach Supporting Documents',
+          'Connect your DigiLocker or manually upload files from your device.',
         ),
         const SizedBox(height: 10),
         AnimatedCrossFade(
@@ -722,11 +723,11 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
         ),
         const SizedBox(height: 20),
 
-        // Reusable Verified Documents (Part 9)
+        // User Documents in Wallet (Verified + Uploaded)
         Builder(
           builder: (context) {
-            final reusable = context.watch<ScholarshipDataService>().reusableDocuments;
-            if (reusable.isEmpty) return const SizedBox.shrink();
+            final allUserDocs = context.watch<ScholarshipDataService>().documents;
+            if (allUserDocs.isEmpty) return const SizedBox.shrink();
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -741,25 +742,36 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Row(
+                      Row(
                         children: [
-                          Icon(Icons.recycling, color: AppColors.success, size: 20),
-                          SizedBox(width: 8),
+                          const Icon(Icons.folder_shared, color: AppColors.success, size: 20),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'Use Existing Verified Documents',
-                              style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E8449), fontSize: 13),
+                              'Available Documents in Wallet (${allUserDocs.length})',
+                              style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1E8449), fontSize: 13),
+                            ),
+                          ),
+                          TextButton.icon(
+                            onPressed: () => _openManualUploadDialog(),
+                            icon: const Icon(Icons.add, size: 14),
+                            label: const Text('Upload More', style: TextStyle(fontSize: 11)),
+                            style: TextButton.styleFrom(
+                              foregroundColor: const Color(0xFF1E8449),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        '${reusable.length} verified document(s) found in your wallet. They will be automatically linked:',
+                        '${allUserDocs.length} document(s) in your wallet will be linked to this application:',
                         style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
                       ),
                       const SizedBox(height: 6),
-                      ...reusable.map((d) => Padding(
+                      ...allUserDocs.map((d) => Padding(
                             padding: const EdgeInsets.symmetric(vertical: 2),
                             child: Row(
                               children: [
@@ -773,7 +785,14 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                                   ),
                                 ),
                                 const SizedBox(width: 6),
-                                const Text('(Verified)', style: TextStyle(color: AppColors.success, fontSize: 11)),
+                                Text(
+                                  d.isVerified ? '(Verified)' : '(Uploaded)',
+                                  style: TextStyle(
+                                    color: d.isVerified ? AppColors.success : AppColors.warning,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                               ],
                             ),
                           )),
@@ -786,13 +805,58 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
           },
         ),
 
-        _buildSectionTitle('Document Checklist', 'Tick verified documents ready for submission.'),
+        _buildSectionTitle('Document Checklist', 'Tick or upload documents ready for submission.'),
         const SizedBox(height: 8),
-        _buildDocCheckItem('Aadhaar Card (UIDAI verified) *', _docAadhaar, (v) => setState(() => _docAadhaar = v)),
-        _buildDocCheckItem('ST/Caste Certificate (e-District) *', _docSTCert, (v) => setState(() => _docSTCert = v)),
-        _buildDocCheckItem('Income Certificate (< ₹2.50 Lakh)', _docIncome, (v) => setState(() => _docIncome = v)),
-        _buildDocCheckItem('Previous Year Marksheet', _docMarksheet, (v) => setState(() => _docMarksheet = v)),
-        _buildDocCheckItem('Institution Bonafide / Enrollment', _docBonafide, (v) => setState(() => _docBonafide = v)),
+        _buildDocCheckItem(
+          'Aadhaar Card (UIDAI verified) *',
+          _docAadhaar,
+          (v) => setState(() => _docAadhaar = v),
+          onUpload: () => _openManualUploadDialog(
+            defaultName: 'Aadhaar Card',
+            defaultCategory: DocumentCategory.identity,
+            defaultDocumentType: 'AADHAAR_CARD',
+          ),
+        ),
+        _buildDocCheckItem(
+          'ST/Caste Certificate (e-District) *',
+          _docSTCert,
+          (v) => setState(() => _docSTCert = v),
+          onUpload: () => _openManualUploadDialog(
+            defaultName: 'ST Certificate',
+            defaultCategory: DocumentCategory.caste,
+            defaultDocumentType: 'ST_CERTIFICATE',
+          ),
+        ),
+        _buildDocCheckItem(
+          'Income Certificate (< ₹2.50 Lakh)',
+          _docIncome,
+          (v) => setState(() => _docIncome = v),
+          onUpload: () => _openManualUploadDialog(
+            defaultName: 'Income Certificate',
+            defaultCategory: DocumentCategory.income,
+            defaultDocumentType: 'INCOME_CERTIFICATE',
+          ),
+        ),
+        _buildDocCheckItem(
+          'Previous Year Marksheet',
+          _docMarksheet,
+          (v) => setState(() => _docMarksheet = v),
+          onUpload: () => _openManualUploadDialog(
+            defaultName: 'Class 12 Marksheet',
+            defaultCategory: DocumentCategory.academic,
+            defaultDocumentType: 'MARKSHEET',
+          ),
+        ),
+        _buildDocCheckItem(
+          'Institution Bonafide / Enrollment',
+          _docBonafide,
+          (v) => setState(() => _docBonafide = v),
+          onUpload: () => _openManualUploadDialog(
+            defaultName: 'Bonafide Certificate',
+            defaultCategory: DocumentCategory.academic,
+            defaultDocumentType: 'BONAFIDE_CERTIFICATE',
+          ),
+        ),
       ],
     );
   }
@@ -899,6 +963,26 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
               ),
             ),
           ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () => _openManualUploadDialog(),
+              icon: const Icon(Icons.upload_file, size: 16),
+              label: const Text(
+                'Upload Manually',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary, width: 1.5),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -974,6 +1058,14 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
             maskedId: 'Roll No. 1163XXXX',
             icon: Icons.school_outlined,
             assetPath: 'assets/images/class12_marksheet.jpg',
+          ),
+          const SizedBox(height: 10),
+          Center(
+            child: TextButton.icon(
+              onPressed: () => _openManualUploadDialog(),
+              icon: const Icon(Icons.add_circle_outline, size: 16),
+              label: const Text('Upload Additional Document Manually', style: TextStyle(fontSize: 12)),
+            ),
           ),
         ],
       ),
@@ -1176,16 +1268,68 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
     );
   }
 
-  Widget _buildDocCheckItem(String label, bool value, ValueChanged<bool> onChanged) {
-    return CheckboxListTile(
-      value: value,
-      dense: true,
-      controlAffinity: ListTileControlAffinity.leading,
-      contentPadding: EdgeInsets.zero,
-      title: Text(label, style: const TextStyle(fontSize: 13)),
-      secondary: const Icon(Icons.check_circle_outline, color: AppColors.success, size: 20),
-      onChanged: (v) => onChanged(v ?? false),
+  Widget _buildDocCheckItem(
+    String label,
+    bool value,
+    ValueChanged<bool> onChanged, {
+    VoidCallback? onUpload,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Material(
+        color: value ? AppColors.successLight.withValues(alpha: 0.15) : Colors.transparent,
+        borderRadius: BorderRadius.circular(8),
+        child: CheckboxListTile(
+          value: value,
+          dense: true,
+          controlAffinity: ListTileControlAffinity.leading,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+          title: Text(label, style: const TextStyle(fontSize: 13)),
+          secondary: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (onUpload != null)
+                IconButton(
+                  icon: const Icon(Icons.upload_file, size: 20, color: AppColors.primary),
+                  tooltip: 'Upload Document',
+                  onPressed: onUpload,
+                ),
+              Icon(
+                value ? Icons.check_circle : Icons.radio_button_unchecked,
+                color: value ? AppColors.success : AppColors.textSecondary.withValues(alpha: 0.4),
+                size: 20,
+              ),
+            ],
+          ),
+          onChanged: (v) => onChanged(v ?? false),
+        ),
+      ),
     );
+  }
+
+  void _openManualUploadDialog({
+    String? defaultName,
+    DocumentCategory defaultCategory = DocumentCategory.academic,
+    String? defaultDocumentType,
+  }) async {
+    final service = context.read<ScholarshipDataService>();
+    final uploaded = await showUploadDocumentDialog(
+      context: context,
+      service: service,
+      defaultName: defaultName,
+      defaultCategory: defaultCategory,
+      defaultDocumentType: defaultDocumentType,
+    );
+    if (uploaded != null && mounted) {
+      setState(() {
+        final n = (defaultName ?? uploaded.name).toLowerCase();
+        if (n.contains('aadhaar')) _docAadhaar = true;
+        if (n.contains('st') || n.contains('caste')) _docSTCert = true;
+        if (n.contains('income')) _docIncome = true;
+        if (n.contains('marksheet')) _docMarksheet = true;
+        if (n.contains('bonafide')) _docBonafide = true;
+      });
+    }
   }
 
   Widget _buildReviewCard(String title, List<Widget> rows) {
@@ -1365,7 +1509,10 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
 
   void _submitApplication() {
     final service = context.read<ScholarshipDataService>();
-    final reusableIds = service.reusableDocuments.map((d) => d.id).toList();
+    final allUserDocIds = service.documents
+        .where((d) => d.userId == service.currentUserId)
+        .map((d) => d.id)
+        .toList();
 
     service.submitApplication(
       scholarshipId: _schemeId,
@@ -1374,7 +1521,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
       academicYear: _academicYear,
       requestedAmount: _requestedAmount,
       remarks: 'Certified submission with linked documents.',
-      reusedDocumentIds: reusableIds,
+      reusedDocumentIds: allUserDocIds,
     );
 
     final l10n = context.l10n;

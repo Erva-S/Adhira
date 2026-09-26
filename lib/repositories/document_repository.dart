@@ -61,6 +61,7 @@ class AppDocumentRepository extends BaseRepository implements DocumentRepository
         bytes: bytes,
       );
 
+      final ext = fileName.contains('.') ? fileName.split('.').last.toLowerCase() : 'pdf';
       final newDoc = Document(
         id: docId,
         userId: userId,
@@ -71,6 +72,7 @@ class AppDocumentRepository extends BaseRepository implements DocumentRepository
         storagePath: uploadRes.storagePath,
         fileUrl: uploadRes.secureUrl,
         fileName: fileName,
+        fileType: ext,
         fileSizeBytes: bytes.length,
         uploadedAt: DateTime.now(),
       );
