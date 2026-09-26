@@ -148,7 +148,17 @@ class AppRouter {
       GoRoute(
         path: RouteNames.eligibilityChecker,
         name: 'eligibilityChecker',
-        builder: (context, state) => const EligibilityCheckerPage(),
+        builder: (context, state) {
+          final extra = state.extra;
+          String? schemeId;
+          if (extra is Map<String, dynamic>) {
+            schemeId = extra['schemeId'] as String? ?? extra['scholarshipId'] as String?;
+          } else if (extra is String) {
+            schemeId = extra;
+          }
+          schemeId ??= state.uri.queryParameters['schemeId'];
+          return EligibilityCheckerPage(initialSchemeId: schemeId);
+        },
       ),
 
       // ── Verification ────────────────────────────────────────────
@@ -162,6 +172,11 @@ class AppRouter {
       GoRoute(
         path: RouteNames.documentWallet,
         name: 'documentWallet',
+        builder: (context, state) => const DocumentWalletPage(),
+      ),
+      GoRoute(
+        path: RouteNames.documentUpload,
+        name: 'documentUpload',
         builder: (context, state) => const DocumentWalletPage(),
       ),
       GoRoute(

@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../../shared/models/student.dart';
 import '../integrations/digilocker/digilocker_service.dart';
+import '../jago/jago_context_service.dart';
+import '../jago/jago_session_service.dart';
 import 'auth_service.dart';
 
 /// State management Provider for Authentication lifecycle.
@@ -118,6 +120,10 @@ class AuthProvider extends ChangeNotifier {
       _lastSentPhone = null;
       _debugLastOtp = null;
       _stopCooldown();
+
+      // Clear JAGO state on logout
+      JagoSessionService().clearAllSessions();
+      await JagoContextService().clearOnLogout();
     } finally {
       _isLoading = false;
       notifyListeners();

@@ -193,25 +193,6 @@ class DashboardPage extends StatelessWidget {
                     ),
                   if (openActions.isNotEmpty) const SizedBox(height: 16),
 
-                  // ── Quick Actions ────────────────────────────────────
-                  SectionHeader(title: context.l10n.quickActions),
-                  SizedBox(
-                    height: 94,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      children: [
-                        _QuickAction(icon: Icons.dashboard_customize, label: 'Scholarship\nHub', color: AppColors.primary, onTap: () => context.push(RouteNames.scholarshipDashboard)),
-                        _QuickAction(icon: Icons.search, label: context.l10n.allSchemes, color: AppColors.postMatric, onTap: () => context.go(RouteNames.scholarshipDiscovery)),
-                        _QuickAction(icon: Icons.checklist, label: context.l10n.eligibilityCheck, color: AppColors.preMatric, onTap: () => context.push(RouteNames.eligibilityChecker)),
-                        _QuickAction(icon: Icons.track_changes, label: context.l10n.trackStatus, color: AppColors.nfst, onTap: () => context.push(RouteNames.applicationTracking)),
-                        _QuickAction(icon: Icons.verified_user, label: 'Verification\nCentre', color: AppColors.topClass, onTap: () => context.push(RouteNames.verificationCentre)),
-                        _QuickAction(icon: Icons.payment, label: context.l10n.jagoQuickPayment, color: AppColors.nos, onTap: () => context.push(RouteNames.payments)),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
                   // ── Current Application ──────────────────────────────
                   SectionHeader(
                     title: 'Current Application',
@@ -438,52 +419,6 @@ class DashboardPage extends StatelessWidget {
           bottomNavigationBar: const AppBottomNav(currentIndex: 0),
         );
       },
-    );
-  }
-}
-
-class _QuickAction extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback? onTap;
-  const _QuickAction({required this.icon, required this.label, required this.color, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          width: 80,
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withValues(alpha: 0.2)),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 22, color: color),
-              const SizedBox(height: 4),
-              Expanded(
-                child: Center(
-                  child: Text(
-                    label,
-                    style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w600, height: 1.15),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

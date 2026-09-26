@@ -13,6 +13,7 @@ import '../../../../shared/widgets/section_header.dart';
 import '../../../../shared/widgets/status_badge.dart';
 import '../../../../shared/widgets/timeline_stage.dart';
 import '../../../../shared/widgets/digilocker_preview_sheet.dart';
+import '../../../../services/jago/jago_context_service.dart';
 
 /// Detailed view of an individual scholarship application.
 class ApplicationDetailPage extends StatelessWidget {
@@ -446,7 +447,17 @@ class ApplicationDetailPage extends StatelessWidget {
                             ),
                           ),
                           TextButton(
-                            onPressed: () => context.push(RouteNames.jago),
+                            onPressed: () {
+                              // Pass application context to JAGO
+                              JagoContextService().setScreenContext(
+                                JagoScreenContext(
+                                  sourceScreen: 'applicationDetail',
+                                  sourceLabel: 'Application Detail',
+                                  application: app,
+                                ),
+                              );
+                              context.push(RouteNames.jago);
+                            },
                             child: const Text('Ask JAGO'),
                           ),
                         ],

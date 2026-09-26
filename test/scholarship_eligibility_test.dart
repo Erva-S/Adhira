@@ -369,6 +369,37 @@ void main() {
       // Now it recalculates to Eligible!
       expect(find.text('Eligible'), findsOneWidget);
     });
+
+    testWidgets('Renders seamlessly without blank screen even when authProvider.currentUser is null', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
+
+      // authProvider with null currentUser
+      final authProvider = AuthProvider(authService: _FakeAuthService(currentUser: null));
+      final scholarshipDataService = ScholarshipDataService();
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
+            ChangeNotifierProvider<ScholarshipDataService>.value(value: scholarshipDataService),
+          ],
+          child: const MaterialApp(
+            home: EligibilityCheckerPage(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify the page is completely visible and NOT a blank or error screen
+      expect(find.text('Eligibility Checker'), findsOneWidget);
+      expect(find.text('Select Scholarship Scheme'), findsOneWidget);
+      expect(find.text('Input Profile Data (Auto-filled)'), findsOneWidget);
+      expect(find.text('Eligibility Result'), findsOneWidget);
+      expect(find.text('Why: Criteria Breakdown'), findsOneWidget);
+    });
   });
 }
 

@@ -603,4 +603,84 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get myApplications => 'मेरे आवेदन';
+
+  @override
+  String get jagoLanguageTitle => 'जागो भाषा';
+
+  @override
+  String get jagoUseAppLanguage => 'ऐप भाषा उपयोग करें';
+
+  @override
+  String get jagoLanguageOverrideHint =>
+      'जागो एक अलग भाषा उपयोग कर रहा है। ऐप भाषा का अनुसरण करने के लिए \"ऐप भाषा उपयोग करें\" पर टैप करें।';
+
+  @override
+  String get jagoLanguageDefaultHint =>
+      'जागो ऐप भाषा का अनुसरण करता है। केवल जागो के लिए एक अलग भाषा चुनें।';
+
+  @override
+  String get jagoContextApplicationTracking =>
+      'मैं इस आवेदन में आपकी मदद कर सकता हूँ। मुझसे इसकी स्थिति, लंबित कार्यवाहियाँ, आवश्यक दस्तावेज़ या आवेदन समयरेखा के बारे में पूछें।';
+
+  @override
+  String get jagoContextEligibility =>
+      'मैं छात्रवृत्ति योजनाओं के लिए आपकी पात्रता जाँचने में मदद कर सकता हूँ। मुझसे विशिष्ट मानदंडों या कमियों के बारे में पूछें।';
+
+  @override
+  String get jagoContextDocuments =>
+      'मैं आपके दस्तावेज़ों में मदद कर सकता हूँ। आवश्यक दस्तावेज़ों, सत्यापन स्थिति या डिजिलॉकर के बारे में पूछें।';
+
+  @override
+  String get jagoContextPayments =>
+      'मैं आपकी भुगतान और डीबीटी स्थिति में मदद कर सकता हूँ। संवितरण, लंबित किस्तों या भुगतान समयरेखा के बारे में पूछें।';
+
+  @override
+  String get jagoSuggestionEligibility => 'मेरी पात्रता जाँचें';
+
+  @override
+  String get jagoSuggestionTrack => 'मेरा आवेदन ट्रैक करें';
+
+  @override
+  String get jagoSuggestionDocs => 'मुझे कौन से दस्तावेज़ चाहिए?';
+
+  @override
+  String get jagoSuggestionPending => 'कौन से दस्तावेज़ लंबित हैं?';
+
+  @override
+  String get jagoSuggestionPayment => 'मेरी भुगतान स्थिति जाँचें';
+
+  @override
+  String get jagoSuggestionWhichScholarship =>
+      'मैं किस छात्रवृत्ति के लिए आवेदन कर रहा/रही हूँ?';
+
+  @override
+  String get jagoNavPromptApplications =>
+      'क्या आप चाहते हैं कि मैं आवेदन ट्रैकिंग खोलूँ?';
+
+  @override
+  String get jagoNavPromptDocuments =>
+      'क्या आप चाहते हैं कि मैं दस्तावेज़ वॉलेट खोलूँ?';
+
+  @override
+  String get jagoNavPromptPayments =>
+      'क्या आप चाहते हैं कि मैं भुगतान अनुभाग खोलूँ?';
+
+  @override
+  String get jagoNavPromptEligibility =>
+      'क्या आप चाहते हैं कि मैं पात्रता जाँच खोलूँ?';
+
+  @override
+  String get jagoAskJago => 'जागो से पूछें';
+
+  @override
+  String get jagoNeedHelp => 'इस आवेदन में मदद चाहिए?';
+
+  @override
+  String get jagoNeedHelpSubtitle =>
+      'जागो AI से पूछें या अपने जिला जनजातीय अधिकारी से संपर्क करें।';
+
+  @override
+  String jagoOpenedFrom(Object screen) {
+    return 'खोला गया: $screen';
+  }
 }

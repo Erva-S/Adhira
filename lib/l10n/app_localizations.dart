@@ -1249,6 +1249,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'My Applications'**
   String get myApplications;
+
+  /// No description provided for @jagoLanguageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'JAGO Language'**
+  String get jagoLanguageTitle;
+
+  /// No description provided for @jagoUseAppLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Use App Language'**
+  String get jagoUseAppLanguage;
+
+  /// No description provided for @jagoLanguageOverrideHint.
+  ///
+  /// In en, this message translates to:
+  /// **'JAGO is using a custom language. Tap \"Use App Language\" to follow the app.'**
+  String get jagoLanguageOverrideHint;
+
+  /// No description provided for @jagoLanguageDefaultHint.
+  ///
+  /// In en, this message translates to:
+  /// **'JAGO follows the app language. Choose a different language for JAGO only.'**
+  String get jagoLanguageDefaultHint;
+
+  /// No description provided for @jagoContextApplicationTracking.
+  ///
+  /// In en, this message translates to:
+  /// **'I can help you with this application. Ask me about its status, pending actions, required documents, or the application timeline.'**
+  String get jagoContextApplicationTracking;
+
+  /// No description provided for @jagoContextEligibility.
+  ///
+  /// In en, this message translates to:
+  /// **'I can help you check your eligibility for scholarship schemes. Ask me about specific criteria or what you might be missing.'**
+  String get jagoContextEligibility;
+
+  /// No description provided for @jagoContextDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'I can help you with your documents. Ask about required documents, verification status, or DigiLocker integration.'**
+  String get jagoContextDocuments;
+
+  /// No description provided for @jagoContextPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'I can help you with your payment and DBT status. Ask about disbursements, pending installments, or payment timeline.'**
+  String get jagoContextPayments;
+
+  /// No description provided for @jagoSuggestionEligibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Check my eligibility'**
+  String get jagoSuggestionEligibility;
+
+  /// No description provided for @jagoSuggestionTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Track my application'**
+  String get jagoSuggestionTrack;
+
+  /// No description provided for @jagoSuggestionDocs.
+  ///
+  /// In en, this message translates to:
+  /// **'What documents do I need?'**
+  String get jagoSuggestionDocs;
+
+  /// No description provided for @jagoSuggestionPending.
+  ///
+  /// In en, this message translates to:
+  /// **'What documents are pending?'**
+  String get jagoSuggestionPending;
+
+  /// No description provided for @jagoSuggestionPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Check my payment status'**
+  String get jagoSuggestionPayment;
+
+  /// No description provided for @jagoSuggestionWhichScholarship.
+  ///
+  /// In en, this message translates to:
+  /// **'Which scholarship am I applying for?'**
+  String get jagoSuggestionWhichScholarship;
+
+  /// No description provided for @jagoNavPromptApplications.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like me to open Application Tracking?'**
+  String get jagoNavPromptApplications;
+
+  /// No description provided for @jagoNavPromptDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like me to open the Document Wallet?'**
+  String get jagoNavPromptDocuments;
+
+  /// No description provided for @jagoNavPromptPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like me to open the Payments section?'**
+  String get jagoNavPromptPayments;
+
+  /// No description provided for @jagoNavPromptEligibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Would you like me to open the Eligibility Checker?'**
+  String get jagoNavPromptEligibility;
+
+  /// No description provided for @jagoAskJago.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask JAGO'**
+  String get jagoAskJago;
+
+  /// No description provided for @jagoNeedHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Need help with this application?'**
+  String get jagoNeedHelp;
+
+  /// No description provided for @jagoNeedHelpSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask JAGO AI or contact your district tribal officer.'**
+  String get jagoNeedHelpSubtitle;
+
+  /// No description provided for @jagoOpenedFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Opened from: {screen}'**
+  String jagoOpenedFrom(Object screen);
 }
 
 class _AppLocalizationsDelegate

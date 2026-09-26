@@ -606,4 +606,80 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get myApplications => 'எனது விண்ணப்பங்கள்';
+
+  @override
+  String get jagoLanguageTitle => 'ஜாகோ மொழி';
+
+  @override
+  String get jagoUseAppLanguage => 'ஆப் மொழியைப் பயன்படுத்து';
+
+  @override
+  String get jagoLanguageOverrideHint =>
+      'ஜாகோ வேறு மொழியைப் பயன்படுத்துகிறது। ஆப் மொழியைப் பின்பற்ற \"ஆப் மொழியைப் பயன்படுத்து\" என்பதைத் தட்டவும்.';
+
+  @override
+  String get jagoLanguageDefaultHint =>
+      'ஜாகோ ஆப் மொழியைப் பின்பற்றுகிறது. ஜாகோவுக்கு மட்டும் வேறு மொழியைத் தேர்ந்தெடுக்கவும்.';
+
+  @override
+  String get jagoContextApplicationTracking =>
+      'இந்த விண்ணப்பத்தில் உங்களுக்கு உதவ முடியும்.';
+
+  @override
+  String get jagoContextEligibility =>
+      'உதவித்தொகை திட்டங்களுக்கான உங்கள் தகுதியை சரிபார்க்க உதவ முடியும்.';
+
+  @override
+  String get jagoContextDocuments => 'உங்கள் ஆவணங்கள் பற்றி உதவ முடியும்.';
+
+  @override
+  String get jagoContextPayments =>
+      'உங்கள் கட்டணம் மற்றும் DBT நிலை பற்றி உதவ முடியும்.';
+
+  @override
+  String get jagoSuggestionEligibility => 'எனது தகுதியை சரிபார்க்கவும்';
+
+  @override
+  String get jagoSuggestionTrack => 'எனது விண்ணப்பத்தை கண்காணிக்கவும்';
+
+  @override
+  String get jagoSuggestionDocs => 'எனக்கு என்ன ஆவணங்கள் தேவை?';
+
+  @override
+  String get jagoSuggestionPending => 'என்ன ஆவணங்கள் நிலுவையில் உள்ளன?';
+
+  @override
+  String get jagoSuggestionPayment => 'எனது கட்டண நிலையை சரிபார்க்கவும்';
+
+  @override
+  String get jagoSuggestionWhichScholarship =>
+      'நான் எந்த உதவித்தொகைக்கு விண்ணப்பிக்கிறேன்?';
+
+  @override
+  String get jagoNavPromptApplications =>
+      'விண்ணப்ப கண்காணிப்பைத் திறக்க வேண்டுமா?';
+
+  @override
+  String get jagoNavPromptDocuments => 'ஆவண வாலட்டைத் திறக்க வேண்டுமா?';
+
+  @override
+  String get jagoNavPromptPayments => 'கட்டண பிரிவைத் திறக்க வேண்டுமா?';
+
+  @override
+  String get jagoNavPromptEligibility => 'தகுதி சரிபார்ப்பைத் திறக்க வேண்டுமா?';
+
+  @override
+  String get jagoAskJago => 'ஜாகோவிடம் கேளுங்கள்';
+
+  @override
+  String get jagoNeedHelp => 'இந்த விண்ணப்பத்தில் உதவி தேவையா?';
+
+  @override
+  String get jagoNeedHelpSubtitle =>
+      'ஜாகோ AI யிடம் கேளுங்கள் அல்லது உங்கள் மாவட்ட பழங்குடியினர் அதிகாரியை தொடர்பு கொள்ளுங்கள்.';
+
+  @override
+  String jagoOpenedFrom(Object screen) {
+    return 'திறக்கப்பட்டது: $screen';
+  }
 }

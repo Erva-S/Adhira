@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/router/route_names.dart';
@@ -12,6 +13,7 @@ import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/status_badge.dart';
 import '../../../../shared/widgets/timeline_stage.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../services/jago/jago_context_service.dart';
 
 /// Application tracking page with dynamic timeline visualization.
 class ApplicationTrackingPage extends StatelessWidget {
@@ -250,6 +252,26 @@ class ApplicationTrackingPage extends StatelessWidget {
                       payments: payments,
                     );
                   }
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
+            // Ask JAGO with context
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: AppButton(
+                label: 'Ask JAGO',
+                icon: Icons.support_agent,
+                variant: AppButtonVariant.outline,
+                onPressed: () {
+                  JagoContextService().setScreenContext(
+                    JagoScreenContext(
+                      sourceScreen: 'applicationTracking',
+                      sourceLabel: 'Application Tracking',
+                      application: app,
+                    ),
+                  );
+                  context.push(RouteNames.jago);
                 },
               ),
             ),

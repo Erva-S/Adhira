@@ -58,6 +58,72 @@ Never fabricate eligibility rules, scholarship amounts, deadlines, application s
 Keep responses concise and student-friendly.
 ''';
 
+  /// Returns a language instruction to prepend to the system prompt based on JAGO's effective language.
+  static String _languageInstruction(String languageCode) {
+    const languageNames = {
+      'en': 'English',
+      'hi': 'Hindi',
+      'gu': 'Gujarati',
+      'mr': 'Marathi',
+      'or': 'Odia',
+      'bn': 'Bengali',
+      'te': 'Telugu',
+      'ta': 'Tamil',
+    };
+    final langName = languageNames[languageCode] ?? 'English';
+    if (languageCode == 'en') return '';
+    return '\nIMPORTANT: You MUST respond in $langName ($languageCode). '
+        'Understand the user\'s question regardless of which language they use, '
+        'but always generate your response in $langName. '
+        'Preserve official scheme names, document names, and government terminology accurately.\n';
+  }
+
+  /// Generates a context-aware initial message when JAGO is opened from a specific screen.
+  static String? generateContextMessage({
+    required String sourceScreen,
+    ScholarshipApplication? application,
+    Scholarship? scholarship,
+    String languageCode = 'en',
+  }) {
+    final buffer = StringBuffer();
+
+    switch (sourceScreen) {
+      case 'applicationTracking':
+      case 'applicationDetail':
+        if (application != null) {
+          final appNo = application.applicationNumber ?? application.id;
+          final status = application.status.label;
+          final stage = application.currentStage.label;
+          buffer.writeln('I can see you were viewing your ${application.scholarshipName} application ($appNo).');
+          buffer.writeln('Current status: $status (Stage: $stage).');
+          if (application.remarks != null && application.remarks!.isNotEmpty) {
+            buffer.writeln('Remarks: ${application.remarks}.');
+          }
+          buffer.writeln('\nAsk me about its status, pending actions, required documents, or the application timeline.');
+        } else {
+          buffer.writeln('I can help you with application tracking. Ask me about your application status, pending actions, or documents.');
+        }
+        break;
+      case 'eligibility':
+        if (scholarship != null) {
+          buffer.writeln('I can help you check eligibility for ${scholarship.name}.');
+        } else {
+          buffer.writeln('I can help you check your eligibility for scholarship schemes. Ask me about specific criteria or what you might be missing.');
+        }
+        break;
+      case 'documents':
+        buffer.writeln('I can help you with your documents. Ask about required documents, verification status, or DigiLocker integration.');
+        break;
+      case 'payments':
+        buffer.writeln('I can help you with your payment and DBT status. Ask about disbursements, pending installments, or payment timeline.');
+        break;
+      default:
+        return null;
+    }
+
+    return buffer.toString().trim();
+  }
+
   // ── Instance Context ────────────────────────────────────────────────────────
   final ScholarshipDataService? scholarshipService;
   final Student? currentStudent;
@@ -77,6 +143,7 @@ Keep responses concise and student-friendly.
     String locale = 'en',
     ScholarshipDataService? scholarshipService,
     Student? student,
+    String? screenContext,
   }) async {
     try {
       String baseUrl = EnvironmentConfig.current.apiBaseUrl;
@@ -86,6 +153,9 @@ Keep responses concise and student-friendly.
         if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android && baseUrl.contains('localhost'))
           Uri.parse('${baseUrl.replaceAll('localhost', '10.0.2.2')}${ApiEndpoints.jagoChat}'),
       ];
+
+      // Build the language instruction for the system prompt
+      final languageInstruction = _languageInstruction(locale);
 
       for (final targetUrl in candidateUrls) {
         try {
@@ -99,6 +169,8 @@ Keep responses concise and student-friendly.
                   'userId': userId ?? student?.id ?? RelationalDataStore.demoUserId,
                   'applicationId': applicationId ?? (scholarshipService?.activeApplications.firstOrNull?.id),
                   'locale': locale,
+                  if (languageInstruction.isNotEmpty) 'languageInstruction': languageInstruction,
+                  if (screenContext != null) 'screenContext': screenContext,
                 }),
               )
               .timeout(const Duration(seconds: 8));
@@ -761,21 +833,33 @@ Keep responses concise and student-friendly.
     }
 
     // 5. If query asks about a specific unnamed or unknown scheme:
-    if (!text.contains('check my eligibility') &&
+    if (!text.contains('eligib') &&
+        !text.contains('check my eligibility') &&
         !text.contains('am i eligible') &&
+        !text.contains('can i apply') &&
         !text.contains('general') &&
         !text.contains('who can apply') &&
-        !text.contains('eligibility criteria')) {
+        !text.contains('qualification') &&
+        !text.contains('criteria')) {
       return unavailableInfoMessage;
     }
 
     // 6. Conversational response for "Am I eligible?" / "Check my eligibility"
     if (student != null) {
-      return 'Let me check your profile against the eligibility criteria. '
-          'Please select the scholarship you want to check, or use Quick Actions → Eligibility Check.\n\n'
-          'Eligibility Summary for ${student.fullName}:\n'
-          '• Post-Matric Scholarship: Eligible as an ST student in ${student.currentCourse ?? 'Higher Education'} (Family income <= ₹2.50 Lakh).\n'
-          '• Top Class Education: Eligible if enrolled in a notified premier institute like ${student.institutionName ?? 'IITs/NITs'} (Family income <= ₹6.00 Lakh).';
+      final buffer = StringBuffer('📋 **Automatic Eligibility Assessment for ${student.fullName}:**\n\n');
+      for (final s in ScholarshipMockData.schemes) {
+        final res = ScholarshipEligibilityService.evaluate(scholarship: s, student: student);
+        final statusIcon = res.status == EligibilityStatus.eligible
+            ? '✅'
+            : (res.status == EligibilityStatus.notEligible ? '❌' : '⚠️');
+        final statusLabel = res.status == EligibilityStatus.eligible
+            ? 'Eligible'
+            : (res.status == EligibilityStatus.notEligible ? 'Ineligible' : 'Needs Info');
+        buffer.writeln('$statusIcon **${s.name}**: $statusLabel');
+        buffer.writeln('   • ${res.summaryMessage}\n');
+      }
+      buffer.write('Official Source: Ministry of Tribal Affairs (MoTA) Guidelines (tribal.nic.in)');
+      return buffer.toString().trim();
     }
 
     return 'General MoTA Scholarship Eligibility:\n'
