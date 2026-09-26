@@ -73,7 +73,9 @@ app.post('/api/jago/chat', async (req, res) => {
       conversationHistory = [],
       userId = 'TSS-2025-45678',
       applicationId = 'app-pms-2025-001',
-      locale = 'en'
+      locale = 'en',
+      languageInstruction = '',
+      screenContext = ''
     } = req.body;
 
     if (!message || typeof message !== 'string') {
@@ -89,7 +91,9 @@ app.post('/api/jago/chat', async (req, res) => {
       conversationHistory,
       userId,
       applicationId,
-      locale
+      locale,
+      languageInstruction,
+      screenContext
     });
 
     return res.json({

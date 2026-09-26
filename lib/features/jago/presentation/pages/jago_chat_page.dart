@@ -356,10 +356,14 @@ class _JagoChatPageState extends State<JagoChatPage> {
     // Language indicator
     final jagoContext = JagoContextService();
     final localeProvider = Provider.of<LocaleProvider>(context);
-    final hasOverride = jagoContext.hasLanguageOverride;
-    final effectiveLangName = jagoContext.getEffectiveLanguageName(localeProvider);
 
-    return Scaffold(
+    return ListenableBuilder(
+      listenable: jagoContext,
+      builder: (context, _) {
+        final hasOverride = jagoContext.hasLanguageOverride;
+        final effectiveLangName = jagoContext.getEffectiveLanguageName(localeProvider);
+
+        return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
@@ -510,6 +514,8 @@ class _JagoChatPageState extends State<JagoChatPage> {
         ],
       ),
       bottomNavigationBar: const AppBottomNav(currentIndex: 3),
+    );
+      },
     );
   }
 }

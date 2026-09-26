@@ -164,9 +164,28 @@ function isScholarshipDomain(text) {
     'nfst', 'nos', 'income cert', 'caste cert', 'bonafide', 'marksheet',
     'passbook', 'aadhaar', 'student', 'profile', 'deadline', 'allowance',
     'tuition', 'hi', 'hello', 'namaste', 'hey', 'jago', 'saathi', 'portal',
-    'last date', 'extended', 'circular', 'notice', 'rule', 'guide'
+    'last date', 'extended', 'circular', 'notice', 'rule', 'guide',
+    // Indian language scholarship & educational aid keywords
+    'छात्रवृत्ति', 'शिष्यवृत्ती', 'पात्रता', 'स्थिति', 'दस्तावेज', 'आवेदन', 'पैसे', 'बैंक',
+    'શિષ્યવૃત્તિ', 'પાત્રતા', 'સ્થિતિ', 'દસ્તાવેજ', 'અરજી', 'પૈસા',
+    'বৃত্তি', 'স্কলারশিপ', 'যোগ্যতা', 'নথি', 'আবেদন',
+    'உதவித்தொகை', 'தகுதி', 'நிலை', 'ஆவணங்கள்', 'விண்ணப்பம்',
+    'స్కాలర్‌షిప్', 'ఉపకార వేతనం', 'అర్హత', 'స్థితి', 'పత్రాలు', 'దరఖాస్తు',
+    'ವಿದ್ಯಾರ್ಥಿವೇತನ', 'ಅರ್ಹತೆ', 'ಸ್ಥಿತಿ', 'ದಾಖಲೆಗಳು', 'ಅರ್ಜಿ',
+    'സ്കോളർഷിപ്പ്', 'യോഗ്യത', 'അവസ്ഥ', 'രേഖകൾ', 'അപേക്ഷ'
   ];
-  return domainKeywords.some(k => lower.includes(k));
+
+  if (domainKeywords.some(k => lower.includes(k))) {
+    return true;
+  }
+
+  // If text contains Indic script characters and is not out of domain, allow through
+  const hasIndicScript = /[\u0900-\u0D7F]/.test(text);
+  if (hasIndicScript) {
+    return true;
+  }
+
+  return false;
 }
 
 function isExplicitlyOutOfDomain(text) {
@@ -250,7 +269,20 @@ class GeminiService {
     }
   }
 
-  getSystemInstruction(locale = 'en', webContext = '') {
+  getSystemInstruction(locale = 'en', webContext = '', languageInstruction = '', screenContext = '') {
+    const languageNames = {
+      en: 'English',
+      hi: 'Hindi',
+      gu: 'Gujarati',
+      mr: 'Marathi',
+      bn: 'Bengali',
+      ta: 'Tamil',
+      te: 'Telugu',
+      kn: 'Kannada',
+      ml: 'Malayalam'
+    };
+    const targetLanguage = languageNames[locale] || 'English';
+
     return `
 You are JAGO, the official AI scholarship assistant inside the "Tribal Scholar Saathi" mobile application for the Ministry of Tribal Affairs (MoTA), Government of India.
 
@@ -264,6 +296,22 @@ ROLE & PERSONALITY:
 - You are STRICTLY DOMAIN-RESTRICTED outside the scholarship domain:
   * If the user asks about completely unrelated topics (general trivia, coding in Python/C++, celebrities, cricket scores, weather, movies, general chit-chat), DO NOT answer using general knowledge. Instead respond:
     "${RESPONSES.OUT_OF_DOMAIN}"
+
+MULTILINGUAL INSTRUCTIONS & TERMINOLOGY RULES:
+${languageInstruction ? languageInstruction : `
+- You must respond in the user's selected JAGO language: ${targetLanguage} (${locale}).
+- Understand questions even when the user writes in another language, including mixed-language input such as Hinglish or Gujarati-English.
+- Generate the final answer directly in ${targetLanguage}.
+- Do not unnecessarily mix languages in the final output.
+- Preserve official scholarship names, scheme names, government terminology, abbreviations, document names, and technical terms accurately.
+- Specifically preserve terms such as: NSP, SFMP, NOS, NFST, DBT, DigiLocker, APAAR, AISHE, UDISE+, UIDAI, UGC, NTA, Aadhaar, Pre-Matric, Post-Matric, Top Class, National Overseas Scholarship.
+- If an official term is normally written in English, it is acceptable to retain the official English term while explaining it in ${targetLanguage}.
+- Keep answers clear and natural for students.
+- Do not translate official scheme names into potentially incorrect names.
+- Remain strictly within the scholarship/education-assistance domain.
+`}
+
+${screenContext ? `SCREEN & APPLICATION CONTEXT:\n${screenContext}\n` : ''}
 
 TRUSTED OFFICIAL WEBSITE GROUNDING:
 - You have access to real-time official scholarship knowledge scraped from the Ministry of Tribal Affairs (MoTA) official website: https://tribal.nic.in/ScholarshiP.aspx.
@@ -369,7 +417,9 @@ USER LANGUAGE & FORMAT:
     conversationHistory = [],
     userId = 'TSS-2025-45678',
     applicationId = 'app-pms-2025-001',
-    locale = 'en'
+    locale = 'en',
+    languageInstruction = '',
+    screenContext = ''
   }) {
     const cleanMessage = (message || '').trim();
     if (!cleanMessage) {
@@ -451,7 +501,7 @@ USER LANGUAGE & FORMAT:
         const response = await this.generateWithModelFallback({
           contents: contents,
           config: {
-            systemInstruction: this.getSystemInstruction(locale, webContext),
+            systemInstruction: this.getSystemInstruction(locale, webContext, languageInstruction, screenContext),
             tools: [{ functionDeclarations }],
             temperature: 0.3
           }

@@ -9,6 +9,7 @@ import '../database/relational_data_store.dart';
 import '../scholarship/scholarship_data_service.dart';
 import '../scholarship/scholarship_mock_data.dart';
 import '../scholarship/scholarship_eligibility_service.dart';
+import 'jago_mlkit_service.dart';
 
 /// Closed-domain AI Assistant Engine for JAGO inside Tribal Scholar Saathi.
 ///
@@ -58,24 +59,34 @@ Never fabricate eligibility rules, scholarship amounts, deadlines, application s
 Keep responses concise and student-friendly.
 ''';
 
-  /// Returns a language instruction to prepend to the system prompt based on JAGO's effective language.
+  /// Returns a dynamic language instruction communicating the user's selected JAGO language,
+  /// mixed-language input comprehension, official terminology preservation, and output domain boundaries.
   static String _languageInstruction(String languageCode) {
     const languageNames = {
       'en': 'English',
       'hi': 'Hindi',
       'gu': 'Gujarati',
       'mr': 'Marathi',
-      'or': 'Odia',
       'bn': 'Bengali',
-      'te': 'Telugu',
       'ta': 'Tamil',
+      'te': 'Telugu',
+      'kn': 'Kannada',
+      'ml': 'Malayalam',
     };
     final langName = languageNames[languageCode] ?? 'English';
-    if (languageCode == 'en') return '';
-    return '\nIMPORTANT: You MUST respond in $langName ($languageCode). '
-        'Understand the user\'s question regardless of which language they use, '
-        'but always generate your response in $langName. '
-        'Preserve official scheme names, document names, and government terminology accurately.\n';
+    return '''
+You are JAGO, the scholarship assistant inside Adhira.
+Respond directly in the user's selected JAGO language: $langName ($languageCode).
+Understand questions even when the user writes in another language, including mixed-language input such as Hinglish or Gujarati-English.
+Generate the final answer directly in $langName.
+Do not unnecessarily mix languages.
+Preserve official scholarship names, scheme names, government terminology, abbreviations, document names, and technical terms accurately.
+Specifically preserve terms such as: NSP, SFMP, NOS, NFST, DBT, DigiLocker, APAAR, AISHE, UDISE+, UIDAI, UGC, NTA, Aadhaar, Pre-Matric, Post-Matric, Top Class, National Overseas Scholarship.
+If an official term is normally written in English, it is acceptable to retain the official English term while explaining it in $langName.
+Keep answers clear and natural for students.
+Do not translate official scheme names into potentially incorrect names.
+Remain strictly within the scholarship/education-assistance domain.
+''';
   }
 
   /// Generates a context-aware initial message when JAGO is opened from a specific screen.
@@ -145,6 +156,12 @@ Keep responses concise and student-friendly.
     Student? student,
     String? screenContext,
   }) async {
+    final mlKitService = JagoMlKitService();
+    String? detectedLanguage;
+    try {
+      detectedLanguage = await mlKitService.identifyLanguage(message);
+    } catch (_) {}
+
     try {
       String baseUrl = EnvironmentConfig.current.apiBaseUrl;
       // On Android, support physical phones (localhost with adb reverse) and emulators (10.0.2.2)
@@ -154,7 +171,7 @@ Keep responses concise and student-friendly.
           Uri.parse('${baseUrl.replaceAll('localhost', '10.0.2.2')}${ApiEndpoints.jagoChat}'),
       ];
 
-      // Build the language instruction for the system prompt
+      // Build the dynamic language instruction for the system prompt
       final languageInstruction = _languageInstruction(locale);
 
       for (final targetUrl in candidateUrls) {
@@ -169,6 +186,7 @@ Keep responses concise and student-friendly.
                   'userId': userId ?? student?.id ?? RelationalDataStore.demoUserId,
                   'applicationId': applicationId ?? (scholarshipService?.activeApplications.firstOrNull?.id),
                   'locale': locale,
+                  'detectedLanguage': detectedLanguage,
                   if (languageInstruction.isNotEmpty) 'languageInstruction': languageInstruction,
                   if (screenContext != null) 'screenContext': screenContext,
                 }),
@@ -178,7 +196,22 @@ Keep responses concise and student-friendly.
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body) as Map<String, dynamic>;
             if (data['success'] == true && data['reply'] != null) {
-              return data['reply'] as String;
+              String reply = data['reply'] as String;
+              // If target language is non-English and response was returned in English (fallback needed)
+              if (locale != 'en') {
+                final responseScript = JagoMlKitService.detectScriptLanguage(reply);
+                if (responseScript == 'en') {
+                  final translated = await mlKitService.translateFallback(
+                    text: reply,
+                    sourceLangCode: 'en',
+                    targetLangCode: locale,
+                  );
+                  if (translated != null && translated.trim().isNotEmpty) {
+                    reply = translated.trim();
+                  }
+                }
+              }
+              return reply;
             }
           }
         } catch (_) {
@@ -187,19 +220,47 @@ Keep responses concise and student-friendly.
       }
 
       // If backend was unreachable or returned non-200, fallback to deterministic knowledge engine
-      return respond(
+      final fallbackResponse = respond(
         message,
         conversationHistory: conversationHistory,
         scholarshipService: scholarshipService,
         student: student,
       );
+
+      if (locale != 'en') {
+        final translated = await mlKitService.translateFallback(
+          text: fallbackResponse,
+          sourceLangCode: 'en',
+          targetLangCode: locale,
+        );
+        if (translated != null && translated.trim().isNotEmpty) {
+          return translated.trim();
+        }
+      }
+
+      return fallbackResponse;
     } catch (_) {
-      return respond(
+      final fallbackResponse = respond(
         message,
         conversationHistory: conversationHistory,
         scholarshipService: scholarshipService,
         student: student,
       );
+
+      if (locale != 'en') {
+        try {
+          final translated = await mlKitService.translateFallback(
+            text: fallbackResponse,
+            sourceLangCode: 'en',
+            targetLangCode: locale,
+          );
+          if (translated != null && translated.trim().isNotEmpty) {
+            return translated.trim();
+          }
+        } catch (_) {}
+      }
+
+      return fallbackResponse;
     }
   }
 
@@ -482,6 +543,21 @@ Keep responses concise and student-friendly.
       'hey',
       'jago',
       'saathi',
+      // Multilingual keywords for supported regional languages
+      // Hindi / Marathi
+      'छात्रवृत्ति', 'शिष्यवृत्ती', 'पात्रता', 'स्थिति', 'दस्तावेज', 'आवेदन', 'पैसे', 'बैंक',
+      // Gujarati
+      'શિષ્યવૃત્તિ', 'પાત્રતા', 'સ્થિતિ', 'દસ્તાવેજ', 'અરજી', 'પૈસા',
+      // Bengali
+      'বৃত্তি', 'স্কলারশিপ', 'যোগ্যতা', 'নথি', 'আবেদন',
+      // Tamil
+      'உதவித்தொகை', 'தகுதி', 'நிலை', 'ஆவணங்கள்', 'விண்ணப்பம்',
+      // Telugu
+      'స్కాలర్‌షిప్', 'ఉపకార వేతనం', 'అర్హత', 'స్థితి', 'పత్రాలు', 'దరఖాస్తు',
+      // Kannada
+      'ವಿದ್ಯಾರ್ಥಿವೇತನ', 'ಅರ್ಹತೆ', 'ಸ್ಥಿತಿ', 'ದಾಖಲೆಗಳು', 'ಅರ್ಜಿ',
+      // Malayalam
+      'സ്കോളർഷിപ്പ്', 'യോഗ്യത', 'അവസ്ഥ', 'രേഖകൾ', 'അപേക്ഷ',
     ];
 
     return domainKeywords.any((keyword) => text.contains(keyword));
@@ -531,7 +607,10 @@ Keep responses concise and student-friendly.
   // ── Intent Helpers ──────────────────────────────────────────────────────────
 
   static bool _isGreeting(String text) {
-    final greetings = ['hi', 'hello', 'namaste', 'hey', 'good morning', 'good afternoon', 'good evening'];
+    final greetings = [
+      'hi', 'hello', 'namaste', 'hey', 'good morning', 'good afternoon', 'good evening',
+      'नमस्ते', 'નમસ્તે', 'নমস্কার', 'வணக்கம்', 'నమస్కారం', 'ನಮಸ್ಕಾರ', 'നമസ്കാരം'
+    ];
     return greetings.any((g) => text == g || text.startsWith('$g ') || text == '$g!');
   }
 

@@ -116,10 +116,10 @@ class _JagoLanguageSelectorSheetContent extends StatelessWidget {
           Flexible(
             child: ListView.separated(
               shrinkWrap: true,
-              itemCount: LocaleProvider.supportedLanguages.length,
+              itemCount: JagoContextService.supportedLanguages.length,
               separatorBuilder: (_, __) => const Divider(height: 1),
               itemBuilder: (context, index) {
-                final lang = LocaleProvider.supportedLanguages[index];
+                final lang = JagoContextService.supportedLanguages[index];
                 final isSelected =
                     hasOverride && lang.code == effectiveCode;
 

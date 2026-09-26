@@ -29,6 +29,8 @@ class LocaleProvider extends ChangeNotifier {
     AppLanguage(code: 'bn', englishName: 'Bengali', nativeName: 'বাংলা'),
     AppLanguage(code: 'te', englishName: 'Telugu', nativeName: 'తెలుగు'),
     AppLanguage(code: 'ta', englishName: 'Tamil', nativeName: 'தமிழ்'),
+    AppLanguage(code: 'kn', englishName: 'Kannada', nativeName: 'ಕನ್ನಡ'),
+    AppLanguage(code: 'ml', englishName: 'Malayalam', nativeName: 'മലയാളം'),
   ];
 
   Locale _locale = const Locale('en');
