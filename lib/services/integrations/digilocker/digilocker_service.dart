@@ -73,10 +73,67 @@ class DigiLockerDocumentData {
   });
 }
 
+/// Represents citizen profile information authorized and retrieved from DigiLocker.
+class DigiLockerUserProfile {
+  final String fullName;
+  final String? fatherName;
+  final String? motherName;
+  final DateTime? dateOfBirth;
+  final String? gender;
+  final String? category;
+  final String? tribeName;
+  final String? stCertificateNumber;
+  final String? address;
+  final String? district;
+  final String? state;
+  final String? pinCode;
+  final String? institutionName;
+  final String? institutionId;
+  final String? currentCourse;
+  final String? currentYear;
+  final String? educationLevel;
+  final String? bankAccountNumber;
+  final String? ifscCode;
+  final String? bankName;
+  final String? maskedAadhaar;
+  final String? mobileNumber;
+  final String? email;
+  final bool isVerified;
+  final DateTime fetchedAt;
+
+  const DigiLockerUserProfile({
+    required this.fullName,
+    this.fatherName,
+    this.motherName,
+    this.dateOfBirth,
+    this.gender,
+    this.category = 'ST',
+    this.tribeName,
+    this.stCertificateNumber,
+    this.address,
+    this.district,
+    this.state,
+    this.pinCode,
+    this.institutionName,
+    this.institutionId,
+    this.currentCourse,
+    this.currentYear,
+    this.educationLevel,
+    this.bankAccountNumber,
+    this.ifscCode,
+    this.bankName,
+    this.maskedAadhaar,
+    this.mobileNumber,
+    this.email,
+    this.isVerified = true,
+    required this.fetchedAt,
+  });
+}
+
 /// Abstract DigiLocker service boundary.
 ///
 /// Clean service interface with connect(), disconnect(),
-/// getAvailableDocuments(), and importDocument().
+/// getAvailableDocuments(), importDocument(), and fetchUserProfile().
 abstract class DigiLockerService {
   IntegrationStatus get status;
   bool get isConnected;
@@ -92,6 +149,9 @@ abstract class DigiLockerService {
 
   /// Import a specific document and return its data for saving into student's wallet.
   Future<DigiLockerDocumentData?> importDocument(String docUri, String userId);
+
+  /// Fetch citizen profile details authorized through DigiLocker.
+  Future<DigiLockerUserProfile> fetchUserProfile(String userId, {String? phoneNumber});
 }
 
 /// Simulated DigiLocker service for prototype & demonstration.
@@ -120,6 +180,78 @@ class MockDigiLockerService implements DigiLockerService {
   Future<void> disconnect() async {
     _connected = false;
     _cachedDocuments = null;
+  }
+
+  @override
+  Future<DigiLockerUserProfile> fetchUserProfile(String userId, {String? phoneNumber}) async {
+    // Realistic simulated latency for identity & certificate retrieval from DigiLocker
+    await Future.delayed(const Duration(milliseconds: 1000));
+
+    // CRITICAL CONDITION: These details must be returned ONLY when the authenticated mobile number is:
+    // 9898418407. For any other mobile number / user, preserve the existing default behavior.
+    final cleanPhone = phoneNumber?.replaceAll(RegExp(r'\D'), '');
+    final isErva = cleanPhone == '9898418407' ||
+        cleanPhone == '919898418407' ||
+        userId.contains('9898418407');
+
+    if (isErva) {
+      return DigiLockerUserProfile(
+        fullName: 'Erva Savaliya',
+        fatherName: 'Dilip Savaliya',
+        motherName: 'Vaishali Savaliya',
+        dateOfBirth: DateTime(2007, 4, 18),
+        gender: 'Female',
+        category: 'ST',
+        tribeName: 'Gamit',
+        stCertificateNumber: 'ST/GJ/2023/88921',
+        address: 'Near Station Road, Valsad',
+        district: 'Valsad',
+        state: 'Gujarat',
+        pinCode: '396195',
+        institutionName: 'NIT Surat (SVNIT)',
+        institutionId: 'AISHE-U-0149',
+        currentCourse: 'B.Tech Computer Science',
+        currentYear: '1st Year',
+        educationLevel: 'Undergraduate',
+        bankAccountNumber: '987654321012',
+        ifscCode: 'SBIN0001234',
+        bankName: 'State Bank of India',
+        maskedAadhaar: 'XXXX-XXXX-4892',
+        mobileNumber: '9898418407',
+        email: 'erva.savaliya.20@gmail.com',
+        isVerified: true,
+        fetchedAt: DateTime.now(),
+      );
+    }
+
+    // Default ST scholar profile for all other users / mobile numbers
+    return DigiLockerUserProfile(
+      fullName: 'Rajesh Soren',
+      fatherName: 'Manoj Soren',
+      motherName: 'Sunita Soren',
+      dateOfBirth: DateTime(2004, 8, 14),
+      gender: 'Male',
+      category: 'ST',
+      tribeName: 'Santal',
+      stCertificateNumber: 'ST/OD/2023/88921',
+      address: 'Plot 42, Ward 3, Baripada',
+      district: 'Mayurbhanj',
+      state: 'Odisha',
+      pinCode: '757001',
+      institutionName: 'NIT Rourkela',
+      institutionId: 'AISHE-U-0355',
+      currentCourse: 'B.Tech Computer Science',
+      currentYear: '2nd Year',
+      educationLevel: 'Undergraduate',
+      bankAccountNumber: '987654321012',
+      ifscCode: 'SBIN0001234',
+      bankName: 'State Bank of India',
+      maskedAadhaar: 'XXXX-XXXX-4892',
+      mobileNumber: cleanPhone ?? '9876543210',
+      email: 'rajesh.soren@nitrkl.ac.in',
+      isVerified: true,
+      fetchedAt: DateTime.now(),
+    );
   }
 
   @override

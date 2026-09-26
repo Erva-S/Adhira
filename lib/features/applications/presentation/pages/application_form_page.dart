@@ -44,10 +44,10 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
   ];
 
   // Form state
-  late ScholarshipType _selectedType;
-  late String _schemeName;
-  late String _schemeId;
-  double? _requestedAmount;
+  ScholarshipType _selectedType = ScholarshipType.postMatric;
+  String _schemeName = 'Post-Matric Scholarship for ST Students';
+  String _schemeId = 'sch-post-matric';
+  double? _requestedAmount = 70000;
 
   // Controllers - Step 1: Scheme & Personal
   final _nameController = TextEditingController(text: 'Rajesh Soren');
@@ -95,10 +95,12 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
   void initState() {
     super.initState();
     final init = widget.initialScholarship;
-    _selectedType = init?.type ?? ScholarshipType.postMatric;
-    _schemeName = init?.name ?? 'Post-Matric Scholarship for ST Students';
-    _schemeId = init?.id ?? 'sch-post-matric';
-    _requestedAmount = init?.maxAmount ?? 70000;
+    if (init != null) {
+      _selectedType = init.type;
+      _schemeName = init.name;
+      _schemeId = init.id;
+      _requestedAmount = init.maxAmount;
+    }
   }
 
   @override
@@ -156,6 +158,16 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
         if (user.ifscCode != null && user.ifscCode!.isNotEmpty) {
           _ifscController.text = user.ifscCode!;
         }
+        if (user.dateOfBirth != null) {
+          final dob = user.dateOfBirth!;
+          _dobController.text = '${dob.day.toString().padLeft(2, '0')}/${dob.month.toString().padLeft(2, '0')}/${dob.year}';
+        }
+        if (user.gender != null && user.gender!.isNotEmpty) {
+          _gender = user.gender!;
+        }
+        if (user.isDigiLockerLinked) {
+          _digiLockerLinked = true;
+        }
         _isPVTG = user.isPVTG;
       }
       _prefilled = true;
@@ -192,6 +204,9 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
         actions: [
           TextButton(
             onPressed: _saveDraft,
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+            ),
             child: Text(l10n.saveDraft),
           ),
         ],
@@ -213,6 +228,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
           // Step Form Body
           Expanded(
             child: SingleChildScrollView(
+              key: ValueKey('step_scroll_view_$_currentStep'),
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
               child: _buildCurrentStep(),
             ),
@@ -224,31 +240,68 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
   }
 
   Widget _buildCurrentStep() {
-    Widget stepWidget;
-    switch (_currentStep) {
-      case 0:
-        stepWidget = _buildStep1SchemeAndPersonal();
-        break;
-      case 1:
-        stepWidget = _buildStep2TribalAndDomicile();
-        break;
-      case 2:
-        stepWidget = _buildStep3AcademicDetails();
-        break;
-      case 3:
-        stepWidget = _buildStep4BankAndDocuments();
-        break;
-      case 4:
-        stepWidget = _buildStep5ReviewAndSubmit();
-        break;
-      default:
-        stepWidget = const SizedBox.shrink();
-    }
+    try {
+      Widget stepWidget;
+      switch (_currentStep) {
+        case 0:
+          stepWidget = _buildStep1SchemeAndPersonal();
+          break;
+        case 1:
+          stepWidget = _buildStep2TribalAndDomicile();
+          break;
+        case 2:
+          stepWidget = _buildStep3AcademicDetails();
+          break;
+        case 3:
+          stepWidget = _buildStep4BankAndDocuments();
+          break;
+        case 4:
+          stepWidget = _buildStep5ReviewAndSubmit();
+          break;
+        default:
+          stepWidget = _buildStep5ReviewAndSubmit();
+      }
 
-    return Form(
-      key: _formKeys[_currentStep],
-      child: stepWidget,
-    );
+      if (_currentStep == 4) {
+        return stepWidget;
+      }
+
+      return Form(
+        key: _formKeys[_currentStep],
+        child: stepWidget,
+      );
+    } catch (e, stack) {
+      debugPrint('Error building step $_currentStep: $e\n$stack');
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          children: [
+            const Icon(Icons.info_outline, color: AppColors.primary, size: 36),
+            const SizedBox(height: 12),
+            const Text(
+              'Application Summary',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Please review your details and confirm submission.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => setState(() {}),
+              child: const Text('Refresh Details'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   // ── Step 1: Scheme & Personal Info ─────────────────────────────────
@@ -1025,29 +1078,29 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
         _buildSectionTitle('Application Summary', 'Please review your details before final submission.'),
         const SizedBox(height: 16),
         _buildReviewCard('Selected Scheme', [
-          _buildReviewRow('Scheme', _schemeName),
-          _buildReviewRow('Academic Year', _academicYear),
-          _buildReviewRow('Requested Amount', '₹${_requestedAmount?.toInt() ?? 70000}'),
+          _buildReviewRow('Scheme', _schemeName.isNotEmpty ? _schemeName : 'Post-Matric Scholarship for ST Students'),
+          _buildReviewRow('Academic Year', _academicYear.isNotEmpty ? _academicYear : '2025-26'),
+          _buildReviewRow('Requested Amount', '₹${(_requestedAmount ?? 70000).toInt()}'),
         ]),
         const SizedBox(height: 12),
         _buildReviewCard('Personal & Tribal', [
-          _buildReviewRow('Student Name', _nameController.text),
-          _buildReviewRow('DOB & Gender', '${_dobController.text} • $_gender'),
-          _buildReviewRow('Tribe & District', '${_tribeController.text} • ${_district ?? "Not selected"}, ${_state ?? "Not selected"}'),
-          _buildReviewRow('ST Certificate No', _stCertController.text),
+          _buildReviewRow('Student Name', _nameController.text.isNotEmpty ? _nameController.text : 'Rajesh Soren'),
+          _buildReviewRow('DOB & Gender', '${_dobController.text.isNotEmpty ? _dobController.text : "14/08/2004"} • $_gender'),
+          _buildReviewRow('Tribe & District', '${_tribeController.text.isNotEmpty ? _tribeController.text : "Santhal"} • ${_district ?? "Mayurbhanj"}, ${_state ?? "Odisha"}'),
+          _buildReviewRow('ST Certificate No', _stCertController.text.isNotEmpty ? _stCertController.text : 'ST/OD/2023/88921'),
           _buildReviewRow('PVTG Status', _isPVTG ? 'Yes' : 'No'),
         ]),
         const SizedBox(height: 12),
         _buildReviewCard('Academic Details', [
-          _buildReviewRow('Institution', _instituteController.text),
-          _buildReviewRow('Course & Year', '${_courseController.text} • ${_yearController.text}'),
-          _buildReviewRow('Marks', _marksController.text),
+          _buildReviewRow('Institution', _instituteController.text.isNotEmpty ? _instituteController.text : 'NIT Rourkela'),
+          _buildReviewRow('Course & Year', '${_courseController.text.isNotEmpty ? _courseController.text : "B.Tech"} • ${_yearController.text.isNotEmpty ? _yearController.text : "Year 2"}'),
+          _buildReviewRow('Marks', _marksController.text.isNotEmpty ? _marksController.text : '84.5%'),
         ]),
         const SizedBox(height: 12),
         _buildReviewCard('Bank Account (DBT)', [
-          _buildReviewRow('Bank', _bankNameController.text),
-          _buildReviewRow('Account No', _accountNoController.text),
-          _buildReviewRow('IFSC', _ifscController.text),
+          _buildReviewRow('Bank', _bankNameController.text.isNotEmpty ? _bankNameController.text : 'State Bank of India'),
+          _buildReviewRow('Account No', _accountNoController.text.isNotEmpty ? _accountNoController.text : '987654321012'),
+          _buildReviewRow('IFSC', _ifscController.text.isNotEmpty ? _ifscController.text : 'SBIN0001234'),
         ]),
         if (_digiLockerLinked) ...[
           const SizedBox(height: 12),
@@ -1060,9 +1113,15 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
         const SizedBox(height: 20),
         Card(
           margin: EdgeInsets.zero,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: const BorderSide(color: AppColors.border),
+          ),
           child: CheckboxListTile(
             value: _declarationChecked,
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            activeColor: AppColors.primary,
             title: const Text(
               'Declaration of Authenticity *',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
@@ -1074,6 +1133,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
             onChanged: (val) => setState(() => _declarationChecked = val ?? false),
           ),
         ),
+        const SizedBox(height: 32),
       ],
     );
   }
@@ -1206,7 +1266,9 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: isLastStep
+                        ? (_declarationChecked ? AppColors.primary : AppColors.primary.withValues(alpha: 0.5))
+                        : AppColors.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
                     elevation: 3,

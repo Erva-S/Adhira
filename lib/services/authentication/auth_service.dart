@@ -2,6 +2,7 @@ import 'dart:math';
 import '../../app/config/environment.dart';
 import '../../shared/models/student.dart';
 import '../database/relational_data_store.dart';
+import '../integrations/digilocker/digilocker_service.dart';
 import '../storage/local_storage_service.dart';
 
 /// Result of an OTP dispatch request.
@@ -43,6 +44,7 @@ abstract class AuthService {
   Future<Student?> getCurrentUser();
   Student? get currentUser;
   Future<void> updateCurrentUser(Student student);
+  Future<Student> populateProfileFromDigiLocker(DigiLockerUserProfile profile);
   Future<void> restoreSession();
   Future<void> logout();
   bool get isLoggedIn;
@@ -260,10 +262,11 @@ class AppAuthService implements AuthService {
     _currentPhoneNumber = cleanPhone;
 
     // Retrieve or create user in RelationalDataStore
-    final isExistingUser = cleanPhone == RelationalDataStore.demoUserPhone || cleanPhone == '9876543211';
+    final isErva = cleanPhone == '9898418407' || cleanPhone == '919898418407';
+    final isExistingUser = cleanPhone == RelationalDataStore.demoUserPhone || cleanPhone == '9876543211' || isErva;
     final student = RelationalDataStore().createOrFindUser(
       phoneNumber: cleanPhone,
-      fullName: isExistingUser ? 'Rajesh Soren' : 'ST Scholar',
+      fullName: isErva ? 'Erva Savaliya' : (isExistingUser ? 'Rajesh Soren' : 'ST Scholar'),
     );
 
     _currentUser = student;
@@ -295,6 +298,46 @@ class AppAuthService implements AuthService {
     if (student.email != null) {
       await _storage.setString('auth_user_email', student.email!);
     }
+  }
+
+  @override
+  Future<Student> populateProfileFromDigiLocker(DigiLockerUserProfile profile) async {
+    final current = _currentUser ?? RelationalDataStore().createOrFindUser(
+      phoneNumber: _currentPhoneNumber ?? RelationalDataStore.demoUserPhone,
+      fullName: profile.fullName,
+    );
+
+    final updated = current.copyWith(
+      fullName: profile.fullName,
+      fatherName: profile.fatherName ?? current.fatherName,
+      motherName: profile.motherName ?? current.motherName,
+      dateOfBirth: profile.dateOfBirth ?? current.dateOfBirth,
+      gender: profile.gender ?? current.gender,
+      category: profile.category ?? current.category,
+      tribeName: profile.tribeName ?? current.tribeName,
+      stCertificateNumber: profile.stCertificateNumber ?? current.stCertificateNumber,
+      address: profile.address ?? current.address,
+      district: profile.district ?? current.district,
+      state: profile.state ?? current.state,
+      pinCode: profile.pinCode ?? current.pinCode,
+      institutionName: profile.institutionName ?? current.institutionName,
+      institutionId: profile.institutionId ?? current.institutionId,
+      currentCourse: profile.currentCourse ?? current.currentCourse,
+      currentYear: profile.currentYear ?? current.currentYear,
+      educationLevel: profile.educationLevel ?? current.educationLevel,
+      bankAccountNumber: profile.bankAccountNumber ?? current.bankAccountNumber,
+      ifscCode: profile.ifscCode ?? current.ifscCode,
+      bankName: profile.bankName ?? current.bankName,
+      aadhaarNumber: profile.maskedAadhaar ?? current.aadhaarNumber,
+      mobileNumber: profile.mobileNumber ?? current.mobileNumber,
+      email: profile.email ?? current.email,
+      isDigiLockerLinked: true,
+      profileCompletionPercent: 0.95,
+      updatedAt: DateTime.now(),
+    );
+
+    await updateCurrentUser(updated);
+    return updated;
   }
 
   // ── Logout ───────────────────────────────────────────────────────

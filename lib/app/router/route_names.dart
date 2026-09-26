@@ -8,6 +8,7 @@ class RouteNames {
   static const String login = '/login';
   static const String register = '/register';
   static const String otpVerification = '/otp-verification';
+  static const String connectDigiLocker = '/auth/digilocker';
 
   // ── Main ──────────────────────────────────────────────────────
   static const String dashboard = '/dashboard';

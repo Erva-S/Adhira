@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../../shared/models/student.dart';
+import '../integrations/digilocker/digilocker_service.dart';
 import 'auth_service.dart';
 
 /// State management Provider for Authentication lifecycle.
@@ -130,6 +131,20 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       await _authService.updateCurrentUser(updated);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // ── Populate Profile from DigiLocker ───────────────────────────────
+  Future<Student> populateProfileFromDigiLocker(DigiLockerUserProfile profile) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final updated = await _authService.populateProfileFromDigiLocker(profile);
+      return updated;
     } finally {
       _isLoading = false;
       notifyListeners();
