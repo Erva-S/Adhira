@@ -162,7 +162,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                       await authProvider.updateProfile(updated);
                     }
 
-                    if (mounted) {
+                    if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Profile updated and persisted successfully!')),
                       );
