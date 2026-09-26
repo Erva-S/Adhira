@@ -4,6 +4,7 @@ import '../../shared/models/student.dart';
 import '../database/relational_data_store.dart';
 import '../integrations/digilocker/digilocker_service.dart';
 import '../storage/local_storage_service.dart';
+import '../jago/jago_session_service.dart';
 
 /// Result of an OTP dispatch request.
 class OtpSendResult {
@@ -331,6 +332,7 @@ class AppAuthService implements AuthService {
       aadhaarNumber: profile.maskedAadhaar ?? current.aadhaarNumber,
       mobileNumber: profile.mobileNumber ?? current.mobileNumber,
       email: profile.email ?? current.email,
+      annualFamilyIncome: profile.annualFamilyIncome ?? current.annualFamilyIncome,
       isDigiLockerLinked: true,
       profileCompletionPercent: 0.95,
       updatedAt: DateTime.now(),
@@ -348,6 +350,9 @@ class AppAuthService implements AuthService {
     _authToken = null;
     _currentPhoneNumber = null;
     _activeOtps.clear();
+
+    // Clear active JAGO conversation sessions on logout
+    JagoSessionService().clearAllSessions();
 
     await _storage.init();
     await _storage.remove('is_logged_in');

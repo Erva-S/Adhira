@@ -36,6 +36,9 @@ class Student {
   final String? ifscCode;
   final String? bankName;
 
+  // ── Financial Details ─────────────────────────────────────────
+  final double? annualFamilyIncome;
+
   // ── Profile Completion ────────────────────────────────────────
   final double profileCompletionPercent;
   final bool isDigiLockerLinked;
@@ -70,6 +73,7 @@ class Student {
     this.bankAccountNumber,
     this.ifscCode,
     this.bankName,
+    this.annualFamilyIncome,
     this.profileCompletionPercent = 0.0,
     this.isDigiLockerLinked = false,
     this.createdAt,
@@ -104,6 +108,7 @@ class Student {
     String? bankAccountNumber,
     String? ifscCode,
     String? bankName,
+    double? annualFamilyIncome,
     double? profileCompletionPercent,
     bool? isDigiLockerLinked,
     DateTime? createdAt,
@@ -137,6 +142,7 @@ class Student {
       bankAccountNumber: bankAccountNumber ?? this.bankAccountNumber,
       ifscCode: ifscCode ?? this.ifscCode,
       bankName: bankName ?? this.bankName,
+      annualFamilyIncome: annualFamilyIncome ?? this.annualFamilyIncome,
       profileCompletionPercent: profileCompletionPercent ?? this.profileCompletionPercent,
       isDigiLockerLinked: isDigiLockerLinked ?? this.isDigiLockerLinked,
       createdAt: createdAt ?? this.createdAt,
@@ -173,6 +179,7 @@ class Student {
       'bank_account_number': bankAccountNumber,
       'ifsc_code': ifscCode,
       'bank_name': bankName,
+      'annual_family_income': annualFamilyIncome,
       'profile_completion_percent': profileCompletionPercent,
       'is_digilocker_linked': isDigiLockerLinked,
       'created_at': createdAt?.toIso8601String(),
@@ -209,6 +216,8 @@ class Student {
       bankAccountNumber: map['bank_account_number']?.toString(),
       ifscCode: map['ifsc_code']?.toString(),
       bankName: map['bank_name']?.toString(),
+      annualFamilyIncome: (map['annual_family_income'] as num?)?.toDouble() ??
+          (map['family_income'] as num?)?.toDouble(),
       profileCompletionPercent: (map['profile_completion_percent'] as num?)?.toDouble() ?? 0.0,
       isDigiLockerLinked: map['is_digilocker_linked'] == true,
       createdAt: map['created_at'] != null ? DateTime.tryParse(map['created_at'].toString()) : null,

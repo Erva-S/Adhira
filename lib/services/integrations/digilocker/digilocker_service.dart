@@ -98,6 +98,7 @@ class DigiLockerUserProfile {
   final String? maskedAadhaar;
   final String? mobileNumber;
   final String? email;
+  final double? annualFamilyIncome;
   final bool isVerified;
   final DateTime fetchedAt;
 
@@ -125,6 +126,7 @@ class DigiLockerUserProfile {
     this.maskedAadhaar,
     this.mobileNumber,
     this.email,
+    this.annualFamilyIncome,
     this.isVerified = true,
     required this.fetchedAt,
   });
@@ -219,6 +221,7 @@ class MockDigiLockerService implements DigiLockerService {
         maskedAadhaar: 'XXXX-XXXX-4892',
         mobileNumber: '9898418407',
         email: 'erva.savaliya.20@gmail.com',
+        annualFamilyIncome: 180000.0,
         isVerified: true,
         fetchedAt: DateTime.now(),
       );
@@ -249,6 +252,7 @@ class MockDigiLockerService implements DigiLockerService {
       maskedAadhaar: 'XXXX-XXXX-4892',
       mobileNumber: cleanPhone ?? '9876543210',
       email: 'rajesh.soren@nitrkl.ac.in',
+      annualFamilyIncome: 180000.0,
       isVerified: true,
       fetchedAt: DateTime.now(),
     );

@@ -10,6 +10,8 @@ class ChatMessage {
   final Map<String, dynamic>? richCardData;
   final List<String>? suggestedActions;
 
+  final bool isError;
+
   const ChatMessage({
     required this.id,
     required this.sender,
@@ -18,5 +20,6 @@ class ChatMessage {
     this.isRichCard = false,
     this.richCardData,
     this.suggestedActions,
+    this.isError = false,
   });
 }
