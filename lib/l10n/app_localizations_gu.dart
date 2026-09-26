@@ -600,4 +600,84 @@ class AppLocalizationsGu extends AppLocalizations {
 
   @override
   String get myApplications => 'મારી અરજીઓ';
+
+  @override
+  String get jagoLanguageTitle => 'જાગો ભાષા';
+
+  @override
+  String get jagoUseAppLanguage => 'ઍપ ભાષા વાપરો';
+
+  @override
+  String get jagoLanguageOverrideHint =>
+      'જાગો એક અલગ ભાષા વાપરે છે। ઍપ ભાષાનું પાલન કરવા \"ઍપ ભાષા વાપરો\" પર ટેપ કરો.';
+
+  @override
+  String get jagoLanguageDefaultHint =>
+      'જાગો ઍપ ભાષાનું પાલન કરે છે. ફક્ત જાગો માટે અલગ ભાષા પસંદ કરો.';
+
+  @override
+  String get jagoContextApplicationTracking =>
+      'હું આ અરજીમાં તમને મદદ કરી શકું છું. મને તેની સ્થિતિ, બાકી કાર્યવાહી, જરૂરી દસ્તાવેજો અથવા અરજી સમયરેખા વિશે પૂછો.';
+
+  @override
+  String get jagoContextEligibility =>
+      'હું સ્કોલરશીપ યોજનાઓ માટે તમારી પાત્રતા ચકાસવામાં મદદ કરી શકું છું. મને ચોક્કસ માપદંડો અથવા ખામીઓ વિશે પૂછો.';
+
+  @override
+  String get jagoContextDocuments =>
+      'હું તમારા દસ્તાવેજોમાં મદદ કરી શકું છું. જરૂરી દસ્તાવેજો, ચકાસણી સ્થિતિ અથવા ડિજિલોકર વિશે પૂછો.';
+
+  @override
+  String get jagoContextPayments =>
+      'હું તમારી ચુકવણી અને DBT સ્થિતિમાં મદદ કરી શકું છું. સંવિતરણ, બાકી હપ્તા અથવા ચુકવણી સમયરેખા વિશે પૂછો.';
+
+  @override
+  String get jagoSuggestionEligibility => 'મારી પાત્રતા ચકાસો';
+
+  @override
+  String get jagoSuggestionTrack => 'મારી અરજી ટ્રૅક કરો';
+
+  @override
+  String get jagoSuggestionDocs => 'મને કયા દસ્તાવેજો જોઈએ?';
+
+  @override
+  String get jagoSuggestionPending => 'કયા દસ્તાવેજો બાકી છે?';
+
+  @override
+  String get jagoSuggestionPayment => 'મારી ચુકવણી સ્થિતિ ચકાસો';
+
+  @override
+  String get jagoSuggestionWhichScholarship =>
+      'હું કઈ સ્કોલરશીપ માટે અરજી કરી રહ્યો/રહી છું?';
+
+  @override
+  String get jagoNavPromptApplications =>
+      'શું તમે ઈચ્છો છો કે હું અરજી ટ્રેકિંગ ખોલું?';
+
+  @override
+  String get jagoNavPromptDocuments =>
+      'શું તમે ઈચ્છો છો કે હું દસ્તાવેજ વૉલેટ ખોલું?';
+
+  @override
+  String get jagoNavPromptPayments =>
+      'શું તમે ઈચ્છો છો કે હું ચુકવણી વિભાગ ખોલું?';
+
+  @override
+  String get jagoNavPromptEligibility =>
+      'શું તમે ઈચ્છો છો કે હું પાત્રતા ચકાસણી ખોલું?';
+
+  @override
+  String get jagoAskJago => 'જાગોને પૂછો';
+
+  @override
+  String get jagoNeedHelp => 'આ અરજીમાં મદદ જોઈએ?';
+
+  @override
+  String get jagoNeedHelpSubtitle =>
+      'જાગો AI ને પૂછો અથવા તમારા જિલ્લા જનજાતીય અધિકારીનો સંપર્ક કરો.';
+
+  @override
+  String jagoOpenedFrom(Object screen) {
+    return 'ખોલ્યું: $screen';
+  }
 }

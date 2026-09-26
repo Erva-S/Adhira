@@ -598,4 +598,82 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get myApplications => 'আমার আবেদনসমূহ';
+
+  @override
+  String get jagoLanguageTitle => 'জাগো ভাষা';
+
+  @override
+  String get jagoUseAppLanguage => 'অ্যাপ ভাষা ব্যবহার করুন';
+
+  @override
+  String get jagoLanguageOverrideHint =>
+      'জাগো একটি ভিন্ন ভাষা ব্যবহার করছে। অ্যাপ ভাষা অনুসরণ করতে \"অ্যাপ ভাষা ব্যবহার করুন\" ট্যাপ করুন।';
+
+  @override
+  String get jagoLanguageDefaultHint =>
+      'জাগো অ্যাপ ভাষা অনুসরণ করে। শুধুমাত্র জাগোর জন্য একটি ভিন্ন ভাষা বেছে নিন।';
+
+  @override
+  String get jagoContextApplicationTracking =>
+      'আমি এই আবেদনে আপনাকে সাহায্য করতে পারি। এর স্থিতি, মুলতুবি কাজ, প্রয়োজনীয় নথি বা আবেদন সময়রেখা সম্পর্কে জিজ্ঞাসা করুন।';
+
+  @override
+  String get jagoContextEligibility =>
+      'আমি বৃত্তি প্রকল্পগুলির জন্য আপনার যোগ্যতা পরীক্ষা করতে সাহায্য করতে পারি।';
+
+  @override
+  String get jagoContextDocuments =>
+      'আমি আপনার নথি সম্পর্কে সাহায্য করতে পারি।';
+
+  @override
+  String get jagoContextPayments =>
+      'আমি আপনার পেমেন্ট এবং DBT স্থিতি সম্পর্কে সাহায্য করতে পারি।';
+
+  @override
+  String get jagoSuggestionEligibility => 'আমার যোগ্যতা পরীক্ষা করুন';
+
+  @override
+  String get jagoSuggestionTrack => 'আমার আবেদন ট্র্যাক করুন';
+
+  @override
+  String get jagoSuggestionDocs => 'আমার কোন নথি দরকার?';
+
+  @override
+  String get jagoSuggestionPending => 'কোন নথি মুলতুবি আছে?';
+
+  @override
+  String get jagoSuggestionPayment => 'আমার পেমেন্ট স্থিতি পরীক্ষা করুন';
+
+  @override
+  String get jagoSuggestionWhichScholarship =>
+      'আমি কোন বৃত্তির জন্য আবেদন করছি?';
+
+  @override
+  String get jagoNavPromptApplications =>
+      'আপনি কি চান আমি আবেদন ট্র্যাকিং খুলি?';
+
+  @override
+  String get jagoNavPromptDocuments => 'আপনি কি চান আমি নথি ওয়ালেট খুলি?';
+
+  @override
+  String get jagoNavPromptPayments => 'আপনি কি চান আমি পেমেন্ট বিভাগ খুলি?';
+
+  @override
+  String get jagoNavPromptEligibility =>
+      'আপনি কি চান আমি যোগ্যতা পরীক্ষা খুলি?';
+
+  @override
+  String get jagoAskJago => 'জাগোকে জিজ্ঞাসা করুন';
+
+  @override
+  String get jagoNeedHelp => 'এই আবেদনে সাহায্য দরকার?';
+
+  @override
+  String get jagoNeedHelpSubtitle =>
+      'জাগো AI কে জিজ্ঞাসা করুন বা আপনার জেলা উপজাতি অফিসারের সাথে যোগাযোগ করুন।';
+
+  @override
+  String jagoOpenedFrom(Object screen) {
+    return 'খোলা হয়েছে: $screen';
+  }
 }

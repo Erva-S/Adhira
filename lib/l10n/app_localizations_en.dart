@@ -602,4 +602,84 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get myApplications => 'My Applications';
+
+  @override
+  String get jagoLanguageTitle => 'JAGO Language';
+
+  @override
+  String get jagoUseAppLanguage => 'Use App Language';
+
+  @override
+  String get jagoLanguageOverrideHint =>
+      'JAGO is using a custom language. Tap \"Use App Language\" to follow the app.';
+
+  @override
+  String get jagoLanguageDefaultHint =>
+      'JAGO follows the app language. Choose a different language for JAGO only.';
+
+  @override
+  String get jagoContextApplicationTracking =>
+      'I can help you with this application. Ask me about its status, pending actions, required documents, or the application timeline.';
+
+  @override
+  String get jagoContextEligibility =>
+      'I can help you check your eligibility for scholarship schemes. Ask me about specific criteria or what you might be missing.';
+
+  @override
+  String get jagoContextDocuments =>
+      'I can help you with your documents. Ask about required documents, verification status, or DigiLocker integration.';
+
+  @override
+  String get jagoContextPayments =>
+      'I can help you with your payment and DBT status. Ask about disbursements, pending installments, or payment timeline.';
+
+  @override
+  String get jagoSuggestionEligibility => 'Check my eligibility';
+
+  @override
+  String get jagoSuggestionTrack => 'Track my application';
+
+  @override
+  String get jagoSuggestionDocs => 'What documents do I need?';
+
+  @override
+  String get jagoSuggestionPending => 'What documents are pending?';
+
+  @override
+  String get jagoSuggestionPayment => 'Check my payment status';
+
+  @override
+  String get jagoSuggestionWhichScholarship =>
+      'Which scholarship am I applying for?';
+
+  @override
+  String get jagoNavPromptApplications =>
+      'Would you like me to open Application Tracking?';
+
+  @override
+  String get jagoNavPromptDocuments =>
+      'Would you like me to open the Document Wallet?';
+
+  @override
+  String get jagoNavPromptPayments =>
+      'Would you like me to open the Payments section?';
+
+  @override
+  String get jagoNavPromptEligibility =>
+      'Would you like me to open the Eligibility Checker?';
+
+  @override
+  String get jagoAskJago => 'Ask JAGO';
+
+  @override
+  String get jagoNeedHelp => 'Need help with this application?';
+
+  @override
+  String get jagoNeedHelpSubtitle =>
+      'Ask JAGO AI or contact your district tribal officer.';
+
+  @override
+  String jagoOpenedFrom(Object screen) {
+    return 'Opened from: $screen';
+  }
 }

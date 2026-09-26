@@ -9,11 +9,13 @@ import '../../../../shared/widgets/app_bottom_nav.dart';
 import '../../../../shared/widgets/chat_bubble.dart';
 import '../../../../shared/widgets/jago_typing_indicator.dart';
 import '../../../../core/localization/app_localizations_extension.dart';
-import '../../../../shared/widgets/language_selector_sheet.dart';
+import '../../../../core/localization/locale_provider.dart';
+import '../../../../shared/widgets/jago_language_selector_sheet.dart';
 import '../../../../services/scholarship/scholarship_data_service.dart';
 import '../../../../services/authentication/auth_provider.dart';
 import '../../../../services/jago/jago_assistant_engine.dart';
 import '../../../../services/jago/jago_session_service.dart';
+import '../../../../services/jago/jago_context_service.dart';
 
 /// JAGO AI Chat Assistant page with persistent in-session history,
 /// animated three-dot thinking indicator, and conversational context support.
@@ -29,21 +31,27 @@ class _JagoChatPageState extends State<JagoChatPage> {
   final _scrollController = ScrollController();
   bool _isGenerating = false;
   String? _activeUserId;
+  bool _contextConsumed = false;
 
-  static const List<String> _quickSuggestions = [
-    'Check my eligibility',
-    'Track my application',
-    'What documents do I need?',
-    'What documents are pending?',
-    'Check my payment status',
-    'Which scholarship am I applying for?',
-  ];
+  /// Get localized quick suggestions from l10n
+  List<String> _getQuickSuggestions(BuildContext context) {
+    final l10n = context.l10n;
+    return [
+      l10n.jagoSuggestionEligibility,
+      l10n.jagoSuggestionTrack,
+      l10n.jagoSuggestionDocs,
+      l10n.jagoSuggestionPending,
+      l10n.jagoSuggestionPayment,
+      l10n.jagoSuggestionWhichScholarship,
+    ];
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
+      _consumeScreenContext();
     });
   }
 
@@ -59,6 +67,38 @@ class _JagoChatPageState extends State<JagoChatPage> {
     if (!sessionService.hasMessages(userId)) {
       final l10n = context.l10n;
       sessionService.seedGreetingIfEmpty(userId, l10n.jagoGreeting);
+    }
+  }
+
+  /// Consume screen context from JagoContextService and inject a context-aware message.
+  void _consumeScreenContext() {
+    if (_contextConsumed) return;
+    _contextConsumed = true;
+
+    final jagoContext = JagoContextService();
+    final screenCtx = jagoContext.consumeScreenContext();
+    if (screenCtx == null) return;
+
+    final userId = _activeUserId ?? 'session_user';
+    final sessionService = JagoSessionService();
+
+    // Generate a context-aware message
+    final contextMessage = JagoAssistantEngine.generateContextMessage(
+      sourceScreen: screenCtx.sourceScreen,
+      application: screenCtx.application,
+      scholarship: screenCtx.scholarship,
+    );
+
+    if (contextMessage != null && contextMessage.isNotEmpty) {
+      final botMessage = ChatMessage(
+        id: 'ctx_${DateTime.now().millisecondsSinceEpoch}',
+        sender: ChatSender.bot,
+        content: contextMessage,
+        timestamp: DateTime.now(),
+      );
+      sessionService.addMessage(userId, botMessage);
+      setState(() {});
+      _scrollToBottom();
     }
   }
 
@@ -79,6 +119,13 @@ class _JagoChatPageState extends State<JagoChatPage> {
         );
       }
     });
+  }
+
+  /// Get the effective JAGO language code (override or app language).
+  String _getEffectiveLocale() {
+    final jagoContext = JagoContextService();
+    final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+    return jagoContext.getEffectiveLanguageCode(localeProvider);
   }
 
   void _sendMessage([String? presetText]) async {
@@ -122,10 +169,15 @@ class _JagoChatPageState extends State<JagoChatPage> {
     _scrollToBottom();
 
     final scholarshipService = Provider.of<ScholarshipDataService>(context, listen: false);
-    final locale = Localizations.localeOf(context).languageCode;
+    final locale = _getEffectiveLocale();
     final activeApp = scholarshipService.activeApplications.isNotEmpty
         ? scholarshipService.activeApplications.first
         : null;
+
+    // Build screen context string if available
+    final jagoContext = JagoContextService();
+    final screenCtx = jagoContext.screenContext;
+    final screenContextStr = screenCtx?.toContextSummary();
 
     try {
       final responseText = await JagoAssistantEngine.queryBackend(
@@ -136,6 +188,7 @@ class _JagoChatPageState extends State<JagoChatPage> {
         locale: locale,
         scholarshipService: scholarshipService,
         student: student,
+        screenContext: screenContextStr,
       );
 
       if (!mounted) return;
@@ -256,9 +309,9 @@ class _JagoChatPageState extends State<JagoChatPage> {
                     ),
                     child: const Icon(Icons.folder_shared, color: AppColors.topClass),
                   ),
-                  title: const Text(
-                    'Document Wallet',
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                  title: Text(
+                    l10n.docWallet,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                   subtitle: const Text('View and manage DigiLocker verified documents'),
                   onTap: () {
@@ -298,6 +351,13 @@ class _JagoChatPageState extends State<JagoChatPage> {
     final l10n = context.l10n;
     final sessionService = JagoSessionService();
     final messages = sessionService.getMessages(_activeUserId);
+    final quickSuggestions = _getQuickSuggestions(context);
+
+    // Language indicator
+    final jagoContext = JagoContextService();
+    final localeProvider = Provider.of<LocaleProvider>(context);
+    final hasOverride = jagoContext.hasLanguageOverride;
+    final effectiveLangName = jagoContext.getEffectiveLanguageName(localeProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -323,7 +383,12 @@ class _JagoChatPageState extends State<JagoChatPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(l10n.jagoAssistantName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                Text(l10n.jagoAssistantSubtitle, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w400)),
+                Text(
+                  hasOverride
+                      ? '${l10n.jagoAssistantSubtitle} · $effectiveLangName'
+                      : l10n.jagoAssistantSubtitle,
+                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w400),
+                ),
               ],
             ),
           ],
@@ -335,9 +400,12 @@ class _JagoChatPageState extends State<JagoChatPage> {
             tooltip: l10n.quickActions,
           ),
           IconButton(
-            onPressed: () => showLanguageSelectorSheet(context),
-            icon: const Icon(Icons.language),
-            tooltip: l10n.selectLanguageTitle,
+            onPressed: () => showJagoLanguageSelectorSheet(context),
+            icon: Icon(
+              Icons.translate,
+              color: hasOverride ? AppColors.primary : null,
+            ),
+            tooltip: l10n.jagoLanguageTitle,
           ),
         ],
       ),
@@ -371,9 +439,9 @@ class _JagoChatPageState extends State<JagoChatPage> {
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              itemCount: _quickSuggestions.length,
+              itemCount: quickSuggestions.length,
               itemBuilder: (context, index) {
-                final suggestion = _quickSuggestions[index];
+                final suggestion = quickSuggestions[index];
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: ActionChip(
@@ -401,7 +469,8 @@ class _JagoChatPageState extends State<JagoChatPage> {
                     onPressed: _isGenerating
                         ? null
                         : () {
-                            if (suggestion == 'Check my eligibility') {
+                            // Eligibility suggestion opens the checker page
+                            if (suggestion == l10n.jagoSuggestionEligibility) {
                               context.push(RouteNames.eligibilityChecker);
                             } else {
                               _sendMessage(suggestion);
