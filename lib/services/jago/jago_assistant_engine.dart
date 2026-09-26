@@ -761,11 +761,14 @@ Keep responses concise and student-friendly.
     }
 
     // 5. If query asks about a specific unnamed or unknown scheme:
-    if (!text.contains('check my eligibility') &&
+    if (!text.contains('eligib') &&
+        !text.contains('check my eligibility') &&
         !text.contains('am i eligible') &&
+        !text.contains('can i apply') &&
         !text.contains('general') &&
         !text.contains('who can apply') &&
-        !text.contains('eligibility criteria')) {
+        !text.contains('qualification') &&
+        !text.contains('criteria')) {
       return unavailableInfoMessage;
     }
 

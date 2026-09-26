@@ -11,6 +11,7 @@ import '../../../../services/authentication/auth_provider.dart';
 import '../../../../services/scholarship/scholarship_data_service.dart';
 import '../../../../services/scholarship/scholarship_eligibility_service.dart';
 import '../../../../services/scholarship/scholarship_mock_data.dart';
+import '../../../../services/database/relational_data_store.dart';
 
 /// Full-featured, criteria-grounded Eligibility Checker.
 ///
@@ -30,7 +31,7 @@ class EligibilityCheckerPage extends StatefulWidget {
 }
 
 class _EligibilityCheckerPageState extends State<EligibilityCheckerPage> {
-  Scholarship? _selectedScheme;
+  String? _selectedSchemeId;
   double? _tempIncomeOverride;
   final TextEditingController _missingIncomeController = TextEditingController();
   bool _isRecalculating = false;
@@ -51,30 +52,27 @@ class _EligibilityCheckerPageState extends State<EligibilityCheckerPage> {
 
   void _initializeSelection() {
     final scholarshipService = Provider.of<ScholarshipDataService>(context, listen: false);
-    final schemes = scholarshipService.schemes.isNotEmpty
+    final rawSchemes = scholarshipService.schemes.isNotEmpty
         ? scholarshipService.schemes
         : ScholarshipMockData.schemes;
 
-    if (schemes.isEmpty) return;
+    if (rawSchemes.isEmpty) return;
 
     if (widget.initialSchemeId != null) {
-      _selectedScheme = schemes.firstWhere(
-        (s) => s.id == widget.initialSchemeId,
-        orElse: () => schemes.first,
-      );
+      _selectedSchemeId = widget.initialSchemeId;
     } else {
-      // Default to Post-Matric or first available scheme
-      _selectedScheme = schemes.firstWhere(
+      final postMatric = rawSchemes.firstWhere(
         (s) => s.type == ScholarshipType.postMatric,
-        orElse: () => schemes.first,
+        orElse: () => rawSchemes.first,
       );
+      _selectedSchemeId = postMatric.id;
     }
-    setState(() {});
+    if (mounted) setState(() {});
   }
 
-  void _onSchemeSelected(Scholarship scheme) {
+  void _onSchemeIdSelected(String schemeId) {
     setState(() {
-      _selectedScheme = scheme;
+      _selectedSchemeId = schemeId;
       _tempIncomeOverride = null;
       _missingIncomeController.clear();
     });
@@ -109,12 +107,23 @@ class _EligibilityCheckerPageState extends State<EligibilityCheckerPage> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    final student = authProvider.currentUser;
-
     final scholarshipService = Provider.of<ScholarshipDataService>(context);
-    final schemes = scholarshipService.schemes.isNotEmpty
+
+    // Ensure student profile is always resolved even if authProvider is hydrating
+    final student = authProvider.currentUser ??
+        RelationalDataStore().getUser(scholarshipService.currentUserId) ??
+        RelationalDataStore().getUser(RelationalDataStore.demoUserId);
+
+    final rawSchemes = scholarshipService.schemes.isNotEmpty
         ? scholarshipService.schemes
         : ScholarshipMockData.schemes;
+
+    // Guarantee unique schemes by id to prevent dropdown collisions
+    final uniqueMap = <String, Scholarship>{};
+    for (final s in rawSchemes) {
+      uniqueMap[s.id] = s;
+    }
+    final schemes = uniqueMap.values.toList();
 
     // Handle empty schemes state gracefully
     if (schemes.isEmpty) {
@@ -153,7 +162,14 @@ class _EligibilityCheckerPageState extends State<EligibilityCheckerPage> {
       );
     }
 
-    final activeScheme = _selectedScheme ?? schemes.first;
+    final targetId = _selectedSchemeId ?? widget.initialSchemeId;
+    final activeScheme = schemes.firstWhere(
+      (s) => s.id == targetId,
+      orElse: () => schemes.firstWhere(
+        (s) => s.type == ScholarshipType.postMatric,
+        orElse: () => schemes.first,
+      ),
+    );
 
     // Deterministic evaluation against user profile
     final result = ScholarshipEligibilityService.evaluate(
@@ -259,16 +275,16 @@ class _EligibilityCheckerPageState extends State<EligibilityCheckerPage> {
                 border: Border.all(color: AppColors.border),
               ),
               child: DropdownButtonHideUnderline(
-                child: DropdownButton<Scholarship>(
-                  value: current,
+                child: DropdownButton<String>(
+                  value: current.id,
                   isExpanded: true,
                   icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.primary),
-                  onChanged: (newScheme) {
-                    if (newScheme != null) _onSchemeSelected(newScheme);
+                  onChanged: (newSchemeId) {
+                    if (newSchemeId != null) _onSchemeIdSelected(newSchemeId);
                   },
                   items: schemes.map((s) {
-                    return DropdownMenuItem<Scholarship>(
-                      value: s,
+                    return DropdownMenuItem<String>(
+                      value: s.id,
                       child: Text(
                         s.name,
                         style: const TextStyle(
@@ -799,7 +815,7 @@ class _EligibilityCheckerPageState extends State<EligibilityCheckerPage> {
               child: AppButton(
                 label: 'Check Another Scheme',
                 variant: AppButtonVariant.outline,
-                onPressed: () => _showSchemePickerBottomSheet(context, schemes),
+                onPressed: () => _showSchemePickerBottomSheet(context, schemes, current),
               ),
             ),
             const SizedBox(width: 12),
@@ -818,7 +834,7 @@ class _EligibilityCheckerPageState extends State<EligibilityCheckerPage> {
     );
   }
 
-  void _showSchemePickerBottomSheet(BuildContext context, List<Scholarship> schemes) {
+  void _showSchemePickerBottomSheet(BuildContext context, List<Scholarship> schemes, Scholarship current) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -844,7 +860,7 @@ class _EligibilityCheckerPageState extends State<EligibilityCheckerPage> {
                   itemCount: schemes.length,
                   itemBuilder: (ctx, index) {
                     final s = schemes[index];
-                    final isCurrent = s.id == _selectedScheme?.id;
+                    final isCurrent = s.id == current.id;
                     return ListTile(
                       leading: Icon(
                         isCurrent ? Icons.radio_button_checked : Icons.radio_button_off,
@@ -863,7 +879,7 @@ class _EligibilityCheckerPageState extends State<EligibilityCheckerPage> {
                       ),
                       onTap: () {
                         Navigator.pop(ctx);
-                        _onSchemeSelected(s);
+                        _onSchemeIdSelected(s.id);
                       },
                     );
                   },
