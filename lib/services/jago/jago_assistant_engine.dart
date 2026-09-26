@@ -8,6 +8,7 @@ import '../../shared/models/models.dart';
 import '../database/relational_data_store.dart';
 import '../scholarship/scholarship_data_service.dart';
 import '../scholarship/scholarship_mock_data.dart';
+import '../scholarship/scholarship_eligibility_service.dart';
 
 /// Closed-domain AI Assistant Engine for JAGO inside Tribal Scholar Saathi.
 ///
@@ -116,12 +117,14 @@ Keep responses concise and student-friendly.
       // If backend was unreachable or returned non-200, fallback to deterministic knowledge engine
       return respond(
         message,
+        conversationHistory: conversationHistory,
         scholarshipService: scholarshipService,
         student: student,
       );
     } catch (_) {
       return respond(
         message,
+        conversationHistory: conversationHistory,
         scholarshipService: scholarshipService,
         student: student,
       );
@@ -138,9 +141,25 @@ Keep responses concise and student-friendly.
     );
   }
 
-  /// Static entrypoint for responding to a query with optional service and student context.
+  /// Extracts the most recently discussed scholarship scheme from conversation history.
+  static String? _extractSchemeFromHistory(List<Map<String, String>> history) {
+    if (history.isEmpty) return null;
+    for (int i = history.length - 1; i >= 0; i--) {
+      final msg = history[i];
+      final text = (msg['text'] ?? '').toLowerCase();
+      if (text.contains('top class') || text.contains('top-class')) return 'top class';
+      if (text.contains('nfst') || text.contains('fellowship')) return 'nfst';
+      if (text.contains('nos') || text.contains('overseas')) return 'nos';
+      if (text.contains('pre-matric') || text.contains('pre matric')) return 'pre-matric';
+      if (text.contains('post-matric') || text.contains('post matric')) return 'post-matric';
+    }
+    return null;
+  }
+
+  /// Static entrypoint for responding to a query with optional service, student, and conversation history context.
   static String respond(
     String query, {
+    List<Map<String, String>> conversationHistory = const [],
     ScholarshipDataService? scholarshipService,
     Student? student,
   }) {
@@ -161,8 +180,15 @@ Keep responses concise and student-friendly.
       return outOfScopeMessage;
     }
 
+    // Contextual Scheme Resolution: if query is a follow-up without an explicit scheme,
+    // infer the scheme from previous conversation turns.
+    final historicalScheme = _extractSchemeFromHistory(conversationHistory);
+    final effectiveLower = (historicalScheme != null && !_mentionsKnownScheme(lower))
+        ? '$lower $historicalScheme'
+        : lower;
+
     // ── STEP 3: Verify Domain Relevance ───────────────────────────────────────
-    if (!_isScholarshipDomain(lower)) {
+    if (!_isScholarshipDomain(lower) && !_isScholarshipDomain(effectiveLower)) {
       return outOfScopeMessage;
     }
 
@@ -230,18 +256,18 @@ Keep responses concise and student-friendly.
     }
 
     // G. Eligibility Check
-    if (_isEligibilityQuery(lower)) {
-      return _handleEligibility(lower, resolvedStudent);
+    if (_isEligibilityQuery(effectiveLower)) {
+      return _handleEligibility(effectiveLower, resolvedStudent);
     }
 
     // H. Required Documents
-    if (_isDocumentsQuery(lower)) {
-      return _handleRequiredDocuments(lower, applications);
+    if (_isDocumentsQuery(effectiveLower)) {
+      return _handleRequiredDocuments(effectiveLower, applications);
     }
 
     // I. Scheme Information
-    if (_isSchemeInfoQuery(lower)) {
-      return _handleSchemeInfo(lower);
+    if (_isSchemeInfoQuery(effectiveLower)) {
+      return _handleSchemeInfo(effectiveLower);
     }
 
     // J. Application Process / How to Apply
@@ -490,7 +516,10 @@ Keep responses concise and student-friendly.
         text.contains('can i apply') ||
         text.contains('who can apply') ||
         text.contains('criteria') ||
-        text.contains('qualification');
+        text.contains('qualification') ||
+        text.contains('what am i missing') ||
+        text.contains('what is missing') ||
+        (text.contains('why') && (text.contains('not') || text.contains('ineligible')));
   }
 
   static bool _isDocumentsQuery(String text) {
@@ -659,51 +688,79 @@ Keep responses concise and student-friendly.
   }
 
   static String _handleEligibility(String text, Student? student) {
-    // Check specific known schemes
+    // 1. Identify if a specific scheme is referenced in the query or history
+    Scholarship? scheme;
     if (text.contains('pre-matric') || text.contains('pre matric')) {
-      final scheme = ScholarshipMockData.schemes.firstWhere((s) => s.type == ScholarshipType.preMatric);
-      final criteria = scheme.eligibilityCriteria.map((c) => '• $c').join('\n');
-      return 'Pre-Matric Scholarship for ST Students Eligibility:\n$criteria';
+      scheme = ScholarshipMockData.schemes.firstWhere((s) => s.type == ScholarshipType.preMatric);
+    } else if (text.contains('post-matric') || text.contains('post matric')) {
+      scheme = ScholarshipMockData.schemes.firstWhere((s) => s.type == ScholarshipType.postMatric);
+    } else if (text.contains('top class')) {
+      scheme = ScholarshipMockData.schemes.firstWhere((s) => s.type == ScholarshipType.topClass);
+    } else if (text.contains('nfst') || text.contains('fellowship')) {
+      scheme = ScholarshipMockData.schemes.firstWhere((s) => s.type == ScholarshipType.nfst);
+    } else if (text.contains('nos') || text.contains('overseas')) {
+      scheme = ScholarshipMockData.schemes.firstWhere((s) => s.type == ScholarshipType.nos);
     }
 
-    if (text.contains('post-matric') || text.contains('post matric')) {
+    // 2. Specific question: "Why am I not eligible?"
+    if (text.contains('why') && (text.contains('not') || text.contains('ineligible'))) {
+      final target = scheme ?? ScholarshipMockData.schemes.firstWhere((s) => s.type == ScholarshipType.postMatric);
+      final result = ScholarshipEligibilityService.evaluate(scholarship: target, student: student);
+      return ScholarshipEligibilityService.explainFailedCriteria(result);
+    }
+
+    // 3. Specific question: "What am I missing?"
+    if (text.contains('what') && text.contains('missing')) {
+      final target = scheme ?? ScholarshipMockData.schemes.firstWhere((s) => s.type == ScholarshipType.postMatric);
+      final result = ScholarshipEligibilityService.evaluate(scholarship: target, student: student);
+      return ScholarshipEligibilityService.explainMissingInformation(result);
+    }
+
+    // 4. Targeted scheme check
+    if (scheme != null) {
       if (student != null) {
-        return 'Based on your student profile:\n'
-            '• Category: ${student.category ?? 'ST'} (Eligible)\n'
-            '• Course: ${student.currentCourse ?? 'Post-Matric course'} (Eligible)\n'
-            '• State: ${student.state ?? 'Recognized'}\n'
-            'You are eligible for the Post-Matric Scholarship for ST Students provided your annual family income is ₹2.50 Lakh or less and you have an Aadhaar-linked bank account.';
+        if (scheme.type == ScholarshipType.postMatric) {
+          return 'Based on your student profile:\n'
+              '• Category: ${student.category ?? 'ST'} (Eligible)\n'
+              '• Course: ${student.currentCourse ?? 'Post-Matric course'} (Eligible)\n'
+              '• State: ${student.state ?? 'Recognized'}\n'
+              'You are eligible for the Post-Matric Scholarship for ST Students provided your annual family income is ₹2.50 Lakh or less and you have an Aadhaar-linked bank account.';
+        }
+
+        if (scheme.type == ScholarshipType.topClass) {
+          if (student.institutionName != null &&
+              (student.institutionName!.contains('NIT') || student.institutionName!.contains('IIT'))) {
+            return 'Based on your admission at ${student.institutionName} (a notified premier institute):\n'
+                '• Category: ${student.category ?? 'ST'} (Eligible)\n'
+                '• Institution: ${student.institutionName} (Notified Premier Institute)\n'
+                'You are eligible for the Top Class Education Scheme provided your annual family income does not exceed ₹6.00 Lakh.';
+          }
+        }
+
+        final result = ScholarshipEligibilityService.evaluate(scholarship: scheme, student: student);
+        final buffer = StringBuffer('Based on your student profile for ${scheme.name}:\n');
+        for (final c in result.criteria) {
+          final mark = c.status == CriterionStatus.satisfied
+              ? '•'
+              : c.status == CriterionStatus.notSatisfied
+                  ? '✕'
+                  : '?';
+          final statusLabel = c.status == CriterionStatus.satisfied
+              ? '(Eligible)'
+              : c.status == CriterionStatus.notSatisfied
+                  ? '(Ineligible)'
+                  : '(Missing information)';
+          buffer.writeln('$mark ${c.label}: ${c.reason ?? c.description} $statusLabel');
+        }
+        buffer.writeln('\n${result.summaryMessage}');
+        return buffer.toString().trim();
       }
-      final scheme = ScholarshipMockData.schemes.firstWhere((s) => s.type == ScholarshipType.postMatric);
+
       final criteria = scheme.eligibilityCriteria.map((c) => '• $c').join('\n');
-      return 'Post-Matric Scholarship for ST Students Eligibility:\n$criteria';
+      return '${scheme.name} Eligibility:\n$criteria';
     }
 
-    if (text.contains('top class')) {
-      if (student != null && student.institutionName != null && student.institutionName!.contains('NIT')) {
-        return 'Based on your admission at ${student.institutionName} (a notified premier institute):\n'
-            '• Category: ${student.category ?? 'ST'} (Eligible)\n'
-            '• Institution: ${student.institutionName} (Notified Premier Institute)\n'
-            'You are eligible for the Top Class Education Scheme provided your annual family income does not exceed ₹6.00 Lakh.';
-      }
-      final scheme = ScholarshipMockData.schemes.firstWhere((s) => s.type == ScholarshipType.topClass);
-      final criteria = scheme.eligibilityCriteria.map((c) => '• $c').join('\n');
-      return 'Top Class Education for ST Students Eligibility:\n$criteria';
-    }
-
-    if (text.contains('nfst') || text.contains('fellowship')) {
-      final scheme = ScholarshipMockData.schemes.firstWhere((s) => s.type == ScholarshipType.nfst);
-      final criteria = scheme.eligibilityCriteria.map((c) => '• $c').join('\n');
-      return 'National Fellowship for ST Students (NFST) Eligibility:\n$criteria';
-    }
-
-    if (text.contains('nos') || text.contains('overseas')) {
-      final scheme = ScholarshipMockData.schemes.firstWhere((s) => s.type == ScholarshipType.nos);
-      final criteria = scheme.eligibilityCriteria.map((c) => '• $c').join('\n');
-      return 'National Overseas Scholarship (NOS) Eligibility:\n$criteria';
-    }
-
-    // If query asks about a specific unnamed or unknown scheme:
+    // 5. If query asks about a specific unnamed or unknown scheme:
     if (!text.contains('check my eligibility') &&
         !text.contains('am i eligible') &&
         !text.contains('general') &&
@@ -712,9 +769,11 @@ Keep responses concise and student-friendly.
       return unavailableInfoMessage;
     }
 
-    // General eligibility check for current student
+    // 6. Conversational response for "Am I eligible?" / "Check my eligibility"
     if (student != null) {
-      return 'Eligibility Summary for ${student.fullName}:\n'
+      return 'Let me check your profile against the eligibility criteria. '
+          'Please select the scholarship you want to check, or use Quick Actions → Eligibility Check.\n\n'
+          'Eligibility Summary for ${student.fullName}:\n'
           '• Post-Matric Scholarship: Eligible as an ST student in ${student.currentCourse ?? 'Higher Education'} (Family income <= ₹2.50 Lakh).\n'
           '• Top Class Education: Eligible if enrolled in a notified premier institute like ${student.institutionName ?? 'IITs/NITs'} (Family income <= ₹6.00 Lakh).';
     }

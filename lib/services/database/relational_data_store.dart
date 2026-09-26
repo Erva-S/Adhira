@@ -200,6 +200,7 @@ class RelationalDataStore {
       bankAccountNumber: '****7890',
       ifscCode: 'SBIN0001234',
       bankName: 'State Bank of India',
+      annualFamilyIncome: 180000.0,
       profileCompletionPercent: 0.72,
     );
     _users[demoUserId] = student;

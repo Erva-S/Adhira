@@ -9,7 +9,6 @@ import '../../../../core/validators/app_validators.dart';
 import '../../../../services/scholarship/scholarship_data_service.dart';
 import '../../../../services/authentication/auth_provider.dart';
 import '../../../../shared/models/models.dart';
-import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/step_progress_bar.dart';
 import '../../../documents/presentation/pages/digilocker_consent_page.dart';
@@ -193,24 +192,50 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
     super.dispose();
   }
 
+  void _handleBack() {
+    if (_currentStep > 0) {
+      setState(() => _currentStep--);
+    } else {
+      final navigator = Navigator.maybeOf(context);
+      if (navigator != null && navigator.canPop()) {
+        navigator.pop();
+      } else if (context.canPop()) {
+        context.pop();
+      } else {
+        context.go(RouteNames.scholarshipDashboard);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: const AppBackButton(fallbackRoute: RouteNames.scholarshipDashboard),
-        title: Text(l10n.applicationFormTitle),
-        actions: [
-          TextButton(
-            onPressed: _saveDraft,
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.white,
-            ),
-            child: Text(l10n.saveDraft),
+    return PopScope(
+      canPop: _currentStep == 0,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && _currentStep > 0) {
+          setState(() => _currentStep--);
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            tooltip: _currentStep > 0 ? l10n.back : 'Exit',
+            onPressed: _handleBack,
           ),
-        ],
-      ),
+          title: Text(l10n.applicationFormTitle),
+          actions: [
+            TextButton(
+              onPressed: _saveDraft,
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+              ),
+              child: Text(l10n.saveDraft),
+            ),
+          ],
+        ),
       body: Column(
         children: [
           // Step Progress Bar
@@ -236,6 +261,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
         ],
       ),
       bottomNavigationBar: _buildBottomActionButtons(),
+      ),
     );
   }
 
