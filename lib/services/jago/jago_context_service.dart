@@ -61,14 +61,28 @@ class JagoScreenContext {
   }
 }
 
+/// Represents a supported language in JAGO.
+class JagoLanguage {
+  final String code;
+  final String englishName;
+  final String nativeName;
+
+  const JagoLanguage({
+    required this.code,
+    required this.englishName,
+    required this.nativeName,
+  });
+}
+
 /// Singleton service managing JAGO's language preference and screen context.
 ///
 /// Design principles:
 /// 1. Does NOT duplicate LocaleProvider or ScholarshipDataService state.
 /// 2. Provides a single integration point for all JAGO context needs.
-/// 3. Language defaults to following the app locale unless overridden.
-/// 4. Screen context is set by entry points before navigating to JAGO.
-/// 5. Clears user-specific state on logout.
+/// 3. Language defaults to following the app locale (followAppLanguage = true) unless overridden.
+/// 4. When overridden, only JAGO changes - the rest of Adhira does NOT change.
+/// 5. Screen context is set by entry points before navigating to JAGO.
+/// 6. Clears user-specific state on logout.
 class JagoContextService extends ChangeNotifier {
   static final JagoContextService _instance = JagoContextService._internal();
   factory JagoContextService() => _instance;
@@ -76,37 +90,82 @@ class JagoContextService extends ChangeNotifier {
 
   static const String _jagoLangPrefKey = 'jago_language_override';
 
+  /// The 9 official supported languages for JAGO chatbot:
+  /// 1. English (en)
+  /// 2. Hindi (hi)
+  /// 3. Gujarati (gu)
+  /// 4. Marathi (mr)
+  /// 5. Bengali (bn)
+  /// 6. Tamil (ta)
+  /// 7. Telugu (te)
+  /// 8. Kannada (kn)
+  /// 9. Malayalam (ml)
+  static const List<JagoLanguage> supportedLanguages = [
+    JagoLanguage(code: 'en', englishName: 'English', nativeName: 'English'),
+    JagoLanguage(code: 'hi', englishName: 'Hindi', nativeName: 'हिन्दी'),
+    JagoLanguage(code: 'gu', englishName: 'Gujarati', nativeName: 'ગુજરાતી'),
+    JagoLanguage(code: 'mr', englishName: 'Marathi', nativeName: 'मराठी'),
+    JagoLanguage(code: 'bn', englishName: 'Bengali', nativeName: 'বাংলা'),
+    JagoLanguage(code: 'ta', englishName: 'Tamil', nativeName: 'தமிழ்'),
+    JagoLanguage(code: 'te', englishName: 'Telugu', nativeName: 'తెలుగు'),
+    JagoLanguage(code: 'kn', englishName: 'Kannada', nativeName: 'ಕನ್ನಡ'),
+    JagoLanguage(code: 'ml', englishName: 'Malayalam', nativeName: 'മലയാളം'),
+  ];
+
   // ── Language State ──────────────────────────────────────────────
 
   /// null means "follow app language" (default behavior)
   String? _languageOverride;
 
+  /// Whether JAGO is following the main Adhira app language.
+  bool get followAppLanguage => _languageOverride == null;
+
+  /// Whether the user has manually overridden the JAGO language.
+  bool get isManualOverride => _languageOverride != null;
+
   /// Whether the user has explicitly set a JAGO-specific language.
   bool get hasLanguageOverride => _languageOverride != null;
 
+  /// The current manual language override, if any.
+  String? get selectedLanguageOverride => _languageOverride;
+
   /// The effective JAGO language code, considering override and app locale.
   String getEffectiveLanguageCode(LocaleProvider localeProvider) {
-    return _languageOverride ?? localeProvider.locale.languageCode;
+    if (_languageOverride != null) {
+      return _languageOverride!;
+    }
+    final appCode = localeProvider.locale.languageCode;
+    // If app locale is one of the 9 supported JAGO languages, use it directly
+    if (supportedLanguages.any((l) => l.code == appCode)) {
+      return appCode;
+    }
+    return 'en';
   }
 
   /// The effective language name for display.
   String getEffectiveLanguageName(LocaleProvider localeProvider) {
     final code = getEffectiveLanguageCode(localeProvider);
-    final lang = LocaleProvider.supportedLanguages.firstWhere(
+    final lang = supportedLanguages.firstWhere(
       (l) => l.code == code,
-      orElse: () => LocaleProvider.supportedLanguages.first,
+      orElse: () => supportedLanguages.first,
     );
     return lang.nativeName;
   }
 
   /// Set a JAGO-specific language override.
+  /// Only changes JAGO without affecting the rest of the Adhira application.
   Future<void> setLanguageOverride(String languageCode) async {
-    if (!LocaleProvider.supportedLanguages.any((l) => l.code == languageCode)) {
+    if (!supportedLanguages.any((l) => l.code == languageCode)) {
       return;
     }
     _languageOverride = languageCode;
     notifyListeners();
     await _persistLanguageOverride();
+  }
+
+  /// Re-enable following the main Adhira app language.
+  Future<void> useAppLanguage() async {
+    await clearLanguageOverride();
   }
 
   /// Reset JAGO to follow the app language.
@@ -125,7 +184,7 @@ class JagoContextService extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final code = prefs.getString(_jagoLangPrefKey);
       if (code != null &&
-          LocaleProvider.supportedLanguages.any((l) => l.code == code)) {
+          supportedLanguages.any((l) => l.code == code)) {
         _languageOverride = code;
         notifyListeners();
       }
