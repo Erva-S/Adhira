@@ -38,6 +38,7 @@ class Student {
 
   // ── Profile Completion ────────────────────────────────────────
   final double profileCompletionPercent;
+  final bool isDigiLockerLinked;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -70,6 +71,7 @@ class Student {
     this.ifscCode,
     this.bankName,
     this.profileCompletionPercent = 0.0,
+    this.isDigiLockerLinked = false,
     this.createdAt,
     this.updatedAt,
   });
@@ -103,6 +105,7 @@ class Student {
     String? ifscCode,
     String? bankName,
     double? profileCompletionPercent,
+    bool? isDigiLockerLinked,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -135,6 +138,7 @@ class Student {
       ifscCode: ifscCode ?? this.ifscCode,
       bankName: bankName ?? this.bankName,
       profileCompletionPercent: profileCompletionPercent ?? this.profileCompletionPercent,
+      isDigiLockerLinked: isDigiLockerLinked ?? this.isDigiLockerLinked,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -170,6 +174,7 @@ class Student {
       'ifsc_code': ifscCode,
       'bank_name': bankName,
       'profile_completion_percent': profileCompletionPercent,
+      'is_digilocker_linked': isDigiLockerLinked,
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
     };
@@ -205,6 +210,7 @@ class Student {
       ifscCode: map['ifsc_code']?.toString(),
       bankName: map['bank_name']?.toString(),
       profileCompletionPercent: (map['profile_completion_percent'] as num?)?.toDouble() ?? 0.0,
+      isDigiLockerLinked: map['is_digilocker_linked'] == true,
       createdAt: map['created_at'] != null ? DateTime.tryParse(map['created_at'].toString()) : null,
       updatedAt: map['updated_at'] != null ? DateTime.tryParse(map['updated_at'].toString()) : null,
     );

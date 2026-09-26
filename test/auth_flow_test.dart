@@ -6,7 +6,10 @@ import 'package:tribal_scholar_saathi/features/auth/presentation/pages/login_pag
 import 'package:tribal_scholar_saathi/features/auth/presentation/pages/otp_verification_page.dart';
 import 'package:tribal_scholar_saathi/services/authentication/auth_service.dart';
 import 'package:tribal_scholar_saathi/services/authentication/auth_provider.dart';
+import 'package:tribal_scholar_saathi/services/integrations/digilocker/digilocker_service.dart';
+import 'package:tribal_scholar_saathi/services/scholarship/scholarship_data_service.dart';
 import 'package:tribal_scholar_saathi/services/storage/local_storage_service.dart';
+import 'package:tribal_scholar_saathi/features/auth/presentation/pages/digilocker_connection_page.dart';
 import 'package:tribal_scholar_saathi/shared/widgets/app_back_button.dart';
 
 Widget _wrapWithAuth(Widget child, AuthProvider authProvider) {
@@ -135,6 +138,149 @@ void main() {
       expect(find.text('Verify & Proceed'), findsOneWidget);
       expect(find.byType(AppBackButton), findsOneWidget);
       expect(find.byType(TextField), findsNWidgets(6));
+    });
+  });
+
+  group('DigiLocker Profile Auto-Population Tests', () {
+    test('AppAuthService.populateProfileFromDigiLocker updates student profile with realistic details', () async {
+      final authService = AppAuthService();
+      final sendRes = await authService.sendOtp('9876543210');
+      await authService.verifyOtp('9876543210', sendRes.debugOtp!);
+
+      final digiLockerService = MockDigiLockerService();
+      final profile = await digiLockerService.fetchUserProfile('TSS-2025-45678');
+
+      final updated = await authService.populateProfileFromDigiLocker(profile);
+
+      expect(updated.fullName, 'Rajesh Soren');
+      expect(updated.fatherName, 'Manoj Soren');
+      expect(updated.motherName, 'Sunita Soren');
+      expect(updated.gender, 'Male');
+      expect(updated.category, 'ST');
+      expect(updated.tribeName, 'Santal');
+      expect(updated.stCertificateNumber, 'ST/OD/2023/88921');
+      expect(updated.district, 'Mayurbhanj');
+      expect(updated.state, 'Odisha');
+      expect(updated.institutionName, 'NIT Rourkela');
+      expect(updated.currentCourse, 'B.Tech Computer Science');
+      expect(updated.aadhaarNumber, 'XXXX-XXXX-4892');
+      expect(updated.isDigiLockerLinked, isTrue);
+      expect(updated.profileCompletionPercent, 0.95);
+    });
+
+    testWidgets('DigiLockerConnectionPage renders idle state and triggers simulated fetch', (WidgetTester tester) async {
+      final authService = AppAuthService();
+      final authProvider = AuthProvider(authService: authService);
+      final scholarshipService = ScholarshipDataService();
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
+            ChangeNotifierProvider<ScholarshipDataService>.value(value: scholarshipService),
+          ],
+          child: const MaterialApp(
+            home: DigiLockerConnectionPage(),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Verify Idle UI elements
+      expect(find.text('Connect DigiLocker'), findsNWidgets(2)); // Title and button
+      expect(
+        find.textContaining('Connect your DigiLocker account to securely fetch your verified details'),
+        findsOneWidget,
+      );
+      expect(find.text('Instant Profile Auto-Fill'), findsOneWidget);
+      expect(find.text('Authentic Government Verification'), findsOneWidget);
+      expect(find.text('100% Private & Masked'), findsOneWidget);
+      expect(find.text('Skip for now (I will fill manually)'), findsOneWidget);
+
+      // Tap Connect DigiLocker
+      final btn = find.widgetWithText(ElevatedButton, 'Connect DigiLocker');
+      await tester.ensureVisible(btn);
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(btn);
+      await tester.pump();
+
+      // Check transition to connecting state
+      expect(find.text('Connecting to DigiLocker...'), findsOneWidget);
+
+      // Advance clock past connection and fetching delays
+      await tester.pump(const Duration(milliseconds: 1000));
+      await tester.pump(const Duration(milliseconds: 1200));
+      await tester.pump(const Duration(milliseconds: 500));
+
+      // Verify Success state and auto-populated preview
+      expect(find.text('DigiLocker Connected'), findsOneWidget);
+      expect(find.text('Your verified details have been successfully fetched.'), findsOneWidget);
+      expect(find.text('Rajesh Soren'), findsOneWidget);
+      expect(find.text('Manoj Soren'), findsOneWidget);
+      expect(find.text('NIT Rourkela'), findsOneWidget);
+      expect(find.text('B.Tech Computer Science'), findsOneWidget);
+      expect(find.text('XXXX-XXXX-4892'), findsOneWidget);
+      expect(find.text('Continue to Dashboard'), findsOneWidget);
+    });
+
+    test('Mobile number 9898418407 populates Erva Savaliya demo profile', () async {
+      final authService = AppAuthService();
+      final sendRes = await authService.sendOtp('9898418407');
+      final authResult = await authService.verifyOtp('9898418407', sendRes.debugOtp!);
+      expect(authResult.success, isTrue);
+
+      final digiLockerService = MockDigiLockerService();
+      final profile = await digiLockerService.fetchUserProfile(
+        authResult.user!.id,
+        phoneNumber: '9898418407',
+      );
+
+      // Verify DigiLocker returns Erva Savaliya details
+      expect(profile.fullName, 'Erva Savaliya');
+      expect(profile.fatherName, 'Dilip Savaliya');
+      expect(profile.motherName, 'Vaishali Savaliya');
+      expect(profile.dateOfBirth, DateTime(2007, 4, 18));
+      expect(profile.gender, 'Female');
+      expect(profile.mobileNumber, '9898418407');
+      expect(profile.email, 'erva.savaliya.20@gmail.com');
+      expect(profile.state, 'Gujarat');
+      expect(profile.district, 'Valsad');
+      expect(profile.pinCode, '396195');
+
+      // Populate into student profile
+      final updatedStudent = await authService.populateProfileFromDigiLocker(profile);
+      expect(updatedStudent.fullName, 'Erva Savaliya');
+      expect(updatedStudent.fatherName, 'Dilip Savaliya');
+      expect(updatedStudent.motherName, 'Vaishali Savaliya');
+      expect(updatedStudent.dateOfBirth, DateTime(2007, 4, 18));
+      expect(updatedStudent.gender, 'Female');
+      expect(updatedStudent.mobileNumber, '9898418407');
+      expect(updatedStudent.email, 'erva.savaliya.20@gmail.com');
+      expect(updatedStudent.state, 'Gujarat');
+      expect(updatedStudent.district, 'Valsad');
+      expect(updatedStudent.pinCode, '396195');
+      expect(updatedStudent.isDigiLockerLinked, isTrue);
+    });
+
+    test('Other mobile numbers do NOT return Erva Savaliya demo profile', () async {
+      final authService = AppAuthService();
+      final sendRes = await authService.sendOtp('9876543211');
+      final authResult = await authService.verifyOtp('9876543211', sendRes.debugOtp!);
+      expect(authResult.success, isTrue);
+
+      final digiLockerService = MockDigiLockerService();
+      final profile = await digiLockerService.fetchUserProfile(
+        authResult.user!.id,
+        phoneNumber: '9876543211',
+      );
+
+      // Verify it does NOT return Erva Savaliya
+      expect(profile.fullName, isNot('Erva Savaliya'));
+      expect(profile.fullName, 'Rajesh Soren');
+      expect(profile.fatherName, 'Manoj Soren');
+      expect(profile.state, 'Odisha');
+      expect(profile.district, 'Mayurbhanj');
     });
   });
 }

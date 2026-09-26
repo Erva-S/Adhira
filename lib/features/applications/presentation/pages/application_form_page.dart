@@ -158,6 +158,16 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
         if (user.ifscCode != null && user.ifscCode!.isNotEmpty) {
           _ifscController.text = user.ifscCode!;
         }
+        if (user.dateOfBirth != null) {
+          final dob = user.dateOfBirth!;
+          _dobController.text = '${dob.day.toString().padLeft(2, '0')}/${dob.month.toString().padLeft(2, '0')}/${dob.year}';
+        }
+        if (user.gender != null && user.gender!.isNotEmpty) {
+          _gender = user.gender!;
+        }
+        if (user.isDigiLockerLinked) {
+          _digiLockerLinked = true;
+        }
         _isPVTG = user.isPVTG;
       }
       _prefilled = true;

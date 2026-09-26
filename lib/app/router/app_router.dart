@@ -6,6 +6,7 @@ import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/auth/presentation/pages/onboarding_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/otp_verification_page.dart';
+import '../../features/auth/presentation/pages/digilocker_connection_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/scholarships/presentation/pages/scholarship_dashboard_page.dart';
 import '../../features/scholarships/presentation/pages/scholarship_discovery_page.dart';
@@ -65,6 +66,11 @@ class AppRouter {
           final phone = extra?['phoneNumber'] as String? ?? '9876543210';
           return OtpVerificationPage(phoneNumber: phone);
         },
+      ),
+      GoRoute(
+        path: RouteNames.connectDigiLocker,
+        name: 'connectDigiLocker',
+        builder: (context, state) => const DigiLockerConnectionPage(),
       ),
 
       // ── Main Routes ─────────────────────────────────────────────

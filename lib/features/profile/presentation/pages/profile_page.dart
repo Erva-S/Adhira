@@ -68,18 +68,44 @@ class ProfilePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
 
-                // Profile completion badge
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 40),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    l10n.profileCompletion(profilePercent),
-                    style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 13),
-                  ),
+                // Profile completion badge + DigiLocker status
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8,
+                  runSpacing: 6,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        l10n.profileCompletion(profilePercent),
+                        style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 13),
+                      ),
+                    ),
+                    if (student?.isDigiLockerLinked == true)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColors.success.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.verified, size: 14, color: AppColors.success),
+                            SizedBox(width: 4),
+                            Text(
+                              'Verified with DigiLocker',
+                              style: TextStyle(color: AppColors.success, fontWeight: FontWeight.w600, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 24),
 
@@ -95,6 +121,7 @@ class ProfilePage extends StatelessWidget {
                         : '14 Aug 2004',
                   ),
                   _ProfileItem(label: l10n.gender, value: student?.gender ?? l10n.male),
+                  _ProfileItem(label: 'Aadhaar (Masked)', value: student?.aadhaarNumber ?? 'XXXX-XXXX-4892'),
                   _ProfileItem(label: l10n.mobileNumber, value: student?.mobileNumber != null ? '+91 ${student!.mobileNumber}' : '—'),
                   _ProfileItem(label: 'Email', value: student?.email ?? '—'),
                 ]),
@@ -103,8 +130,10 @@ class ProfilePage extends StatelessWidget {
                   _ProfileItem(label: l10n.tribeName, value: student?.tribeName ?? 'Santal'),
                   _ProfileItem(label: l10n.pvtgStatus, value: (student?.isPVTG == true) ? l10n.yes : l10n.no),
                   _ProfileItem(label: l10n.casteCertificate, value: student?.stCertificateNumber ?? 'SC/OD/2023/12345'),
-                  _ProfileItem(label: l10n.state, value: student?.state ?? 'Odisha'),
+                  _ProfileItem(label: 'Address', value: student?.address ?? 'Plot 42, Baripada'),
                   _ProfileItem(label: l10n.district, value: student?.district ?? 'Mayurbhanj'),
+                  _ProfileItem(label: l10n.state, value: student?.state ?? 'Odisha'),
+                  if (student?.pinCode != null) _ProfileItem(label: 'PIN Code', value: student!.pinCode!),
                 ]),
                 _ProfileSection(title: l10n.educationDetails, items: [
                   _ProfileItem(label: 'Level', value: student?.educationLevel ?? 'Undergraduate'),

@@ -129,8 +129,12 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
         ),
       );
 
-      // Navigate to dashboard and clear auth stack
-      context.go(RouteNames.dashboard);
+      // Route to DigiLocker connection screen to auto-populate profile
+      if (result.user?.isDigiLockerLinked == true) {
+        context.go(RouteNames.dashboard);
+      } else {
+        context.go(RouteNames.connectDigiLocker);
+      }
     } else {
       setState(() {
         _inlineError = result.errorMessage ?? 'Verification failed. Please try again.';
