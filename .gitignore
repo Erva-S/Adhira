@@ -12,6 +12,9 @@
 .swiftpm/
 migrate_working_dir/
 .backup_images/
+.env
+*.env
+*.apk
 
 # IntelliJ related
 *.iml
