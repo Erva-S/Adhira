@@ -86,6 +86,8 @@ class NotificationsPage extends StatelessWidget {
                               'message': notif.message,
                               'time': formattedTime,
                               'type': notif.type,
+                              'actionRoute': notif.actionRoute,
+                              'relatedId': notif.relatedId,
                             },
                           );
                         },

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'app/app.dart';
 import 'services/jago/jago_context_service.dart';
+import 'services/notifications/push_notification_service.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Set system UI overlay style
@@ -22,6 +23,9 @@ void main() {
 
   // Load persisted JAGO language preference
   JagoContextService().loadPersistedLanguageOverride();
+
+  // Initialize Real-time Push Notification Engine
+  await PushNotificationService.instance.initialize();
 
   runApp(const TribalScholarApp());
 }

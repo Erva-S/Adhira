@@ -223,6 +223,8 @@ class AppRouter {
             message: extra?['message'] as String? ?? 'No message content available.',
             time: extra?['time'] as String? ?? 'Just now',
             type: extra?['type'] as NotificationType? ?? NotificationType.system,
+            actionRoute: extra?['actionRoute'] as String? ?? extra?['action_route'] as String?,
+            relatedId: extra?['relatedId'] as String? ?? extra?['related_id'] as String?,
           );
         },
       ),

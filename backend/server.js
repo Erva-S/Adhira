@@ -117,6 +117,52 @@ app.get('/api/scholarships', async (req, res) => {
   res.json({ success: true, data: schemes });
 });
 
+// ── Real-Time Push Notification Endpoints ─────────────────────────────────────
+const PushNotificationService = require('./services/push_notification_service');
+
+// Register FCM Device Token for authenticated user
+app.post('/api/notifications/register-token', (req, res) => {
+  const { userId, token } = req.body;
+  if (!userId || !token) {
+    return res.status(400).json({ success: false, error: 'userId and token are required.' });
+  }
+  const registered = PushNotificationService.registerToken(userId, token);
+  return res.json({ success: registered, message: 'FCM device token registered successfully.' });
+});
+
+// Unregister Device Token on logout
+app.post('/api/notifications/unregister-token', (req, res) => {
+  const { userId, token } = req.body;
+  if (!userId) {
+    return res.status(400).json({ success: false, error: 'userId is required.' });
+  }
+  PushNotificationService.unregisterToken(userId, token);
+  return res.json({ success: true, message: 'FCM device token unregistered successfully.' });
+});
+
+// Send Push Notification to User (or simulate event)
+app.post('/api/notifications/send', async (req, res) => {
+  const { userId, title, message, type = 'system', actionRoute = '/notifications', relatedId = null, metadata = {} } = req.body;
+  if (!userId || !title || !message) {
+    return res.status(400).json({ success: false, error: 'userId, title, and message are required.' });
+  }
+  const result = await PushNotificationService.sendToUser(userId, {
+    title,
+    message,
+    type,
+    actionRoute,
+    relatedId,
+    metadata
+  });
+  return res.json(result);
+});
+
+// Query registered tokens for user (debug/admin)
+app.get('/api/notifications/tokens/:userId', (req, res) => {
+  const tokens = PushNotificationService.getTokensForUser(req.params.userId);
+  return res.json({ success: true, userId: req.params.userId, tokenCount: tokens.length, tokens });
+});
+
 // Start Server if not imported by test
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {

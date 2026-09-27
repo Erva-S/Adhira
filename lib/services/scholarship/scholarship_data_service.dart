@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../../shared/models/models.dart';
 import '../../core/enums/app_enums.dart';
 import '../../repositories/repositories.dart';
+import '../../app/router/route_names.dart';
 import '../database/relational_data_store.dart';
+import '../notifications/push_notification_service.dart';
 import 'scholarship_mock_data.dart';
 
 /// Centralized state management service for scholarship data.
@@ -16,6 +19,8 @@ class ScholarshipDataService extends ChangeNotifier {
   final DocumentRepository _documentRepo;
   final PaymentRepository _paymentRepo;
   final NotificationRepository _notificationRepo;
+
+  StreamSubscription<NotificationItem>? _notificationSubscription;
 
   // ── Internal State ─────────────────────────────────────────────
   String _currentUserId = RelationalDataStore.demoUserId;
@@ -53,6 +58,19 @@ class ScholarshipDataService extends ChangeNotifier {
     _documents = store.getDocumentsForUser(_currentUserId);
     _payments = store.getPaymentsForUser(_currentUserId);
     _notifications = store.getNotificationsForUser(_currentUserId);
+
+    // Subscribe to real-time notification stream for live Notification Centre & badge updates
+    _notificationSubscription = _notificationRepo.notificationStream.listen((newItem) {
+      if (newItem.userId == _currentUserId) {
+        final idx = _notifications.indexWhere((n) => n.id == newItem.id);
+        if (idx != -1) {
+          _notifications[idx] = newItem;
+        } else {
+          _notifications.insert(0, newItem);
+        }
+        notifyListeners();
+      }
+    });
 
     _loadInitialData();
   }
@@ -280,6 +298,14 @@ class ScholarshipDataService extends ChangeNotifier {
     await _applicationRepo.resolveAction(actionId, _currentUserId);
     _pendingActions = await _applicationRepo.getPendingActions(_currentUserId);
     notifyListeners();
+
+    await sendRealtimeNotification(
+      title: 'Action Resolved',
+      message: 'Deficiency resolved on your scholarship application.',
+      type: NotificationType.verification,
+      actionRoute: RouteNames.applicationTracking,
+      relatedId: actionId,
+    );
   }
 
   /// Mark notification as read.
@@ -294,6 +320,30 @@ class ScholarshipDataService extends ChangeNotifier {
     await _notificationRepo.markAllAsRead(_currentUserId);
     _notifications = await _notificationRepo.getNotificationsForUser(_currentUserId);
     notifyListeners();
+  }
+
+  /// Send a real-time notification to the user and fire native push notification.
+  Future<NotificationItem> sendRealtimeNotification({
+    required String title,
+    required String message,
+    required NotificationType type,
+    String? actionRoute,
+    String? relatedId,
+  }) async {
+    final item = NotificationItem(
+      id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
+      userId: _currentUserId,
+      type: type,
+      title: title,
+      message: message,
+      timestamp: DateTime.now(),
+      isRead: false,
+      actionRoute: actionRoute,
+      relatedId: relatedId,
+    );
+    final created = await _notificationRepo.createNotification(item);
+    await PushNotificationService.instance.showNotification(created);
+    return created;
   }
 
   /// Upload a document to user's wallet.
@@ -314,11 +364,26 @@ class ScholarshipDataService extends ChangeNotifier {
     );
     _documents = await _documentRepo.getDocumentsForUser(_currentUserId);
     notifyListeners();
+
+    await sendRealtimeNotification(
+      title: 'Document Uploaded',
+      message: 'Your document "$name" was uploaded and is pending verification.',
+      type: NotificationType.document,
+      actionRoute: RouteNames.documentWallet,
+      relatedId: doc.id,
+    );
+
     return doc;
   }
 
   /// Refresh data.
   void refreshData() {
     loadUserData(_currentUserId);
+  }
+
+  @override
+  void dispose() {
+    _notificationSubscription?.cancel();
+    super.dispose();
   }
 }
