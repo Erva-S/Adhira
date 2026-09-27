@@ -259,9 +259,11 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
               child: _buildCurrentStep(),
             ),
           ),
+
+          // Persistent Bottom Action Bar (pinned securely inside body)
+          _buildBottomActionButtons(),
         ],
       ),
-      bottomNavigationBar: _buildBottomActionButtons(),
       ),
     );
   }
@@ -1375,32 +1377,45 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
   Widget _buildBottomActionButtons() {
     final isLastStep = _currentStep == _totalSteps - 1;
 
+    String backText = 'Back';
+    String nextText = isLastStep ? 'Submit Application' : 'Next Step';
+    try {
+      backText = context.l10n.back;
+      nextText = isLastStep ? 'Submit Application' : context.l10n.nextStep;
+    } catch (_) {}
+
     return Container(
+      width: double.infinity,
       decoration: BoxDecoration(
         color: AppColors.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 8,
             offset: const Offset(0, -3),
           ),
         ],
-        border: const Border(top: BorderSide(color: AppColors.border)),
+        border: const Border(top: BorderSide(color: AppColors.border, width: 1)),
       ),
       child: SafeArea(
         top: false,
         bottom: true,
+        minimum: const EdgeInsets.only(bottom: 6),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Row(
             children: [
               if (_currentStep > 0) ...[
                 OutlinedButton.icon(
                   onPressed: () => setState(() => _currentStep--),
-                  icon: const Icon(Icons.arrow_back, size: 16),
-                  label: Text(context.l10n.back),
+                  icon: const Icon(Icons.arrow_back, size: 18),
+                  label: Text(
+                    backText,
+                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                  ),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    minimumSize: const Size(80, 48),
                     side: const BorderSide(color: AppColors.primary, width: 1.5),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
@@ -1431,7 +1446,7 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                     size: 20,
                   ),
                   label: Text(
-                    isLastStep ? 'Submit Application' : context.l10n.nextStep,
+                    nextText,
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -1440,8 +1455,9 @@ class _ApplicationFormPageState extends State<ApplicationFormPage> {
                         ? (_declarationChecked ? AppColors.primary : AppColors.primary.withValues(alpha: 0.5))
                         : AppColors.primary,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-                    elevation: 3,
+                    minimumSize: const Size(0, 48),
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    elevation: 2,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
                 ),

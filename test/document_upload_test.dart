@@ -42,8 +42,8 @@ void main() {
 
     test('DocumentStorageService enforces user isolation on private paths', () async {
       final storage = LocalDocumentStorageService();
-      final userA = 'student-101';
-      final userB = 'student-202';
+      const userA = 'student-101';
+      const userB = 'student-202';
       final bytes = Uint8List.fromList([1, 2, 3, 4]);
 
       final uploadA = await storage.uploadUserDocument(
