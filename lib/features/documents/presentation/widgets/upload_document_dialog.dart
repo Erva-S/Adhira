@@ -1,7 +1,6 @@
 import 'dart:io' as io;
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/enums/app_enums.dart';
@@ -87,21 +86,26 @@ class _UploadDocumentDialogState extends State<UploadDocumentDialog> {
 
   Future<void> _pickFileFromDevice() async {
     try {
-      final result = await FilePicker.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: _allowedExtensions,
-        withData: true,
-      );
+      FilePickerResult? result;
+
+      // First attempt: Pick files with custom extensions (pdf, jpg, jpeg, png)
+      try {
+        result = await FilePicker.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: _allowedExtensions,
+          withData: true,
+        );
+      } catch (e) {
+        debugPrint('FileType.custom picker failed, falling back to FileType.any: $e');
+        // Fallback for Android OEM file managers that fail on custom MIME arrays
+        result = await FilePicker.pickFiles(
+          type: FileType.any,
+          withData: true,
+        );
+      }
 
       if (result == null || result.files.isEmpty) {
-        // User cancelled selection
-        if (mounted) {
-          setState(() {
-            if (_selectedFileBytes == null) {
-              _validationError = 'Document upload cancelled.';
-            }
-          });
-        }
+        // User cancelled selection or closed file picker - do not set error
         return;
       }
 
@@ -112,7 +116,7 @@ class _UploadDocumentDialogState extends State<UploadDocumentDialog> {
       if (!_allowedExtensions.contains(ext)) {
         if (mounted) {
           setState(() {
-            _validationError = 'Unsupported file format. Please select a PDF, JPG, or PNG.';
+            _validationError = 'Unsupported format (.$ext). Please select a PDF, JPG, or PNG document.';
           });
         }
         return;
@@ -122,34 +126,29 @@ class _UploadDocumentDialogState extends State<UploadDocumentDialog> {
       if (file.size > _maxFileSizeBytes) {
         if (mounted) {
           setState(() {
-            _validationError = 'File is too large. Maximum allowed size is 10 MB.';
+            _validationError = 'File is too large (${_formatSize(file.size)}). Maximum allowed size is 10 MB.';
           });
         }
         return;
       }
 
-      // 3. Read file bytes across all platforms (Web, Windows, Android, iOS, macOS, Linux)
+      // 3. Read file bytes across all platforms (Web, Android, iOS, Windows, macOS, Linux)
       Uint8List? bytes = file.bytes;
-      if ((bytes == null || bytes.isEmpty) && !kIsWeb && file.path != null) {
+      if ((bytes == null || bytes.isEmpty) && file.path != null && file.path!.isNotEmpty) {
         try {
           final ioFile = io.File(file.path!);
           if (await ioFile.exists()) {
             bytes = await ioFile.readAsBytes();
           }
         } catch (e) {
-          if (mounted) {
-            setState(() {
-              _validationError = 'Could not read file from device: $e';
-            });
-          }
-          return;
+          debugPrint('Error reading file from path: $e');
         }
       }
 
       if (bytes == null || bytes.isEmpty) {
         if (mounted) {
           setState(() {
-            _validationError = 'Selected file is empty. Please select a valid document.';
+            _validationError = 'Could not read document contents. Please select a valid file.';
           });
         }
         return;
@@ -158,7 +157,7 @@ class _UploadDocumentDialogState extends State<UploadDocumentDialog> {
       if (mounted) {
         setState(() {
           _selectedFileName = file.name;
-          _selectedFileSize = file.size;
+          _selectedFileSize = bytes!.length;
           _selectedFileBytes = bytes;
           _validationError = null;
 
@@ -195,7 +194,7 @@ class _UploadDocumentDialogState extends State<UploadDocumentDialog> {
       _selectedFileName = filename;
       _selectedFileSize = 245 * 1024;
       _selectedFileBytes = Uint8List.fromList(
-        '%PDF-1.4 MoTA Sample Document for $name'.codeUnits,
+        '%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj\nxref\n0 4\n0000000000 65535 f\n0000000010 00000 n\n0000000053 00000 n\n0000000102 00000 n\ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n185\n%%EOF'.codeUnits,
       );
       _validationError = null;
     });
@@ -256,7 +255,7 @@ class _UploadDocumentDialogState extends State<UploadDocumentDialog> {
       if (mounted) {
         setState(() {
           _isUploading = false;
-          _validationError = 'Upload failed. Please try again.';
+          _validationError = 'Upload failed: $e';
         });
       }
     }
