@@ -6,6 +6,8 @@ import '../jago/jago_context_service.dart';
 import '../jago/jago_session_service.dart';
 import 'auth_service.dart';
 
+import '../notifications/push_notification_service.dart';
+
 /// State management Provider for Authentication lifecycle.
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService;
@@ -40,6 +42,9 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       await _authService.restoreSession();
+      if (_authService.isLoggedIn && _authService.currentUser != null) {
+        PushNotificationService.instance.onUserLoggedIn(_authService.currentUser!.id);
+      }
     } catch (_) {
       // Ignored
     } finally {
@@ -94,6 +99,10 @@ class AuthProvider extends ChangeNotifier {
         _errorMessage = null;
         _debugLastOtp = null;
         _stopCooldown();
+
+        if (result.user != null) {
+          PushNotificationService.instance.onUserLoggedIn(result.user!.id);
+        }
       }
       return result;
     } catch (e) {
@@ -115,6 +124,11 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      final exitingUserId = _authService.currentUser?.id;
+      if (exitingUserId != null) {
+        await PushNotificationService.instance.onUserLoggedOut(exitingUserId);
+      }
+
       await _authService.logout();
       _errorMessage = null;
       _lastSentPhone = null;

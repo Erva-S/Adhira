@@ -4,12 +4,16 @@ import '../../../../app/router/route_names.dart';
 import '../../../../core/enums/app_enums.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 
+import '../../../../services/notifications/push_notification_service.dart';
+
 /// Notification detail page showing the complete notification content.
 class NotificationDetailPage extends StatelessWidget {
   final String title;
   final String message;
   final String time;
   final NotificationType type;
+  final String? actionRoute;
+  final String? relatedId;
 
   const NotificationDetailPage({
     super.key,
@@ -17,6 +21,8 @@ class NotificationDetailPage extends StatelessWidget {
     required this.message,
     required this.time,
     this.type = NotificationType.system,
+    this.actionRoute,
+    this.relatedId,
   });
 
   @override
@@ -94,6 +100,29 @@ class NotificationDetailPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
+            if (actionRoute != null && actionRoute!.isNotEmpty) ...[
+              ElevatedButton.icon(
+                onPressed: () {
+                  PushNotificationService.navigateFromPayload({
+                    'action_route': actionRoute,
+                    'type': type.name,
+                    'related_id': relatedId,
+                  });
+                },
+                icon: const Icon(Icons.arrow_forward),
+                label: Text(_getActionLabel(type)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  minimumSize: const Size.fromHeight(48),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
             Row(
               children: [
                 Expanded(
@@ -113,6 +142,23 @@ class NotificationDetailPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getActionLabel(NotificationType type) {
+    switch (type) {
+      case NotificationType.application:
+        return 'View Application Status';
+      case NotificationType.verification:
+        return 'Open Verification Centre';
+      case NotificationType.payment:
+        return 'View DBT Disbursements';
+      case NotificationType.document:
+        return 'Go to Document Wallet';
+      case NotificationType.reminder:
+      case NotificationType.alert:
+      case NotificationType.system:
+        return 'Take Action';
+    }
   }
 
   Color _getColor(NotificationType type) {

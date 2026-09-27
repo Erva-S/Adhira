@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import '../../core/enums/app_enums.dart';
 import '../../shared/models/models.dart';
@@ -25,6 +26,13 @@ class RelationalDataStore {
   final List<ApplicationAction> _applicationActions = [];
   final List<Payment> _payments = [];
   final List<NotificationItem> _notifications = [];
+  final Map<String, Set<String>> _userDeviceTokens = {};
+
+  final StreamController<NotificationItem> _notificationStreamController =
+      StreamController<NotificationItem>.broadcast();
+
+  /// Real-time stream of notifications across all users (filtered by subscriber).
+  Stream<NotificationItem> get notificationStream => _notificationStreamController.stream;
 
   static const String demoUserId = 'TSS-2025-45678';
   static const String demoUserPhone = '9876543210';
@@ -527,8 +535,7 @@ class RelationalDataStore {
     _users[newUserId] = newUser;
 
     // Send initial welcome notification
-    _notifications.insert(
-      0,
+    addNotification(
       NotificationItem(
         id: 'notif-new-${DateTime.now().millisecondsSinceEpoch}',
         userId: newUserId,
@@ -537,6 +544,7 @@ class RelationalDataStore {
         message: 'Your account is ready. Complete your student profile and apply for scholarships.',
         timestamp: DateTime.now(),
         isRead: false,
+        actionRoute: '/profile',
       ),
     );
 
@@ -648,8 +656,7 @@ class RelationalDataStore {
     }
 
     // Add notification
-    _notifications.insert(
-      0,
+    addNotification(
       NotificationItem(
         id: 'notif-app-${DateTime.now().millisecondsSinceEpoch}',
         userId: userId,
@@ -739,7 +746,7 @@ class RelationalDataStore {
   }
 
   // ==========================================================================
-  // NOTIFICATIONS (Part 13 - User Isolated)
+  // NOTIFICATIONS (Part 13 - User Isolated & Real-Time)
   // ==========================================================================
   List<NotificationItem> getNotificationsForUser(String userId) {
     return _notifications.where((n) => n.userId == userId).toList();
@@ -747,6 +754,12 @@ class RelationalDataStore {
 
   int getUnreadNotificationCount(String userId) {
     return _notifications.where((n) => n.userId == userId && !n.isRead).length;
+  }
+
+  NotificationItem addNotification(NotificationItem notification) {
+    _notifications.insert(0, notification);
+    _notificationStreamController.add(notification);
+    return notification;
   }
 
   void markNotificationAsRead(String notificationId, String userId) {
@@ -762,5 +775,23 @@ class RelationalDataStore {
         _notifications[i] = _notifications[i].copyWith(isRead: true);
       }
     }
+  }
+
+  // ── Device Token Registration (FCM Lifecycle) ─────────────────────
+  void registerDeviceToken(String userId, String token) {
+    if (userId.isEmpty || token.isEmpty) return;
+    _userDeviceTokens.putIfAbsent(userId, () => {}).add(token);
+  }
+
+  void unregisterDeviceToken(String userId, [String? token]) {
+    if (token != null) {
+      _userDeviceTokens[userId]?.remove(token);
+    } else {
+      _userDeviceTokens.remove(userId);
+    }
+  }
+
+  Set<String> getDeviceTokensForUser(String userId) {
+    return Set.unmodifiable(_userDeviceTokens[userId] ?? {});
   }
 }
